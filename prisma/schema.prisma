@@ -1,0 +1,78 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = env("DATABASE_URL")
+}
+
+model Region {
+  id        String     @id @default(cuid())
+  name      String // e.g., "경상"
+  provinces Province[]
+  createdAt DateTime   @default(now())
+  updatedAt DateTime   @updatedAt
+}
+
+model Province {
+  id        String   @id @default(cuid())
+  name      String // e.g., "경상남도"
+  regionId  String
+  region    Region   @relation(fields: [regionId], references: [id], onDelete: Cascade)
+  cities    City[]
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+}
+
+model City {
+  id         String   @id @default(cuid())
+  name       String // e.g., "김해시"
+  provinceId String
+  province   Province @relation(fields: [provinceId], references: [id], onDelete: Cascade)
+  schools    School[]
+  createdAt  DateTime @default(now())
+  updatedAt  DateTime @updatedAt
+}
+
+model School {
+  id        String              @id @default(cuid())
+  name      String // e.g., "신어중학교"
+  cityId    String
+  city      City                @relation(fields: [cityId], references: [id], onDelete: Cascade)
+  maps      SchoolTextbookMap[]
+  createdAt DateTime            @default(now())
+  updatedAt DateTime            @updatedAt
+}
+
+model SchoolTextbookMap {
+  id        String @id @default(cuid())
+  schoolId  String
+  grade     String // "중3"
+  subject   String // "영어"
+  publisher String // e.g., "천재", "동아", "비상", "YBM" 등
+  year      Int? // optional
+  school    School @relation(fields: [schoolId], references: [id], onDelete: Cascade)
+
+  @@unique([schoolId, grade, subject])
+  @@index([schoolId, grade, subject])
+}
+
+model PublisherBlueprint {
+  id        String @id @default(cuid())
+  grade     String
+  subject   String
+  publisher String
+
+  // Store JSON as string for SQLite/MVP compatibility
+  styleJson String @default("{}")
+
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  @@unique([grade, subject, publisher])
+  @@index([grade, subject, publisher])
+}

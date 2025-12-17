@@ -6,15 +6,28 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "eslint"
+    "lint": "eslint",
+    "db:generate": "prisma generate",
+    "db:push": "prisma db push",
+    "db:seed": "tsx prisma/seed.ts",
+    "db:update-publishers": "tsx prisma/scripts/update-all-publishers.ts",
+    "seed:dialogue": "tsx scripts/seed-dialogue.ts",
+    "seed:schools": "tsx scripts/seed-school-textbooks.ts",
+    "seed:reading": "tsx scripts/seed-reading.ts",
+    "seed:vocab:def": "tsx scripts/seed-vocab-definition.ts",
+    "debug:counts": "tsx scripts/debug-counts.ts",
+    "import:problems": "tsx scripts/importProblemsFromXlsx.ts"
   },
   "dependencies": {
+    "@prisma/client": "^5.22.0",
     "@supabase/ssr": "^0.8.0",
-    "@supabase/supabase-js": "^2.86.2",
+    "@supabase/supabase-js": "^2.87.1",
+    "dotenv": "^17.2.3",
     "next": "16.0.7",
     "openai": "^6.10.0",
     "react": "19.2.0",
     "react-dom": "19.2.0",
+    "xlsx": "^0.18.5",
     "zod": "^4.1.13"
   },
   "devDependencies": {
@@ -24,7 +37,9 @@
     "@types/react-dom": "^19",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
+    "prisma": "^5.22.0",
     "tailwindcss": "^4",
+    "tsx": "^4.21.0",
     "typescript": "^5"
   }
 }

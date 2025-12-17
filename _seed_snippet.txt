@@ -1,0 +1,362 @@
+﻿
+  _find_seed_limit_1.txt:1:
+  _find_seed_limit_1.txt:2:.next\dev\server\chunks\ssr\node_modules_473cc24e._.js:8335
+:    card = card || (((_res
+> _find_seed_limit_1.txt:3:olved_images = resolved.images) == null ? void 0 : _resolve
+d_images.length) ? 'summary
+> _find_seed_limit_1.txt:4:_large_image' : 'summary');
+> _find_seed_limit_1.txt:5:.next\dev\server\chunks\ssr\node_modules_473cc24e._.js:8349
+:            case 'summary'
+  _find_seed_limit_1.txt:6::
+> _find_seed_limit_1.txt:7:.next\dev\server\chunks\ssr\node_modules_473cc24e._.js:8350
+:            case 'summary_
+  _find_seed_limit_1.txt:8:large_image':
+> _find_seed_limit_1.txt:9:.next\dev\server\chunks\[root-of-the-server]__df234fcb._.js
+:188:        const summary 
+  _find_seed_limit_1.txt:10:= filtered.reduce((acc, p)=>{
+  _find_seed_limit_1.txt:11:.next\dev\server\chunks\[root-of-the-server]__df234fcb._.j
+s:206:            totalSampl
+  _find_seed_limit_1.txt:15:.next\dev\server\chunks\[root-of-the-server]__df234fcb._.j
+s:208:            insertedBa
+  _find_seed_limit_1.txt:16:tches: results,
+> _find_seed_limit_1.txt:17:.next\dev\server\chunks\[root-of-the-server]__df234fcb._.j
+s:209:            summary
+> _find_seed_limit_1.txt:18:.next\dev\static\chunks\node_modules_next_dist_compiled_8c
+a6b690._.js:2575:summary {
+  _find_seed_limit_1.txt:19:.next\dev\static\chunks\node_modules_next_dist_compiled_8c
+a6b690._.js:3102:`,""]);let 
+  _find_seed_limit_1.txt:20:l=i},"../../node_modules/.pnpm/css-loader@7.1.2_@rspack+co
+re@1.6.0_@swc+helpers@0.5.15
+  _find_seed_limit_1.txt:313:an gridRowStart gridColumn gridColumnEnd gridColumnSpan g
+ridColumnStart fontWeight lin
+  _find_seed_limit_1.txt:314:eClamp lineHeight opacity order orphans scale tabSize wid
+ows zIndex zoom fillOpacity f
+> _find_seed_limit_1.txt:315:loodOpacity stopOpacity strokeDasharray strokeDashoffset 
+strokeMiterlimit strokeOpacit
+  _find_seed_limit_1.txt:316:y strokeWidth MozAnimationIterationCount MozBoxFlex MozBo
+xFlexGroup MozLineClamp msAni
+  _find_seed_limit_1.txt:317:mationIterationCount msFlex msZoom msFlexGrow msFlexNegat
+ive msFlexOrder msFlexPositiv
+  _find_seed_limit_1.txt:351:ghThickness","strikethrough-thickness"],["strokeDasharray
+","stroke-dasharray"],["strok
+  _find_seed_limit_1.txt:352:eDashoffset","stroke-dashoffset"],["strokeLinecap","strok
+e-linecap"],["strokeLinejoin"
+> _find_seed_limit_1.txt:353:,"stroke-linejoin"],["strokeMiterlimit","stroke-miterlimi
+t"],["strokeOpacity","stroke-
+  _find_seed_limit_1.txt:354:opacity"],["strokeWidth","stroke-width"],["textAnchor","t
+ext-anchor"],["textDecoration
+  _find_seed_limit_1.txt:355:","text-decoration"],["textRendering","text-rendering"],[
+"transformOrigin","transform-
+  _find_seed_limit_1.txt:3059:t=this._getOrReturnCtx(e,t),(0,c.addIssueToContext)(t,{c
+ode:i.ZodIssueCode.not_finite,
+  _find_seed_limit_1.txt:3060:message:r.message}),n.dirty()):u.util.assertNever(r);ret
+urn{status:n.value,value:e.dat
+> _find_seed_limit_1.txt:3061:a}}gte(e,t){return this.setLimit("min",e,!0,s.errorUtil.
+toString(t))}gt(e,t){return th
+> _find_seed_limit_1.txt:3062:is.setLimit("min",e,!1,s.errorUtil.toString(t))}lte(e,t)
+{return this.setLimit("max",e,
+> _find_seed_limit_1.txt:3063:!0,s.errorUtil.toString(t))}lt(e,t){return this.setLimit
+("max",e,!1,s.errorUtil.toStri
+> _find_seed_limit_1.txt:3064:ng(t))}setLimit(e,t,n,r){return new A({...this._def,chec
+ks:[...this._def.checks,{kind:
+  _find_seed_limit_1.txt:3065:e,value:t,inclusive:n,message:s.errorUtil.toString(r)}]}
+)}_addCheck(e){return new A({.
+  _find_seed_limit_1.txt:3066:..this._def,checks:[...this._def.checks,e]})}int(e){retu
+rn this._addCheck({kind:"int",
+  _find_seed_limit_1.txt:3097:ue:e.data}}_getInvalidInput(e){let t=this._getOrReturnCt
+x(e);return(0,c.addIssueToCont
+  _find_seed_limit_1.txt:3098:ext)(t,{code:i.ZodIssueCode.invalid_type,expected:u.ZodP
+arsedType.bigint,received:t.pa
+> _find_seed_limit_1.txt:3099:rsedType}),c.INVALID}gte(e,t){return this.setLimit("min"
+,e,!0,s.errorUtil.toString(t))
+> _find_seed_limit_1.txt:3100:}gt(e,t){return this.setLimit("min",e,!1,s.errorUtil.toS
+tring(t))}lte(e,t){return this
+> _find_seed_limit_1.txt:3101:.setLimit("max",e,!0,s.errorUtil.toString(t))}lt(e,t){re
+turn this.setLimit("max",e,!1,
+> _find_seed_limit_1.txt:3102:s.errorUtil.toString(t))}setLimit(e,t,n,r){return new z(
+{...this._def,checks:[...this.
+  _find_seed_limit_1.txt:3103:_def.checks,{kind:e,value:t,inclusive:n,message:s.errorU
+til.toString(r)}]})}_addCheck(
+  _find_seed_limit_1.txt:3104:e){return new z({...this._def,checks:[...this._def.check
+s,e]})}positive(e){return this
+  _find_seed_limit_1.txt:7577:c));return u},sB=function(e){var t=e.getBoundingClientRe
+ct(),n=t.width,r=t.height;retu
+  _find_seed_limit_1.txt:7578:rn 0===n&&0===r},s$=function(e,t){var n=t.displayCheck,r
+=t.getShadowRoot;if("hidden"==
+> _find_seed_limit_1.txt:7579:=getComputedStyle(e).visibility)return!0;var o=sE.call(e
+,"details>summary:first-of-typ
+  _find_seed_limit_1.txt:7580:e")?e.parentElement:e;if(sE.call(o,"details:not([open]) 
+*"))return!0;if(n&&"full"!==n&
+  _find_seed_limit_1.txt:7581:&"legacy-full"!==n){if("non-zero-area"===n)return sB(e)}
+else{if("function"==typeof r){
+  _find_seed_limit_1.txt:7588:ns(e)}return!0}t=t.parentElement}return!1},sW=function(e
+,t){var n,r;return!(t.disabled
+  _find_seed_limit_1.txt:7589:||sI(t)||sZ(n=t)&&"hidden"===n.type||s$(t,e)||"DETAILS"=
+==(r=t).tagName&&Array.prototy
+> _find_seed_limit_1.txt:7590:pe.slice.apply(r.children).some(function(e){return"SUMMA
+RY"===e.tagName})||sq(t))},sK=
+  _find_seed_limit_1.txt:7591:function(e,t){return!(sH(t)||0>sR(t))&&!!sW(e,t)},sY=fun
+ction(e){var t=parseInt(e.getA
+  _find_seed_limit_1.txt:7592:ttribute("tabindex"),10);return!!isNaN(t)||!!(t>=0)},sG=
+function e(t){var n=[],r=[];re
+  _find_seed_limit_1.txt:7800:y!==n)return{reset:{placement:n}}}return{}}},options:[o,
+a]},er=ee?null:(l=e=>{var t,n,
+  _find_seed_limit_1.txt:7801:r;let o=lZ(e.elements.floating).documentElement;return{.
+..K,rootBoundary:z?{x:0,y:0,wi
+> _find_seed_limit_1.txt:7802:dth:o.clientWidth,height:o.clientHeight}:void 0,mainAxis
+:"none"!==Z,crossAxis:et,limit
+  _find_seed_limit_1.txt:7803:er:P||z?void 0:{...(void 0===(r=t=()=>{if(!Y.current)ret
+urn{};let{height:e}=Y.current.
+  _find_seed_limit_1.txt:7804:getBoundingClientRect();return{offset:e/2+("number"==typ
+eof O?O:0)}})&&(r={}),{options
+  _find_seed_limit_1.txt:7812:0)-(t?g.crossAxis:0);h<n?h=n:h>r&&(h=r)}return{[f]:p,[d]
+:h}}}),options:[t,n]}}},s=[K,P
+  _find_seed_limit_1.txt:7813:,z,O,Z],{...(void 0===(c=l)&&(c={}),{name:"shift",option
+s:c,async fn(e){let{x:t,y:n,pl
+> _find_seed_limit_1.txt:7814:acement:r}=e,{mainAxis:o=!0,crossAxis:a=!1,limiter:i={fn
+:e=>{let{x:t,y:n}=e;return{x:t
+  _find_seed_limit_1.txt:7815:,y:n}}},...l}=lr(c,e),s={x:t,y:n},u=await ci(e,l),d=lc(l
+o(r)),f=li(d),p=s[f],h=s[d];if
+  _find_seed_limit_1.txt:7816:(o){let e="y"===f?"top":"left",t="y"===f?"bottom":"right
+",n=p+u[e],r=p-u[t];p=i9(n,i6(
+  _find_seed_limit_1.txt:7920:dingClientRect();n=`polygon(
+  _find_seed_limit_1.txt:7921:.next\dev\static\chunks\node_modules_next_dist_compiled_
+next-devtools_index_1dd7fb59.j
+> _find_seed_limit_1.txt:7922:s:1115:summary {
+  _find_seed_limit_1.txt:7923:.next\dev\static\chunks\node_modules_next_dist_compiled_
+next-devtools_index_1dd7fb59.j
+  _find_seed_limit_1.txt:7924:s:1642:`,""]);let l=i},"../../node_modules/.pnpm/css-loa
+der@7.1.2_@rspack+core@1.6.0_@
+  _find_seed_limit_1.txt:8218:art fontWeight lineClamp lineHeight opacity order orphan
+s scale tabSize widows zIndex 
+  _find_seed_limit_1.txt:8219:zoom fillOpacity floodOpacity stopOpacity strokeDasharra
+y strokeDashoffset strokeMiter
+> _find_seed_limit_1.txt:8220:limit strokeOpacity strokeWidth MozAnimationIterationCou
+nt MozBoxFlex MozBoxFlexGroup 
+  _find_seed_limit_1.txt:8221:MozLineClamp msAnimationIterationCount msFlex msZoom msF
+lexGrow msFlexNegative msFlexO
+  _find_seed_limit_1.txt:8222:rder msFlexPositive msFlexShrink msGridColumn msGridColu
+mnSpan msGridRow msGridRowSpan
+  _find_seed_limit_1.txt:8255:on"],["strikethroughThickness","strikethrough-thickness"
+],["strokeDasharray","stroke-d
+  _find_seed_limit_1.txt:8256:asharray"],["strokeDashoffset","stroke-dashoffset"],["st
+rokeLinecap","stroke-linecap"]
+> _find_seed_limit_1.txt:8257:,["strokeLinejoin","stroke-linejoin"],["strokeMiterlimit
+","stroke-miterlimit"],["strok
+  _find_seed_limit_1.txt:8258:eOpacity","stroke-opacity"],["strokeWidth","stroke-width
+"],["textAnchor","text-anchor"
+  _find_seed_limit_1.txt:8259:],["textDecoration","text-decoration"],["textRendering",
+"text-rendering"],["transformO
+  _find_seed_limit_1.txt:10963:sFinite(e.data)||(t=this._getOrReturnCtx(e,t),(0,c.addI
+ssueToContext)(t,{code:i.ZodIss
+  _find_seed_limit_1.txt:10964:ueCode.not_finite,message:r.message}),n.dirty()):u.util
+.assertNever(r);return{status:n
+> _find_seed_limit_1.txt:10965:.value,value:e.data}}gte(e,t){return this.setLimit("min
+",e,!0,s.errorUtil.toString(t))
+> _find_seed_limit_1.txt:10966:}gt(e,t){return this.setLimit("min",e,!1,s.errorUtil.to
+String(t))}lte(e,t){return this
+> _find_seed_limit_1.txt:10967:.setLimit("max",e,!0,s.errorUtil.toString(t))}lt(e,t){r
+eturn this.setLimit("max",e,!1,
+> _find_seed_limit_1.txt:10968:s.errorUtil.toString(t))}setLimit(e,t,n,r){return new A
+({...this._def,checks:[...this.
+  _find_seed_limit_1.txt:10969:_def.checks,{kind:e,value:t,inclusive:n,message:s.error
+Util.toString(r)}]})}_addCheck(
+  _find_seed_limit_1.txt:10970:e){return new A({...this._def,checks:[...this._def.chec
+ks,e]})}int(e){return this._add
+  _find_seed_limit_1.txt:11001:status:n.value,value:e.data}}_getInvalidInput(e){let t=
+this._getOrReturnCtx(e);return(
+  _find_seed_limit_1.txt:11002:0,c.addIssueToContext)(t,{code:i.ZodIssueCode.invalid_t
+ype,expected:u.ZodParsedType.bi
+> _find_seed_limit_1.txt:11003:gint,received:t.parsedType}),c.INVALID}gte(e,t){return 
+this.setLimit("min",e,!0,s.erro
+> _find_seed_limit_1.txt:11004:rUtil.toString(t))}gt(e,t){return this.setLimit("min",e
+,!1,s.errorUtil.toString(t))}lt
+> _find_seed_limit_1.txt:11005:e(e,t){return this.setLimit("max",e,!0,s.errorUtil.toSt
+ring(t))}lt(e,t){return this.se
+> _find_seed_limit_1.txt:11006:tLimit("max",e,!1,s.errorUtil.toString(t))}setLimit(e,t
+,n,r){return new z({...this._de
+  _find_seed_limit_1.txt:11007:f,checks:[...this._def.checks,{kind:e,value:t,inclusive
+:n,message:s.errorUtil.toString
+  _find_seed_limit_1.txt:11008:(r)}]})}_addCheck(e){return new z({...this._def,checks:
+[...this._def.checks,e]})}posit
+  _find_seed_limit_1.txt:15447:t]),button:not([inert]),[tabindex]:not(slot):not([inert
+]),audio[controls]:not([inert])
+  _find_seed_limit_1.txt:15448:,video[controls]:not([inert]),[contenteditable]:not([co
+ntenteditable="false"]):not([in
+> _find_seed_limit_1.txt:15449:ert]),details>summary:first-of-type:not([inert]),detail
+s:not([inert])',sP="undefined"=
+  _find_seed_limit_1.txt:15450:=typeof Element,sE=sP?function(){}:Element.prototype.ma
+tches||Element.prototype.msMatc
+  _find_seed_limit_1.txt:15451:hesSelector||Element.prototype.webkitMatchesSelector,sT
+=!sP&&Element.prototype.getRoot
+  _find_seed_limit_1.txt:15492:ed] *")||!r.contains(e)}return!0}t=t.parentElement}retu
+rn!1},sW=function(e,t){var n,r;
+  _find_seed_limit_1.txt:15493:return!(t.disabled||sI(t)||sZ(n=t)&&"hidden"===n.type||
+s$(t,e)||"DETAILS"===(r=t).tagN
+> _find_seed_limit_1.txt:15494:ame&&Array.prototype.slice.apply(r.children).some(funct
+ion(e){return"SUMMARY"===e.tagN
+  _find_seed_limit_1.txt:15495:ame})||sq(t))},sK=function(e,t){return!(sH(t)||0>sR(t))
+&&!!sW(e,t)},sY=function(e){var
+  _find_seed_limit_1.txt:15496: t=parseInt(e.getAttribute("tabindex"),10);return!!isNa
+N(t)||!!(t>=0)},sG=function e(t
+  _find_seed_limit_1.txt:15705:ll:(l=e=>{var t,n,r;let o=lZ(e.elements.floating).docum
+entElement;return{...K,rootBoun
+  _find_seed_limit_1.txt:15706:dary:z?{x:0,y:0,width:o.clientWidth,height:o.clientHeig
+ht}:void 0,mainAxis:"none"!==Z,
+> _find_seed_limit_1.txt:15707:crossAxis:et,limiter:P||z?void 0:{...(void 0===(r=t=()=
+>{if(!Y.current)return{};let{he
+  _find_seed_limit_1.txt:15708:ight:e}=Y.current.getBoundingClientRect();return{offset
+:e/2+("number"==typeof O?O:0)}}
+  _find_seed_limit_1.txt:15709:)&&(r={}),{options:r,fn(e){let{x:t,y:n,placement:o,rect
+s:a,middlewareData:i}=e,{offset
+  _find_seed_limit_1.txt:15716:et)?void 0:y[d])||0)-(t?g.crossAxis:0);h<n?h=n:h>r&&(h=
+r)}return{[f]:p,[d]:h}}}),optio
+  _find_seed_limit_1.txt:15717:ns:[t,n]}}},s=[K,P,z,O,Z],{...(void 0===(c=l)&&(c={}),{
+name:"shift",options:c,async fn
+> _find_seed_limit_1.txt:15718:(e){let{x:t,y:n,placement:r}=e,{mainAxis:o=!0,crossAxis
+:a=!1,limiter:i={fn:e=>{let{x:t
+  _find_seed_limit_1.txt:15719:,y:n}=e;return{x:t,y:n}}},...l}=lr(c,e),s={x:t,y:n},u=a
+wait ci(e,l),d=lc(lo(r)),f=li(d
+  _find_seed_limit_1.txt:15720:),p=s[f],h=s[d];if(o){let e="y"===f?"top":"left",t="y"=
+==f?"bottom":"right",n=p+u[e],r
+  _find_seed_limit_1.txt:15824:){let e=r?.getBoundingClientRect();n=`polygon(
+  _find_seed_limit_1.txt:15825:.next\dev\static\chunks\node_modules_next_dist_compiled
+_react-dom_1e674e59._.js:1904: 
+> _find_seed_limit_1.txt:15826:           case "summary":
+  _find_seed_limit_1.txt:15827:.next\dev\static\chunks\node_modules_next_dist_compiled
+_react-dom_1e674e59._.js:13324:
+  _find_seed_limit_1.txt:15828:    ], didWarnValDefaultVal = !1, needsEscaping = /["'&
+<>\n\t]|^\s|\s$/, specialTags =
+  _find_seed_limit_1.txt:15831:oter form frame frameset h1 h2 h3 h4 h5 h6 head header 
+hgroup hr html iframe img input
+  _find_seed_limit_1.txt:15832: isindex li link listing main marquee menu menuitem met
+a nav noembed noframes noscript
+> _find_seed_limit_1.txt:15833: object ol p param plaintext pre script section select 
+source style summary table tbod
+  _find_seed_limit_1.txt:15834:y td template textarea tfoot th thead title tr track ul
+ wbr xmp".split(" "), inScopeTa
+  _find_seed_limit_1.txt:15835:gs = "applet caption html table td th marquee object te
+mplate foreignObject desc title
+  _find_seed_limit_1.txt:15836:".split(" "), buttonScopeTags = inScopeTags.concat([
+  _find_seed_limit_1.txt:15837:.next\dev\static\chunks\node_modules_next_dist_compiled
+_react-dom_1e674e59._.js:13991:
+> _find_seed_limit_1.txt:15838:        summary: "summary",
+  _find_seed_limit_1.txt:15839:.next\dev\static\chunks\node_modules_react-dom_4411d9bd
+._.js:1826:            case "su
+  _find_seed_limit_1.txt:15840:mmary":
+  _find_seed_limit_1.txt:15845:meset h1 h2 h3 h4 h5 h6 head header hgroup hr html ifra
+me img input isindex li link li
+  _find_seed_limit_1.txt:15846:sting main marquee menu menuitem meta nav noembed nofra
+mes noscript object ol p param 
+> _find_seed_limit_1.txt:15847:plaintext pre script section select source style summar
+y table tbody td template texta
+  _find_seed_limit_1.txt:15848:rea tfoot th thead title tr track ul wbr xmp".split(" "
+), inScopeTags = "applet captio
+  _find_seed_limit_1.txt:15849:n html table td th marquee object template foreignObjec
+t desc title".split(" "), butto
+  _find_seed_limit_1.txt:15850:nScopeTags = inScopeTags.concat([
+> _find_seed_limit_1.txt:15851:.next\dev\static\chunks\node_modules_react-dom_4411d9bd
+._.js:12988:        summary: "s
+  _find_seed_limit_1.txt:15852:ummary",
+> _find_seed_limit_1.txt:15853:node_modules\@types\node\test.d.ts:417:                
+summary: {
+  _find_seed_limit_1.txt:15854:node_modules\@types\node\test.d.ts:507:                
+     * An object containing a s
+  _find_seed_limit_1.txt:15855:ummary of coverage for all files.
+> _find_seed_limit_1.txt:15856:node_modules\@types\node\v8.d.ts:195:     * found. If `
+options.format` is `'summary'`,
+  _find_seed_limit_1.txt:15857: it returns an array containing brief string representa
+tions for each object. The visi
+  _find_seed_limit_1.txt:15858:bility provided
+  _find_seed_limit_1.txt:15864:mary' }));
+  _find_seed_limit_1.txt:15865:node_modules\@types\node\v8.d.ts:230:    function query
+Objects(ctor: Function, options
+> _find_seed_limit_1.txt:15866:: { format: "summary" }): string[];
+> _find_seed_limit_1.txt:15867:node_modules\@types\node\vm.d.ts:202:    type MeasureMe
+moryMode = "summary" | "detaile
+  _find_seed_limit_1.txt:15868:d";
+> _find_seed_limit_1.txt:15869:node_modules\@types\node\vm.d.ts:205:         * @defaul
+t 'summary'
+> _find_seed_limit_1.txt:15870:node_modules\@types\node\vm.d.ts:618:     * vm.measureM
+emory({ mode: 'summary' })
+> _find_seed_limit_1.txt:15871:node_modules\@types\react\ts5.0\index.d.ts:2952:       
+ summary?: string | undefined;
+> _find_seed_limit_1.txt:15872:node_modules\@types\react\ts5.0\index.d.ts:3474:       
+ summary?: string | undefined;
+> _find_seed_limit_1.txt:15873:node_modules\@types\react\ts5.0\index.d.ts:3968:       
+ | "summary"
+> _find_seed_limit_1.txt:15874:node_modules\@types\react\ts5.0\index.d.ts:4211:       
+     summary: React.DetailedHTM
+  _find_seed_limit_1.txt:15875:LProps<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+> _find_seed_limit_1.txt:15876:node_modules\@types\react\index.d.ts:2953:        summa
+ry?: string | undefined;
+> _find_seed_limit_1.txt:15877:node_modules\@types\react\index.d.ts:3475:        summa
+ry?: string | undefined;
+> _find_seed_limit_1.txt:15878:node_modules\@types\react\index.d.ts:3969:        | "su
+mmary"
+> _find_seed_limit_1.txt:15879:node_modules\@types\react\index.d.ts:4224:            s
+ummary: React.DetailedHTMLProps
+  _find_seed_limit_1.txt:15880:<React.HTMLAttributes<HTMLElement>, HTMLElement>;
+> _find_seed_limit_1.txt:15881:node_modules\aria-query\lib\domMap.js:233:}], ['summary
+', {
+> _find_seed_limit_1.txt:15882:node_modules\axe-core\axe.d.ts:182:    failureSummary?:
+ string;
+> _find_seed_limit_1.txt:15883:node_modules\axe-core\axe.js:11401:      if (vNode.prop
+s.nodeName === 'summary') {
+> _find_seed_limit_1.txt:15884:node_modules\axe-core\axe.js:11402:        var firstSum
+mary = vNode.parent.children.fi
+  _find_seed_limit_1.txt:15885:nd(function(node) {
+> _find_seed_limit_1.txt:15886:node_modules\axe-core\axe.js:11403:          return nod
+e.props.nodeName === 'summary';
+> _find_seed_limit_1.txt:15887:node_modules\axe-core\axe.js:11405:        if (firstSum
+mary === vNode) {
+> _find_seed_limit_1.txt:15888:node_modules\axe-core\axe.js:12465:       case 'summary
+':
+  _find_seed_limit_1.txt:15889:node_modules\axe-core\axe.js:12470:        return !quer
+y_selector_all_default(vNode, '
+> _find_seed_limit_1.txt:15890:summary').length;
+> _find_seed_limit_1.txt:15891:node_modules\axe-core\axe.js:14317:      summary: {
+  _find_seed_limit_1.txt:15892:node_modules\axe-core\axe.js:14328:        namingMethod
+s: [ 'tableCaptionText', 'table
+> _find_seed_limit_1.txt:15893:SummaryText' ]
+> _find_seed_limit_1.txt:15894:node_modules\axe-core\axe.js:14854:      summary: 'butt
+on',
+> _find_seed_limit_1.txt:15895:node_modules\axe-core\axe.js:15454:      tableSummaryTe
+xt: attrText.bind(null, 'summar
+  _find_seed_limit_1.txt:15896:y'),
+> _find_seed_limit_1.txt:15897:node_modules\axe-core\axe.js:15875:      matches: 'summ
+ary',
+  _find_seed_limit_1.txt:15898:node_modules\axe-core\axe.js:15885:      namingMethods:
+ [ 'tableCaptionText', 'tableSu
+  _find_seed_limit_1.txt:15899:mmaryText' ]
+> _find_seed_limit_1.txt:15900:node_modules\axe-core\axe.js:18473:    function failure
+Summary(nodeData) {
+> _find_seed_limit_1.txt:15901:node_modules\axe-core\axe.js:18491:    var failure_summ
+ary_default = failureSummary;
+> _find_seed_limit_1.txt:15902:node_modules\axe-core\axe.js:20508:      if (node.getAt
+tribute('summary')) {
+  _find_seed_limit_1.txt:15903:node_modules\axe-core\axe.js:21214:        implicit: [ 
+'button', 'input[type="button"]
+> _find_seed_limit_1.txt:15904:', 'input[type="image"]', 'input[type="reset"]', 'input
+[type="submit"]', 'summary' ],
+> _find_seed_limit_1.txt:15905:node_modules\axe-core\axe.js:23018:    var same_caption
+_summary_evaluate_default = sam
+> _find_seed_limit_1.txt:15906:eCaptionSummaryEvaluate;
+> _find_seed_limit_1.txt:15907:node_modules\axe-core\axe.js:23019:    function sameCap
+tionSummaryEvaluate(node, optio
+  _find_seed_limit_1.txt:15908:ns, virtualNode) {
+> _find_seed_limit_1.txt:15909:node_modules\axe-core\axe.js:23023:      var summary = 
+virtualNode.attr('summary');
+> _find_seed_limit_1.txt:15910:node_modules\axe-core\axe.js:23026:      if (!caption |
+| !summary) {
+> _find_seed_limit_1.txt:15911:node_modules\axe-core\axe.js:23029:      return sanitiz
+e_default(summary).toLowerCase(
+  _find_seed_limit_1.txt:15912:) === sanitize_default(caption).toLowerCase();
+> _find_seed_limit_1.txt:15913:node_modules\axe-core\axe.js:27142:    function summary
+IsInteractiveMatches(_, virtual
+  _find_seed_limit_1.txt:15914:Node) {
+> _find_seed_limit_1.txt:15915:node_modules\axe-core\axe.js:27147:      var firstSumma
+ry = parent.children.find(funct
+  _find_seed_limit_1.txt:15916:ion(child) {
+
+

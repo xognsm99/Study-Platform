@@ -1,8 +1,12 @@
 import { cookies } from "next/headers";
 import { createServerClient } from "@supabase/ssr";
 
-export async function supabaseServer() {
-  const cookieStore = await cookies();
+/**
+ * 서버 컴포넌트/API에서 사용하는 Supabase 클라이언트
+ * SSR 세션 쿠키를 자동으로 관리합니다.
+ */
+export function createSupabaseServer() {
+  const cookieStore = cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -25,3 +29,6 @@ export async function supabaseServer() {
     }
   );
 }
+
+// 하위 호환성을 위한 별칭
+export const supabaseServer = createSupabaseServer;

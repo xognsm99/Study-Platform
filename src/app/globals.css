@@ -24,3 +24,533 @@ body {
   color: var(--foreground);
   font-family: Arial, Helvetica, sans-serif;
 }
+
+/* 프린트 전용 CSS */
+@media print {
+  .no-print {
+    display: none !important;
+  }
+  .problem {
+    page-break-inside: avoid;
+  }
+}
+
+.problem {
+  margin: 12px 0;
+}
+
+.choices {
+  margin: 6px 0 0 16px;
+}
+
+.choice {
+  margin: 2px 0;
+}
+
+.blank-box {
+  display: inline-block;
+  min-width: 220px;
+  height: 18px;
+  background: #eee;
+  border-radius: 4px;
+  vertical-align: middle;
+}
+
+/* 인쇄/프리뷰 화면 가독성 강제 */
+.print-root {
+  background: #fff !important;
+  color: #000 !important;
+  color-scheme: light;           /* 다크모드 브라우저라도 밝게 */
+}
+
+.print-root .passage {
+  background: #f3f4f6 !important;
+  color: #000 !important;
+}
+
+.print-root .question,
+.print-root .choices,
+.print-root li {
+  color: #000 !important;
+  font-weight: 600;
+}
+
+/* 미리보기/인쇄 공통 카드(다크에서도 잘 보이게) */
+.problem-card {
+  background: #ffffff;
+  color: #111827;
+}
+
+@media (prefers-color-scheme: dark) {
+  .problem-card {
+    background: #0b1220; /* 어두운 카드 */
+    color: #e5e7eb;      /* 밝은 글자 */
+  }
+  .problem-card .passage {
+    background: #111827;
+    color: #e5e7eb;
+  }
+}
+
+/* ===== 1) 미리보기/화면에서 보기 번호(1~5) 보이게 ===== */
+.problem-card ol,
+.problem-card ul {
+  list-style: decimal !important;     /* 번호 강제 */
+  padding-left: 1.25rem !important;   /* 들여쓰기 */
+  margin-left: 0 !important;
+}
+
+.problem-card li {
+  list-style: inherit !important;
+}
+
+/* marker(번호) 색상 강제 */
+.problem-card li::marker {
+  color: currentColor !important;
+  font-weight: 700;
+}
+
+/* 혹시 기존에 marker를 숨긴 스타일이 있으면 무력화 */
+.problem-card ol li,
+.problem-card ul li {
+  display: list-item !important;
+}
+
+/* ===== 2) 인쇄는 무조건 흰 배경/검정 글자 ===== */
+@media print {
+  /* 전체 페이지 흰색 강제 */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 카드/지문 박스가 검정으로 출력되는 것 방지 */
+  .problem-card,
+  .print-root,
+  .passage {
+    background: #fff !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    -webkit-print-color-adjust: economy; /* 배경색 과다 출력 방지 */
+    print-color-adjust: economy;
+  }
+
+  /* 지문 프리 영역도 흰 바탕 */
+  .passage {
+    border: 1px solid #ddd !important;
+  }
+
+  /* marker도 검정 */
+  .problem-card li::marker {
+    color: #000 !important;
+  }
+}
+
+/* ===== PRINT: 보기 번호(1~5) 강제 표시 ===== */
+@media print {
+  /* 인쇄에서 list marker가 사라지는 문제 방지 */
+  .print-root ol,
+  .print-root ul,
+  .print-root .choices {
+    list-style: decimal !important;
+    padding-left: 1.35rem !important;
+    margin-left: 0 !important;
+  }
+
+  .print-root li {
+    display: list-item !important; /* display:block 등에 의해 marker 사라짐 방지 */
+  }
+
+  .print-root li::marker {
+    color: #000 !important;
+    font-weight: 700 !important;
+  }
+
+  /* 혹시 전역으로 list-style:none; 이 있으면 무력화 */
+  .print-root ol li,
+  .print-root ul li {
+    list-style: decimal !important;
+  }
+}
+
+.choices-block { margin-top: 8px; }
+.choice-row { display: flex; gap: 10px; align-items: flex-start; }
+.choice-no { width: 28px; font-weight: 800; }
+.choice-text { flex: 1; white-space: pre-wrap; }
+
+/* 인쇄에서는 무조건 검정 글자 */
+@media print {
+  .choice-no, .choice-text { color: #000 !important; }
+}
+
+/* ===== 인쇄 화면: 문제 간격 ===== */
+.print-root .print-problem {
+  padding: 14px 0;
+  margin-bottom: 18px;          /* ✅ 문제 사이 간격 */
+  border-bottom: 1px solid #eee;/* ✅ 숨쉬는 라인(싫으면 삭제) */
+}
+
+/* 마지막 문제는 라인 제거 */
+.print-root .print-problem:last-child {
+  border-bottom: none;
+  margin-bottom: 0;
+}
+
+/* ===== 보기 번호(1~5) 한 단계 다운 ===== */
+.print-root .choice-row {
+  gap: 8px;                     /* 약간 좁게 */
+  margin: 2px 0;                /* 줄 간격 살짝 */
+}
+
+.print-root .choice-no {
+  width: 22px;                  /* ✅ 숫자 영역 줄이기 */
+  font-weight: 600;             /* ✅ 볼드 제거(800→600) */
+  font-size: 0.95rem;           /* ✅ 한 단계 작게 */
+  line-height: 1.4;
+}
+
+.print-root .choice-text {
+  font-size: 1rem;              /* 보기 텍스트는 기본 유지 */
+  line-height: 1.5;
+}
+
+.print-root .passage {
+  margin-bottom: 10px !important;
+}
+
+.print-root .problem-title {
+  margin-bottom: 8px;
+}
+
+/* ===== Preview: 무조건 밝은 카드 ===== */
+.preview-root .problem-card,
+.preview-root .passage,
+.preview-root .choices-block {
+  background: #fff !important;
+  color: #111 !important;
+  box-shadow: 0 1px 10px rgba(0,0,0,0.06) !important;
+}
+
+.preview-root .passage {
+  border: 1px solid #e6e6e6 !important;
+}
+
+.preview-root .choice-no,
+.preview-root .choice-text,
+.preview-root .problem-title,
+.preview-root h1,
+.preview-root h2,
+.preview-root h3,
+.preview-root p,
+.preview-root li {
+  color: #111 !important;
+}
+
+/* ===== PRINT: 무조건 흰 종이 스타일로 강제(검정 카드 제거) ===== */
+@media print {
+  /* 페이지 전체 흰색 */
+  html, body {
+    background: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+
+  /* 인쇄 루트 내부는 전부 흰 배경/검정 글자 */
+  .print-root,
+  .print-root * {
+    background: transparent !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+  }
+
+  /* 문제 카드/지문 박스는 흰색 박스로 */
+  .print-root .problem-card,
+  .print-root .print-problem,
+  .print-root .passage,
+  .print-root .choices-block {
+    background: #fff !important;
+    border: 1px solid #ddd !important;
+    border-radius: 10px !important;
+  }
+
+  /* 지문 박스는 살짝 구분 */
+  .print-root .passage {
+    background: #f7f7f7 !important;
+  }
+
+  /* 보기 줄 간격/번호 스타일(이전 요청 유지) */
+  .print-root .choice-no {
+    font-weight: 600 !important;
+    font-size: 0.95rem !important;
+  }
+}
+
+/* ===== PRINT: 무조건 흰 종이 + 검정 글씨 (검정 카드/다크 배경 제거) ===== */
+@media print {
+  /* 최상위 강제 */
+  :root,
+  html,
+  body {
+    color-scheme: light !important;
+    --background: #fff !important;
+    --foreground: #000 !important;
+    background: #fff !important;
+    background-color: #fff !important;
+    color: #000 !important;
+    -webkit-print-color-adjust: exact !important;
+    print-color-adjust: exact !important;
+  }
+
+  /* print-root와 모든 하위 요소 강제 */
+  .print-root,
+  .print-root *,
+  .print-root *::before,
+  .print-root *::after {
+    background-color: #fff !important;
+    background: #fff !important;
+    background-image: none !important;
+    color: #000 !important;
+    box-shadow: none !important;
+    text-shadow: none !important;
+    filter: none !important;
+    border-color: #ddd !important;
+  }
+
+  /* 모든 태그 타입별 강제 */
+  .print-root div,
+  .print-root span,
+  .print-root p,
+  .print-root h1,
+  .print-root h2,
+  .print-root h3,
+  .print-root h4,
+  .print-root h5,
+  .print-root h6,
+  .print-root pre,
+  .print-root code,
+  .print-root li,
+  .print-root ol,
+  .print-root ul,
+  .print-root a,
+  .print-root button,
+  .print-root input,
+  .print-root textarea,
+  .print-root select {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 지문 박스만 연회색으로 구분 */
+  .print-root .passage,
+  .print-root pre.passage {
+    background-color: #f6f6f6 !important;
+    background: #f6f6f6 !important;
+    border: 1px solid #ddd !important;
+    color: #000 !important;
+  }
+
+  /* 문제 카드 강제 */
+  .print-root .problem-card,
+  .print-root .print-problem,
+  .print-root .problem-card *,
+  .print-root .print-problem * {
+    background-color: #fff !important;
+    background: #fff !important;
+    border: 1px solid #e5e5e5 !important;
+    color: #000 !important;
+  }
+
+  /* 보기 관련 강제 */
+  .print-root .choices-block,
+  .print-root .choice-row,
+  .print-root .choice-no,
+  .print-root .choice-text {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 문제 제목과 본문 강제 */
+  .print-root .no,
+  .print-root .problem-title,
+  .print-root .question,
+  .print-root .problem-title *,
+  .print-root .question * {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 헤더 영역 강제 */
+  .print-root .print-page,
+  .print-root .print-container,
+  .print-root .print-page *,
+  .print-root .print-container * {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* Tailwind 클래스 강제 무력화 */
+  .print-root .text-gray-700,
+  .print-root .text-gray-900,
+  .print-root .text-red-600,
+  .print-root .text-blue-600,
+  .print-root .text-white,
+  .print-root .text-slate-600,
+  .print-root .text-slate-900,
+  .print-root [class*="text-"] {
+    color: #000 !important;
+    background-color: #fff !important;
+    background: #fff !important;
+  }
+
+  /* 다크모드 클래스 강제 무력화 */
+  .print-root .dark\:bg-gray-900,
+  .print-root .dark\:text-white,
+  .print-root [class*="dark:"] {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 인라인 스타일도 무시하도록 최종 강제 */
+  .print-root [style] {
+    background-color: #fff !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* 화면용 버튼/헤더 UI 숨기기 */
+  .no-print { display: none !important; }
+}
+
+/* =========================
+   PRINT FIX: 1페이지 빈 화면 제거 + 쓸데없는 선 제거
+   ========================= */
+@media print {
+  /* (선택) 크롬 인쇄 여백 안정화 */
+  @page { margin: 12mm; }
+
+  /* 인쇄 시 사이트 헤더/네비/버튼류는 숨김 */
+  header, nav, .no-print, .print-hide {
+    display: none !important;
+  }
+
+  /* ✅ 1페이지 먹는 원인 1순위: min-h-screen / h-screen / 100vh 계열 무력화 */
+  .min-h-screen, .h-screen, [style*="100vh"] {
+    min-height: auto !important;
+    height: auto !important;
+  }
+
+  /* ✅ print-root 자체도 화면용 패딩/마진 있으면 0으로 */
+  .print-root {
+    margin: 0 !important;
+    padding: 0 !important;
+    background: #fff !important;
+    color: #000 !important;
+  }
+
+  /* ✅ 혹시 첫 문제에 break-before/page-break가 걸려있으면 무력화 */
+  .print-root .problem-card:first-of-type,
+  .print-root .print-problem:first-of-type {
+    break-before: auto !important;
+    page-break-before: auto !important;
+  }
+
+  /* ✅ 선(테두리) 과다 제거: 내부 요소들 테두리/구분선 싹 제거 (단, print-rule은 제외) */
+  .print-root hr:not(.print-rule) { display: none !important; }
+
+  .print-root table,
+  .print_root table, /* 혹시 오타 클래스가 있었을 경우 대비 */
+  .print-root tr,
+  .print-root td,
+  .print-root th {
+    border: none !important;
+    border-collapse: collapse !important;
+  }
+
+  /* problem 카드/지문 박스 "바깥선만" 남기고 내부 선 제거 */
+  .print-root .problem-card,
+  .print-root .print-problem {
+    border: 1px solid #e6e6e6 !important;
+    border-radius: 10px !important;
+    padding: 10px 12px !important;
+    margin: 0 0 20px 0 !important; /* ✅ 문제 사이 간격 (14px → 20px) */
+    box-shadow: none !important;
+    background: #fff !important;
+  }
+
+  .print-header { margin-bottom: 14px !important; }
+
+  .print-root .problem-card * ,
+  .print-root .print-problem * {
+    border: none !important;      /* ✅ 내부 줄 싹 제거 */
+    box-shadow: none !important;
+    background-image: none !important;
+  }
+
+  /* 지문 박스만 은은하게 */
+  .print-root .passage {
+    border: 1px solid #e9e9e9 !important;
+    background: #f7f7f7 !important;
+    border-radius: 8px !important;
+    padding: 8px 10px !important;
+    margin-bottom: 8px !important;
+  }
+
+  /* 보기 줄 간격 조금 더 깔끔하게 */
+  .print-root .choices,
+  .print-root .choices-block {
+    margin-top: 6px !important;
+  }
+}
+
+/* ===== Print Header Styles ===== */
+.print-header { text-align: center; }
+
+.print-title-row {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.print-title {
+  flex: 1;
+  font-size: 22px;
+  font-weight: 800;
+  text-align: center;
+}
+
+.print-name {
+  font-size: 14px;
+  white-space: nowrap;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.print-name-line {
+  display: inline-block;
+  width: 160px;
+  border-bottom: 1px solid #111;
+  transform: translateY(-2px);
+}
+
+.print-subtitle {
+  margin-top: 6px;
+  font-size: 12px;
+  color: #333;
+}
+
+.print-subtitle .sep { margin: 0 8px; }
+
+.print-rule {
+  margin: 12px 0 0;
+  border: none;
+  border-top: 1px solid #111;
+}

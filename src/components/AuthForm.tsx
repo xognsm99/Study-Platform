@@ -1,95 +1,97 @@
 "use client";
 
 import { useState } from "react";
-import { supabaseBrowser } from "@/lib/supabase/browser";
+import Image from "next/image";
+import { useSearchParams } from "next/navigation";
+import { createSupabaseBrowser } from "@/lib/supabase/browser";
 
 export default function AuthForm() {
-  const supabase = supabaseBrowser();
-  const [email, setEmail] = useState("");
-  const [password, setPassword] = useState("");
-  const [mode, setMode] = useState<"signin" | "signup">("signin");
+  const supabase = createSupabaseBrowser();
+  const searchParams = useSearchParams();
   const [msg, setMsg] = useState<string | null>(null);
-  const [loading, setLoading] = useState(false);
+  const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
-  async function handle() {
-    setLoading(true);
+  const nextParam = searchParams.get("next") || "/";
+
+  async function loginWith(provider: "google" | "kakao") {
+    setSocialLoading(provider);
     setMsg(null);
 
     try {
-      if (mode === "signup") {
-        const { data, error } = await supabase.auth.signUp({
-          email,
-          password,
-        });
-        if (error) throw error;
+      const { error } = await supabase.auth.signInWithOAuth({
+        provider,
+        options: {
+          // ✅ 로그인 성공 후 항상 /auth/callback?next=/ 로 돌아옴
+          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
+            nextParam
+          )}`,
+        },
+      });
 
-        // profiles upsert
-        if (data.user) {
-          await supabase.from("profiles").upsert({
-            id: data.user.id,
-            email: data.user.email,
-            role: "student",
-            subscription_status: "free",
-          });
-        }
-        setMsg("가입 완료! 로그인해 주세요.");
-        setMode("signin");
-      } else {
-        const { error } = await supabase.auth.signInWithPassword({
-          email,
-          password,
-        });
-        if (error) throw error;
-        setMsg("로그인 성공!");
+      if (error) {
+        console.error("[OAuth] signInWithOAuth error:", error);
+        const message = error.message ?? `${provider} 로그인 중 오류가 발생했습니다.`;
+        alert(message);
+        setMsg(message);
+        setSocialLoading(null);
       }
     } catch (e: any) {
-      setMsg(e.message ?? "오류가 발생했습니다.");
-    } finally {
-      setLoading(false);
+      console.error("[OAuth] unexpected error:", e);
+      const message = e?.message ?? `${provider} 로그인 중 오류가 발생했습니다.`;
+      alert(message);
+      setMsg(message);
+      setSocialLoading(null);
     }
   }
 
   return (
-    <div className="w-full max-w-sm rounded-2xl border bg-white p-6 shadow-sm">
-      <h1 className="mb-4 text-xl font-semibold">
-        {mode === "signin" ? "로그인" : "회원가입"}
-      </h1>
-
-      <label className="block text-sm">이메일</label>
-      <input
-        className="mb-3 w-full rounded-md border px-3 py-2"
-        value={email}
-        onChange={(e) => setEmail(e.target.value)}
-        placeholder="you@example.com"
-      />
-
-      <label className="block text-sm">비밀번호</label>
-      <input
-        type="password"
-        className="mb-4 w-full rounded-md border px-3 py-2"
-        value={password}
-        onChange={(e) => setPassword(e.target.value)}
-        placeholder="8자 이상 권장"
-      />
-
-      <button
-        onClick={handle}
-        disabled={loading}
-        className="w-full rounded-md bg-blue-600 px-4 py-2 text-white hover:bg-blue-700 disabled:opacity-50"
-      >
-        {loading ? "처리 중..." : mode === "signin" ? "로그인" : "가입하기"}
-      </button>
-
-      <div className="mt-3 flex justify-between text-xs">
+    <div className="w-full max-w-md rounded-2xl border border-slate-200 bg-white p-8 shadow-sm">
+      {/* 소셜 로그인 버튼 */}
+      <div className="space-y-3">
+        {/* Google */}
         <button
-          className="underline"
-          onClick={() => setMode(mode === "signin" ? "signup" : "signin")}
+          onClick={() => loginWith("google")}
+          disabled={!!socialLoading}
+          className="relative w-full rounded-xl border border-slate-200 bg-white py-2.5 pl-12 pr-4 text-base font-semibold text-slate-700 transition-colors hover:bg-slate-50 active:bg-slate-100 disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-white"
         >
-          {mode === "signin" ? "회원가입으로" : "로그인으로"}
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/70">
+            <Image src="/google.png" alt="Google" width={20} height={20} />
+          </span>
+          {socialLoading === "google" ? "처리 중..." : "Google 로그인"}
+        </button>
+
+        {/* Kakao */}
+        <button
+          onClick={() => loginWith("kakao")}
+          disabled={!!socialLoading}
+          className="relative w-full rounded-xl bg-[#FEE500] py-2.5 pl-12 pr-4 text-base font-semibold text-slate-900 transition-colors hover:bg-[#FDD835] active:bg-[#FBC02D] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#FEE500]"
+        >
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/70">
+            <Image src="/kakao.png" alt="Kakao" width={20} height={20} />
+          </span>
+          {socialLoading === "kakao" ? "처리 중..." : "kakao 로그인"}
+        </button>
+
+        {/* Naver */}
+        <button
+          onClick={() =>
+            alert("네이버 로그인은 현재 Supabase에서 공식 지원하지 않아 준비중입니다.")
+          }
+          className="relative w-full rounded-xl bg-[#03C75A] py-2.5 pl-12 pr-4 text-base font-semibold text-white transition-colors hover:bg-[#02B350] active:bg-[#029640] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#03C75A]"
+        >
+          <span className="absolute left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/70">
+            <Image src="/naver.png" alt="Naver" width={20} height={20} />
+          </span>
+          {socialLoading === "naver" ? "처리 중..." : "Naver 로그인"}
         </button>
       </div>
 
-      {msg && <p className="mt-3 text-sm text-gray-600">{msg}</p>}
+      {/* 메시지 */}
+      {msg && (
+        <div className="mt-4 rounded-lg bg-slate-50 px-4 py-3 text-sm text-slate-700">
+          {msg}
+        </div>
+      )}
     </div>
   );
 }
