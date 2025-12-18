@@ -3,29 +3,26 @@
 import { useState } from "react";
 import Image from "next/image";
 import { useSearchParams } from "next/navigation";
-import { createSupabaseBrowser } from "@/lib/supabase/browser";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 export default function AuthForm() {
-  const supabase = createSupabaseBrowser();
   const searchParams = useSearchParams();
   const [msg, setMsg] = useState<string | null>(null);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
-  const nextParam = searchParams.get("next") || "/";
+  const redirectTo =
+    typeof window !== "undefined"
+      ? `${window.location.origin}/auth/callback`
+      : undefined;
 
-  async function loginWith(provider: "google" | "kakao") {
+  async function loginWith(provider: "google" | "kakao" | "naver") {
     setSocialLoading(provider);
     setMsg(null);
 
     try {
-      const { error } = await supabase.auth.signInWithOAuth({
+      const { error } = await supabaseBrowser.auth.signInWithOAuth({
         provider,
-        options: {
-          // ✅ 로그인 성공 후 항상 /auth/callback?next=/ 로 돌아옴
-          redirectTo: `${window.location.origin}/auth/callback?next=${encodeURIComponent(
-            nextParam
-          )}`,
-        },
+        options: { redirectTo },
       });
 
       if (error) {
@@ -74,9 +71,8 @@ export default function AuthForm() {
 
         {/* Naver */}
         <button
-          onClick={() =>
-            alert("네이버 로그인은 현재 Supabase에서 공식 지원하지 않아 준비중입니다.")
-          }
+          onClick={() => loginWith("naver")}
+          disabled={!!socialLoading}
           className="relative w-full rounded-xl bg-[#03C75A] py-2.5 pl-12 pr-4 text-base font-semibold text-white transition-colors hover:bg-[#02B350] active:bg-[#029640] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#03C75A]"
         >
           <span className="absolute left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/70">

@@ -470,12 +470,14 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
       {/* ✅ 1) 문제 */}
       <h2 className="text-xl font-bold mb-4">
-        {renderWithBlanks(question || "문제가 비어 있습니다.")}
+        <div className="whitespace-pre-line leading-relaxed">
+          {renderWithBlanks(question || "문제가 비어 있습니다.")}
+        </div>
       </h2>
 
       {/* ✅ 2) 지문(영영풀이/본문/해석) - stimulus 포함 */}
       {finalPassage && (
-        <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-wrap">
+        <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
           {renderWithBlanks(finalPassage)}
         </div>
       )}

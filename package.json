@@ -16,13 +16,13 @@
     "seed:reading": "tsx scripts/seed-reading.ts",
     "seed:vocab:def": "tsx scripts/seed-vocab-definition.ts",
     "debug:counts": "tsx scripts/debug-counts.ts",
-    "import:problems": "tsx scripts/importProblemsFromXlsx.ts"
+    "import:problems": "tsx scripts/importProblemsFromXlsx.ts",
+    "import:vocab_keypad": "tsx scripts/import-vocab-keypad-tsv.ts"
   },
   "dependencies": {
     "@prisma/client": "^5.22.0",
     "@supabase/ssr": "^0.8.0",
     "@supabase/supabase-js": "^2.87.1",
-    "dotenv": "^17.2.3",
     "next": "16.0.7",
     "openai": "^6.10.0",
     "react": "19.2.0",
@@ -35,6 +35,7 @@
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
+    "dotenv": "^17.2.3",
     "eslint": "^9",
     "eslint-config-next": "16.0.7",
     "prisma": "^5.22.0",

@@ -5,6 +5,14 @@ import crypto from "node:crypto";
 
 dotenv.config({ path: ".env.local" });
 
+// 전역 에러 로깅 (어디서 터지는지 바로 확인용)
+process.on("unhandledRejection", (e) => {
+  console.error("UNHANDLED:", e);
+});
+process.on("uncaughtException", (e) => {
+  console.error("UNCAUGHT:", e);
+});
+
 const SUPABASE_URL = process.env.SUPABASE_URL;
 const SUPABASE_SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY;
 
@@ -68,7 +76,7 @@ const COLUMN_ALIASES: Record<string, string[]> = {
   보기5: ["보기5", "선택지5", "choice5", "option5", "보기 5", "선택지 5"],
   정답번호: ["정답번호", "정답", "answer", "answernumber", "answer_no", "answerNumber"],
   문제: ["문제", "question", "질문"],
-  지문: ["지문", "passage", "본문", "지문텍스트"],
+  지문: ["지문", "지문(없으면 비움)", "본문", "passage", "body", "지문텍스트"],
   해설: ["해설", "explain", "explanation", "설명"],
   qtype: ["qtype", "소분류", "유형"],
   번호: ["번호", "number", "num", "no"],
@@ -126,24 +134,18 @@ const toInt = (v: any): number | null => {
   return Number.isFinite(n) ? n : null;
 };
 
-// content_hash 생성: sha256(grade|subject|category|difficulty|JSON.stringify(content))
-// content 전체를 포함하여 충돌/덮어쓰기 방지
-function generateContentHash(
-  grade: string,
-  subject: string,
-  category: string,
-  difficulty: string,
-  content: any
-): string {
-  const hashInput = {
-    grade,
-    subject,
-    category,
-    difficulty,
-    content,
-  };
-  return crypto.createHash("sha256").update(JSON.stringify(hashInput)).digest("hex");
+// ✅ 번호 정규화: 문자열에서 앞쪽 숫자만 추출 (예: "Q01-1" → 1)
+function normalizeNo(v: any): number | null {
+  const s = String(v ?? "").trim();
+  const m = s.match(/\d+/);
+  return m ? Number(m[0]) : null;
 }
+
+// ✅ content_hash용 정규화/해시 함수
+const norm = (v: any) => (v ?? "").toString().trim();
+
+const makeContentHash = (x: any): string =>
+  crypto.createHash("sha256").update(JSON.stringify(x)).digest("hex");
 
 // 번호를 5자리 문자열로 변환
 function formatNumber(num: number | null): string {
@@ -332,6 +334,18 @@ async function main() {
     
     const headers = sheetData[0] as string[];
     const headerMap = createHeaderMap(headers);
+
+    // ✅ 실제 헤더 디버깅 (매핑 확인용)
+    try {
+      const objRows = xlsx.utils.sheet_to_json(ws, { defval: "" }) as any[];
+      if (objRows && objRows.length > 0) {
+        console.log("RAW_HEADER_KEYS (첫 row):", Object.keys(objRows[0] || {}));
+      } else {
+        console.log("RAW_HEADER_KEYS: (데이터 없음)");
+      }
+    } catch (e) {
+      console.warn("RAW_HEADER_KEYS 로깅 중 오류:", e);
+    }
     
     // ✅ 컬럼 인덱스 찾기
     const colIndex = {
@@ -364,7 +378,8 @@ async function main() {
       const row = sheetData[i] as any[];
 
       // ✅ 컬럼 읽기 (헤더 맵 사용)
-      const 번호 = toInt(getColumnValueByIndex(row, colIndex.번호));
+      const rawNo = getColumnValueByIndex(row, colIndex.번호);
+      const 번호 = normalizeNo(rawNo);
       const 문제 = t(getColumnValueByIndex(row, colIndex.문제));
       // ✅ 지문(없으면 비움) / 지문 컬럼 + B열(index 1) fallback
       let rawStimulus = getColumnValueByIndex(row, colIndex.지문);
@@ -396,17 +411,17 @@ async function main() {
         }
       }
       
-      // qtype 결정: --qtype 옵션이 있으면 사용, 없으면 엑셀 컬럼에서 읽기, 그것도 없으면 시트명 사용
+      // qtype 결정: --qtype 옵션이 있으면 사용, 없으면 엑셀 컬럼에서만 읽기 (시트명 fallback 제거)
       let rowQtype: string | null = null;
       if (globalQtype) {
         rowQtype = globalQtype;
       } else {
         const columnQtype = t(getColumnValueByIndex(row, colIndex.qtype));
-        rowQtype = columnQtype || sheetQtype; // 컬럼이 비어있으면 시트명 사용
+        rowQtype = columnQtype || null;
       }
 
-      // qtype 허용 목록 검증
-      if (!ALLOWED_QTYPES.has(rowQtype)) {
+      // qtype 누락 또는 허용 목록 외 값은 스킵
+      if (!rowQtype || !ALLOWED_QTYPES.has(rowQtype)) {
         skipReasons.qtype불일치++;
         console.warn(`⚠️  [${sheetName}] ${i + 1}행: 허용되지 않은 qtype: ${rowQtype} (스킵)`);
         totalSkipped++;
@@ -430,9 +445,9 @@ async function main() {
       // 필수 필드 검증
       if (!번호) {
         skipReasons.번호없음++;
-        console.warn(`⚠️  [${sheetName}] ${i + 1}행: 번호가 없어 스킵합니다.`);
+        console.warn(`⚠️  [${sheetName}] ${i + 1}행: 번호 파싱 실패, row=`, row);
         totalSkipped++;
-        continue;
+        continue; // 번호 없으면 스킵 (throw 하지 않음)
       }
 
       if (!문제) {
@@ -462,35 +477,63 @@ async function main() {
       const choices = [보기1, 보기2, 보기3, 보기4, 보기5];
 
       // ✅ stimulus용 지문 문자열 (줄바꿈 유지, 앞뒤만 trim)
-      const stimulus = String(지문 ?? "").trim();
+      //    "선지:" 같은 프리픽스는 제거
+      const stimulusRaw = String(지문 ?? "");
+      const stimulus = stimulusRaw.replace(/^\s*선지:\s*/g, "").trim();
 
-      // ✅ content.raw 구조 생성 (한국어 키만 사용, 표준 저장)
-      const contentRaw: any = {
-        문제: 문제, // ✅ 한국어 키로 저장
-        지문: 지문 || null, // ✅ 한국어 키로 저장 (없으면 null)
-        보기1: 보기1, // ✅ 명시적으로 보기1~보기5 저장
-        보기2: 보기2,
-        보기3: 보기3,
-        보기4: 보기4,
-        보기5: 보기5,
-        정답번호: 정답번호, // ✅ 명시적으로 정답번호 저장
-        해설: explanationText || null, // ✅ 한국어 키로 저장 (없으면 null)
-        qtype: rowQtype,  // 최종 qtype으로 저장
-      };
+      // ✅ 표준 content 스키마로 정규화
+      //  - stem: 문제 질문(한 줄)
+      //  - body: 지문/본문/대화 등 (여러 줄 가능, 없으면 "")
+      //  - choices: 항상 5개 문자열
+      //  - answer: 1~5 정답번호
+      //  - explanation: 해설(없으면 "")
+      const stem = String(문제 ?? "").trim();
+      const body = stimulus; // 엑셀 지문/B열을 그대로 사용 (줄바꿈 유지)
+      const stdChoices = [보기1, 보기2, 보기3, 보기4, 보기5].map((v) =>
+        String(v ?? "").trim()
+      );
+      const stdAnswer = 정답번호 as number; // 위에서 1~5로 검증 완료
+      const stdExplanation = String(explanationText ?? "").trim();
 
-      // content 구조 (최상위에 qtype 추가)
       const content = {
-        qtype: rowQtype,  // content 최상위에 qtype 추가
-        stimulus: stimulus || undefined, // ✅ 엑셀 B열 지문을 stimulus로 저장 (없으면 undefined)
-        explanation: explanationText || undefined, // ✅ top-level 해설 저장 (없으면 undefined)
-        raw: contentRaw,
+        stem,
+        body,
+        choices: stdChoices,
+        answer: stdAnswer,
+        explanation: stdExplanation,
+        // 📝 호환용 필드(raw/qtype)는 유지하되, UI/로직은 표준 스키마를 우선 사용
+        raw: {
+          문제,
+          지문,
+          보기1,
+          보기2,
+          보기3,
+          보기4,
+          보기5,
+          정답번호,
+          해설: explanationText || null,
+          qtype: rowQtype,
+        },
+        qtype: rowQtype,
       };
 
       // difficulty 기본값 설정
       const difficulty = "1"; // 기본값
 
-      // content_hash 생성 (grade/subject/category/difficulty + content 전체 포함)
-      const content_hash = generateContentHash(grade, subject, category, difficulty, content);
+      // ✅ content_hash 생성 (표준 content 기반: stem/body/choices/answer/explanation + 메타정보)
+      const contentForHash = {
+        grade,
+        subject,
+        category,
+        qtype: rowQtype,
+        stem: norm(stem),
+        body: norm(body),
+        choices: stdChoices.map(norm),
+        answer: norm(stdAnswer),
+        explanation: norm(stdExplanation),
+      };
+
+      const content_hash = makeContentHash(contentForHash);
       
       // UNIQUE_HASHES 추적
       allHashes.add(content_hash);
@@ -527,7 +570,6 @@ async function main() {
           정답번호,
           해설: explanationText || "(없음)",
           qtype: rowQtype,
-          contentRaw, // 실제 저장될 content.raw
         });
       }
 
@@ -536,9 +578,40 @@ async function main() {
 
       // 200개 단위로 배치 upsert
       if (payloads.length >= 200) {
+        // ✅ 배치 내 content_hash 중복 제거 (완전 동일 문제는 1개만 upsert)
+        const map = new Map<string, any>();
+        for (const p of payloads) {
+          map.set(p.content_hash, p);
+        }
+        const deduped = Array.from(map.values());
+        if (deduped.length !== payloads.length) {
+          console.warn(`DUP_IN_PAYLOAD = ${payloads.length - deduped.length}`);
+        }
+
         batchCount++;
         process.stdout.write(`\n🔄 배치 ${batchCount} 처리 중... `);
-        const result = await upsertBatch(payloads);
+
+        let agg = { success: 0, failed: 0, skipped: 0, duplicate: 0 };
+
+for (let j = 0; j < deduped.length; j++) {
+  const one = deduped[j];
+
+  // 🔥 1행씩 upsert (21000 방지)
+  const r = await upsertBatch([one]);
+
+  agg.success += r.success;
+  agg.failed += r.failed;
+  agg.skipped += r.skipped;
+  agg.duplicate += r.duplicate;
+
+  if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
+    process.stdout.write(` (${j + 1}/${deduped.length})`);
+  }
+}
+
+const result = agg;
+
+
         totalSuccess += result.success;
         totalFailed += result.failed;
         totalSkipped += result.skipped;
@@ -551,9 +624,40 @@ async function main() {
 
   // 남은 payload 처리
   if (payloads.length > 0) {
+    // ✅ 마지막 배치도 content_hash 기준으로 dedupe
+    const map = new Map<string, any>();
+    for (const p of payloads) {
+      map.set(p.content_hash, p);
+    }
+    const deduped = Array.from(map.values());
+    if (deduped.length !== payloads.length) {
+      console.warn(`DUP_IN_PAYLOAD = ${payloads.length - deduped.length}`);
+    }
+
     batchCount++;
     process.stdout.write(`\n🔄 배치 ${batchCount} 처리 중... `);
-    const result = await upsertBatch(payloads);
+    
+    let agg = { success: 0, failed: 0, skipped: 0, duplicate: 0 };
+
+for (let j = 0; j < deduped.length; j++) {
+  const one = deduped[j];
+
+  // 🔥 1행씩 upsert (21000 방지)
+  const r = await upsertBatch([one]);
+
+  agg.success += r.success;
+  agg.failed += r.failed;
+  agg.skipped += r.skipped;
+  agg.duplicate += r.duplicate;
+
+  if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
+    process.stdout.write(` (${j + 1}/${deduped.length})`);
+  }
+}
+
+const result = agg;
+
+
     totalSuccess += result.success;
     totalFailed += result.failed;
     totalSkipped += result.skipped;
@@ -631,15 +735,15 @@ async function main() {
 
   // 실제 DB row count 확인
   console.log("\n🔍 실제 DB row count 확인 중...");
-  const { count, error: countErr } = await supabase
+  const { data: countRows, error: countErr } = await supabase
     .from(TABLE)
-    .select("id", { count: "exact", head: true });
-  
-  console.log("DB_COUNT_AFTER_UPLOAD =", count, "COUNT_ERR =", countErr);
+    .select("id");
   
   if (countErr) {
     console.error("❌ DB count 조회 실패:", countErr);
   } else {
+    const count = Array.isArray(countRows) ? countRows.length : 0;
+    console.log("DB_COUNT_AFTER_UPLOAD =", count, "COUNT_ERR =", countErr);
     console.log(`✅ 실제 DB에 저장된 문제 수: ${count}개`);
     if (count !== totalSuccess) {
       console.warn(`⚠️  경고: 업로드 성공 카운트(${totalSuccess})와 실제 DB count(${count})가 다릅니다.`);
@@ -650,37 +754,30 @@ async function main() {
   console.log("select count(*) total, count(*) filter (where created_at > now()-interval '2 hours') last_2h from public.problems;");
 
   // ✅ stimulus 필드 저장 검증 (content->>'stimulus'가 비어있지 않은 레코드 수)
-  console.log("\n🔍 stimulus 필드 저장 여부 확인 중...");
-  const { count: stimulusCount, error: stimulusErr } = await supabase
+  console.log("\n🔍 body(stem/body 스키마) 필드 저장 여부 확인 중...");
+  const { data: bodyRows, error: stimulusErr } = await supabase
     .from(TABLE)
-    .select("id", { count: "exact", head: true })
-    .not("content->>stimulus", "is", null);
+    .select("id, content")
+    .not("content->>body", "is", null);
 
   if (stimulusErr) {
-    console.error("❌ stimulus 필드 count 조회 실패:", stimulusErr);
+    console.error("❌ body 필드 count 조회 실패:", stimulusErr);
   } else {
-    console.log(`✅ content->>'stimulus'가 NOT NULL인 레코드 수: ${stimulusCount}개`);
-    console.log(`stimulus saved count: ${stimulusCount}`);
+    const stimulusCount = Array.isArray(bodyRows) ? bodyRows.length : 0;
+    console.log(`✅ content->>'body'가 NOT NULL인 레코드 수: ${stimulusCount}개`);
+    console.log(`body saved count: ${stimulusCount}`);
     
-    // ✅ stimulus가 0개면 즉시 실패 처리 (엑셀 매핑 문제)
+    // ✅ body가 0개면 즉시 실패 처리 (엑셀 매핑 문제)
     if (!stimulusCount || stimulusCount === 0) {
-      throw new Error("지문(B열)이 DB에 저장되지 않았습니다. 엑셀 헤더/매핑을 확인하세요.");
+      throw new Error("지문(body)이 DB에 저장되지 않았습니다. 엑셀 헤더/매핑을 확인하세요.");
     }
-
-    // ✅ stimulus가 있는 레코드 1개를 조회해 120자 프리뷰 출력
-    const { data: stimulusRows, error: stimulusSampleErr } = await supabase
-      .from(TABLE)
-      .select("id, content")
-      .not("content->>stimulus", "is", null)
-      .limit(1);
-
-    if (stimulusSampleErr) {
-      console.error("❌ stimulus 샘플 조회 실패:", stimulusSampleErr);
-    } else if (stimulusRows && stimulusRows.length > 0) {
-      const first = stimulusRows[0] as any;
-      const s = String(first?.content?.stimulus ?? "").trim();
+    
+    // ✅ body가 있는 레코드 1개를 조회해 120자 프리뷰 출력
+    const first = bodyRows && bodyRows[0] as any;
+    if (first?.content?.body) {
+      const s = String(first.content.body ?? "").trim();
       const preview = s.length > 120 ? `${s.slice(0, 120)}...` : s;
-      console.log(`stimulus preview (first record, 120 chars): ${preview}`);
+      console.log(`body preview (first record, 120 chars): ${preview}`);
     }
   }
   

@@ -80,10 +80,13 @@ async function seedDialogueBlank() {
     });
 
     // 3) DB에 insert
-    const { error: insertError, count } = await supabase
-      .from("problems")
-      .insert(rows)
-      .select("id", { count: "exact" });
+    const { data: inserted, error: insertError } = await supabase
+  .from("problems")
+  .insert(rows)
+  .select("id");
+
+const count = inserted?.length ?? 0;
+
 
     if (insertError) {
       console.error("insert error", insertError);

@@ -2,6 +2,7 @@
 
 import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
+import { ui } from "@/lib/ui";
 
 const GRADES = [
   { label: "중1 (준비중)", value: 1 },
@@ -38,11 +39,11 @@ export default function TeacherHomePage() {
 
         <div className="mt-8 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
           <label className="block">
-            <span className="text-sm font-medium text-gray-800">학년</span>
+            <span className={ui.label}>학년</span>
             <select
               value={grade}
               onChange={(e) => setGrade(Number(e.target.value))}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm transition-colors border-gray-200 bg-gray-100 text-gray-900 focus:border-gray-400 focus:outline-none dark:border-gray-300 dark:bg-gray-200 dark:text-gray-900"
+              className={`mt-2 ${ui.control} pr-10`}
             >
               {GRADES.map((g) => (
                 <option key={g.value} value={g.value}>{g.label}</option>
@@ -51,11 +52,11 @@ export default function TeacherHomePage() {
           </label>
 
           <label className="block">
-            <span className="text-sm font-medium text-gray-800">과목</span>
+            <span className={ui.label}>과목</span>
             <select
               value={subject}
               onChange={(e) => setSubject(e.target.value)}
-              className="mt-2 w-full rounded-lg border px-3 py-2 text-sm transition-colors border-gray-200 bg-gray-100 text-gray-900 focus:border-gray-400 focus:outline-none dark:border-gray-300 dark:bg-gray-200 dark:text-gray-900"
+              className={`mt-2 ${ui.control} pr-10`}
             >
               {SUBJECTS.map((s) => (
                 <option key={s.value} value={s.value}>{s.label}</option>
