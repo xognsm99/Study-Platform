@@ -121,7 +121,7 @@ export async function POST(req: Request) {
     createdByFilter,
   });
   
-  // ✅ jsonb 경로 필터: content->raw->>qtype
+  // ✅ qtype 컬럼으로 필터 (DB에 qtype 컬럼 존재)
   // category 필터링도 추가 (category 컬럼이 있으면)
   let query = supabase
     .from("problems")
@@ -138,7 +138,7 @@ export async function POST(req: Request) {
   }
   
   // qtype 필터링 추가
-  query = query.in("content->raw->>qtype", neededQtypes);
+  query = query.in("qtype", neededQtypes);
 
   // 쿼리 직전 로그
   console.log("QUERY_PARAMS", { grade, subject, category: categories, createdByFilter });

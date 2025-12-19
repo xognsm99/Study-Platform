@@ -4,6 +4,7 @@ import { useState, useEffect, useMemo } from "react";
 import { useRouter, useParams } from "next/navigation";
 import { ENGLISH_CATEGORIES, normalizeCategory, getCategoryLabel } from "@/lib/utils/constants";
 import { createSupabaseBrowser } from "@/lib/supabase/browser";
+import SchoolSearch from "@/components/SchoolSearch";
 
 type School = { id: string; name: string };
 type TextbookMap = {
@@ -152,6 +153,13 @@ export default function SetupPage() {
   const [areaFilter, setAreaFilter] = useState<RegionKey>("all");
   const isGimhae = selectedCityName === "김해시";
   const isChangwon = selectedCityName === "창원시";
+  
+  // SchoolSearch용 region/gu 상태 (예: "서울", "강남구")
+  const [region, setRegion] = useState<string>("");
+  const [gu, setGu] = useState<string>("");
+  
+  // 선택된 학교 정보 (SchoolSearch에서 사용)
+  const [selectedSchoolItem, setSelectedSchoolItem] = useState<any>(null);
   
   // 드래그 상태 관리
   const [draggingCityId, setDraggingCityId] = useState<string | null>(null);
@@ -767,6 +775,37 @@ export default function SetupPage() {
                   ← 도시 다시 선택
                 </button>
               </div>
+
+              {/* 학교 검색 컴포넌트 */}
+              <SchoolSearch
+                region={region || selectedCityName || ""}
+                gu={gu === "전체" ? "" : gu}
+                onSelect={(s) => {
+                  setSelectedSchoolItem(s);
+                  // SchoolSearch에서 선택한 학교를 기존 로직에 맞게 변환
+                  // schoolCode를 id로 사용하거나, name으로 찾기
+                  const matchedSchool = baseSchools.find((school) => school.name === s.name);
+                  if (matchedSchool) {
+                    handleSchoolSelect(matchedSchool.id, matchedSchool.name);
+                  } else {
+                    // 매칭되는 학교가 없으면 새로 추가하거나, schoolCode를 id로 사용
+                    setSelectedSchool(s.schoolCode);
+                    setSelectedSchoolName(s.name);
+                    if (selectedRole === "student") {
+                      setCurrentStep(1);
+                    } else {
+                      setCurrentStep(1);
+                    }
+                  }
+                }}
+              />
+
+              {selectedSchoolItem && (
+                <div className="mt-3 rounded-xl border p-3 text-sm">
+                  <div className="font-medium">{selectedSchoolItem.name}</div>
+                  <div className="text-gray-600">{selectedSchoolItem.address}</div>
+                </div>
+              )}
 
               {/* 권역 필터 (도시별) */}
               {selectedCityName && REGION_CONFIG[selectedCityName] && (

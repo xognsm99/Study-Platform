@@ -2,6 +2,7 @@ import dotenv from "dotenv";
 import xlsx from "xlsx";
 import { createClient } from "@supabase/supabase-js";
 import crypto from "node:crypto";
+import path from "path";
 
 dotenv.config({ path: ".env.local" });
 
@@ -45,6 +46,44 @@ const ALLOWED_QTYPES = new Set<string>([
   "대화문_흐름",
   "대화문_응답",
 ]);
+
+// ✅ 파일명/헤더 기반 qtype 보조 추론
+function inferQtypeFromFilename(filePath: string): string | null {
+  const base = path.basename(filePath).replace(/\.(xlsx|xls)$/i, "");
+  const parts = base.split("_");
+
+  // 예: 20251219_2_english_문법_어법오류_TEACHER_frompdf_v1
+  // qtype = subject 다음부터 TEACHER/STUDENT 이전까지 join
+  const sourceIdx = parts.findIndex((p) => p === "TEACHER" || p === "STUDENT");
+  if (sourceIdx !== -1) {
+    const qtype = parts.slice(3, sourceIdx).join("_");
+    if (ALLOWED_QTYPES.has(qtype)) return qtype;
+  }
+
+  // fallback: 파일명 전체에서 허용 qtype 문자열을 찾는 방식(더 튼튼)
+  for (const q of ALLOWED_QTYPES) {
+    if (
+      base.includes(`_${q}_`) ||
+      base.includes(`${q}_TEACHER`) ||
+      base.includes(`${q}_STUDENT`)
+    ) {
+      return q;
+    }
+  }
+
+  return null;
+}
+
+function findQtypeColIndex(headers: string[]): number {
+  const lowered = headers.map((h) => (h ?? "").toString().trim().toLowerCase());
+  // qtype / qType / QTYPE / 소분류 등도 허용
+  const candidates = new Set(["qtype", "q_type", "소분류", "세부분류", "q-type"]);
+  for (let i = 0; i < lowered.length; i++) {
+    const h = lowered[i];
+    if (candidates.has(h)) return i;
+  }
+  return -1;
+}
 
 // qtype에서 category로 매핑 (prefix 기반, fallback은 vocab)
 function categoryFromQtype(qtype: string): string {
@@ -335,17 +374,30 @@ async function main() {
     const headers = sheetData[0] as string[];
     const headerMap = createHeaderMap(headers);
 
-    // ✅ 실제 헤더 디버깅 (매핑 확인용)
+    // ✅ 실제 헤더 디버깅 (매핑 확인용) + qtype 컬럼 인덱스 탐색
+    let qtypeColIndex = -1;
+    const fallbackQtype = inferQtypeFromFilename(filePath);
     try {
       const objRows = xlsx.utils.sheet_to_json(ws, { defval: "" }) as any[];
       if (objRows && objRows.length > 0) {
-        console.log("RAW_HEADER_KEYS (첫 row):", Object.keys(objRows[0] || {}));
+        const rawHeaderKeys = Object.keys(objRows[0] || {});
+        console.log("RAW_HEADER_KEYS (첫 row):", rawHeaderKeys);
+        qtypeColIndex = findQtypeColIndex(rawHeaderKeys as string[]);
       } else {
         console.log("RAW_HEADER_KEYS: (데이터 없음)");
       }
     } catch (e) {
       console.warn("RAW_HEADER_KEYS 로깅 중 오류:", e);
     }
+
+    // RAW_HEADER_KEYS에서 찾지 못했으면, 엑셀 헤더 행에서도 한 번 더 시도
+    if (qtypeColIndex < 0) {
+      qtypeColIndex = findQtypeColIndex(headers as string[]);
+    }
+
+    console.log(
+      `📋 qtype 소스: ${qtypeColIndex >= 0 ? "엑셀 컬럼" : "파일명 fallback"} (fallback=${fallbackQtype ?? "없음"})`
+    );
     
     // ✅ 컬럼 인덱스 찾기
     const colIndex = {
@@ -411,21 +463,31 @@ async function main() {
         }
       }
       
-      // qtype 결정: --qtype 옵션이 있으면 사용, 없으면 엑셀 컬럼에서만 읽기 (시트명 fallback 제거)
-      let rowQtype: string | null = null;
+      // qtype 결정: --qtype 옵션 > 엑셀 qtype 컬럼 > 파일명 fallback
+      let rowQtype = "";
+
+      // 1) --qtype 옵션이 있으면 그 값을 우선 사용
       if (globalQtype) {
         rowQtype = globalQtype;
       } else {
-        const columnQtype = t(getColumnValueByIndex(row, colIndex.qtype));
-        rowQtype = columnQtype || null;
+        // 2) 엑셀에 qtype 컬럼이 있으면 그걸 우선
+        if (qtypeColIndex >= 0) {
+          rowQtype = (row[qtypeColIndex] ?? "").toString().trim();
+        }
+        // 3) 없거나 비어있으면 파일명에서 추출한 qtype 사용
+        if (!rowQtype) {
+          rowQtype = (fallbackQtype ?? "").toString().trim();
+        }
       }
 
-      // qtype 누락 또는 허용 목록 외 값은 스킵
+      // qtype 누락 또는 허용 목록 외 값이면 즉시 중단
       if (!rowQtype || !ALLOWED_QTYPES.has(rowQtype)) {
-        skipReasons.qtype불일치++;
-        console.warn(`⚠️  [${sheetName}] ${i + 1}행: 허용되지 않은 qtype: ${rowQtype} (스킵)`);
-        totalSkipped++;
-        continue;
+        console.error("❌ qtype을 결정할 수 없습니다. 엑셀에 qtype 컬럼이 없고, 파일명에서도 추출 실패했습니다.");
+        console.error(
+          "   파일명 예: 20251219_2_english_문법_어법오류_TEACHER_frompdf_v1.xlsx"
+        );
+        console.error("   허용 qtype:", Array.from(ALLOWED_QTYPES).join(", "));
+        process.exit(1);
       }
 
       // ✅ category는 qtype prefix로만 결정 (어휘_/문법_/본문_/대화문_)

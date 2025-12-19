@@ -18,13 +18,16 @@ type Props = {
   wrong: number;
   grade: string;
   subject: string;
-  category: string;
+  category?: string;
   // 시간 측정 비활성화: durationSeconds는 향후 확장을 위해 남겨두되 현재는 사용하지 않음
   durationSeconds?: number;
+  elapsedTime?: number;
   hintUsedCount?: number;
   isTripleMode?: boolean;
   roundResults?: RoundResult[];
   locale?: string; // locale prop 추가
+  onRetry?: () => void;
+  onNewProblems?: () => void;
 };
 
 function subjectLabel(subject: string) {
@@ -309,15 +312,21 @@ export default function ResultCard({
   subject,
   category,
   durationSeconds = 0,
+  elapsedTime,
   hintUsedCount = 0,
   isTripleMode = false,
   roundResults = [],
   locale: localeProp,
+  onRetry: onRetryProp,
+  onNewProblems: onNewProblemsProp,
 }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const subjText = subjectLabel(subject);
-  const catText = categoryLabel(category);
+  const catText = category ? categoryLabel(category) : "";
+  
+  // elapsedTime이 있으면 우선 사용, 없으면 durationSeconds 사용
+  const actualDurationSeconds = elapsedTime ?? durationSeconds;
 
   const safeTotal = Math.max(total, 1);
   const scorePct = Math.round((correct / safeTotal) * 100);
@@ -339,16 +348,16 @@ export default function ResultCard({
   };
 
   // ✅ 다시 풀기 (같은 카테고리로 바로 돌아가서 재시작)
-  const onRetry = () => {
+  const onRetry = onRetryProp || (() => {
     router.push(buildStudentQuizHref());
-  };
+  });
 
   // ✅ 다른 문제 생성 (역시 같은 화면으로 가서 새로 시작)
   // 만약 캐시 때문에 화면이 안 바뀌면 ts를 붙여 강제
-  const onNew = () => {
+  const onNew = onNewProblemsProp || (() => {
     const href = buildStudentQuizHref();
     router.push(`${href}?ts=${Date.now()}`);
-  };
+  });
 
   // ✅ 부모 리포트 생성 및 공유
   const handleShareToParent = async () => {
@@ -414,7 +423,8 @@ export default function ResultCard({
   return (
     <div className="rounded-2xl border bg-white p-6 shadow-sm text-slate-900">
       <div className="mb-4 text-xs text-gray-500">
-        {grade} · {subjText} · {catText}
+        {grade} · {subjText}
+        {catText && ` · ${catText}`}
         {isActuallyTripleMode && " · 3회 세트 완료"}
       </div>
 
@@ -428,7 +438,7 @@ export default function ResultCard({
           wrong={wrong}
           total={total}
           scorePct={scorePct}
-          durationSeconds={durationSeconds}
+          durationSeconds={actualDurationSeconds}
           hintUsedCount={hintUsedCount}
           roundResults={roundResults}
         />
@@ -439,7 +449,7 @@ export default function ResultCard({
           wrong={wrong}
           total={total}
           scorePct={scorePct}
-          durationSeconds={durationSeconds}
+          durationSeconds={actualDurationSeconds}
           hintUsedCount={hintUsedCount}
         />
       )}

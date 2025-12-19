@@ -222,10 +222,10 @@ export async function POST(req: Request) {
     // 디버그 로그: API 호출 파라미터
     console.log("🔍 [TEACHER/COMPOSE] API 호출 파라미터:", { grade, subject, plan, total });
 
-    // 필요한 qtype만 먼저 모은다 (현재 8개 기준)
+    // 필요한 qtype만 먼저 모은다 (현재 9개 기준)
     const neededQtypes = [
       QT.VOCAB_DICT, QT.VOCAB_ENG,
-      QT.DIA_BLANK, QT.DIA_FLOW,
+      QT.DIA_BLANK, QT.DIA_FLOW, QT.DIA_REPLY,
       QT.GRAM_ERR, QT.GRAM_BLANK,
       QT.READ_TITLE, QT.READ_Q,
     ];
@@ -233,13 +233,13 @@ export async function POST(req: Request) {
     console.log("🔍 [TEACHER/COMPOSE] 필요한 qtype:", neededQtypes);
     console.log("🔍 [TEACHER/COMPOSE] Supabase 조회 조건:", { grade, subject, neededQtypes });
 
-    // ✅ jsonb 경로 필터: content->raw->>qtype
+    // ✅ qtype 컬럼으로 필터 (DB에 qtype 컬럼 존재)
     const { data, error, count } = await supabase
       .from("problems")
-      .select("id, grade, subject, category, difficulty, content, content_hash, created_at", { count: "exact" })
+      .select("id, grade, subject, category, difficulty, content, content_hash, created_at, qtype", { count: "exact" })
       .eq("grade", grade)
       .eq("subject", subject)
-      .in("content->raw->>qtype", neededQtypes)
+      .in("qtype", neededQtypes)
       .limit(5000);
 
     console.log("📊 [TEACHER/COMPOSE] Supabase 쿼리 결과 count:", count);
@@ -281,9 +281,9 @@ export async function POST(req: Request) {
       );
     }
 
-    // 필터링: content.raw.qtype이 있으면 사용, 없으면 category 기반으로 유추
+    // 필터링: qtype 컬럼 우선, 없으면 content에서 찾고, 없으면 category 기반으로 유추
     const rows = (data ?? []).filter(r => {
-      const q = r?.content?.raw?.qtype;
+      const q = (r as any)?.qtype || r?.content?.qtype || r?.content?.raw?.qtype;
       if (typeof q === "string" && ALLOWED_QTYPES.has(q)) {
         return true;
       }
@@ -313,7 +313,7 @@ export async function POST(req: Request) {
         hasChoices1to5,
         hasChoicesArray,
         category: sample?.category,
-        qtype: (sample?.content?.raw as any)?.qtype,
+        qtype: (sample as any)?.qtype || (sample?.content?.raw as any)?.qtype || sample?.content?.qtype,
       });
     }
 
@@ -322,7 +322,7 @@ export async function POST(req: Request) {
     const byQtype = new Map<string, any[]>();
     for (const r of rows) {
       try {
-        let q = r.content?.raw?.qtype as string;
+        let q = ((r as any)?.qtype || r?.content?.qtype || r?.content?.raw?.qtype) as string;
         // qtype이 없으면 category 기반으로 유추
         if (!q || typeof q !== "string") {
           const inferred = inferQtypeFromCategory(r.category);
@@ -356,14 +356,21 @@ export async function POST(req: Request) {
 
     // 계획(plan)대로 각 카테고리에서 랜덤 문제 가져오기
     // 각 카테고리별 소분류 반반 분배
+    // dialogue를 3개 qtype(빈칸/흐름/응답)으로 분배
+    const dTotal = plan.dialogue;
+    const dBlank = Math.floor(dTotal / 3);
+    const dFlow = Math.floor(dTotal / 3);
+    const dReply = dTotal - dBlank - dFlow; // 나머지(0~2개)는 응답에 몰아줌(안 보이는 문제 방지)
+
     const categoryItems: Record<string, any[]> = {
       vocabulary: [
         ...pick(QT.VOCAB_DICT, Math.floor(plan.vocabulary / 2)),
         ...pick(QT.VOCAB_ENG, Math.ceil(plan.vocabulary / 2)),
       ],
       dialogue: [
-        ...pick(QT.DIA_BLANK, Math.floor(plan.dialogue / 2)),
-        ...pick(QT.DIA_FLOW, Math.ceil(plan.dialogue / 2)),
+        ...pick(QT.DIA_BLANK, dBlank),
+        ...pick(QT.DIA_FLOW, dFlow),
+        ...pick(QT.DIA_REPLY, dReply),
       ],
       grammar: [
         ...pick(QT.GRAM_ERR, Math.floor(plan.grammar / 2)),
@@ -474,9 +481,9 @@ export async function POST(req: Request) {
     // 선생님 전용: text 포함하여 정규화
     const resultItems = shuffledItems.map((row: any) => {
       try {
-        // qtype 결정: content.raw.qtype이 있으면 사용, 없으면 category 기반으로 유추
+        // qtype 결정: qtype 컬럼 우선, 없으면 content에서 찾고, 없으면 category 기반으로 유추
         const raw = row?.content?.raw ?? {};
-        let qtype = raw.qtype;
+        let qtype = (row as any)?.qtype || raw.qtype || row?.content?.qtype;
         if (!qtype || typeof qtype !== "string") {
           const inferred = inferQtypeFromCategory(row.category);
           qtype = inferred ?? "";

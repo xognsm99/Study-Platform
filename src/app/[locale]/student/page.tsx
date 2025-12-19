@@ -5,6 +5,8 @@ import { useRouter } from "next/navigation";
 import QuizClient from "@/components/QuizClient";
 import type { ProblemItem } from "@/components/QuizClient";
 import { ui } from "@/lib/ui";
+import SchoolSearch from "@/components/SchoolSearch";
+
 
 const GRADES = [
   { label: "중1 (준비중)", value: "1" },
@@ -40,6 +42,27 @@ const GYEONGGI_CITIES = [
   "구리시", "안성시", "포천시", "의왕시", "하남시", "여주시", "동두천시", "과천시",
   "가평군", "양평군", "연천군",
 ];
+
+// 세부지역 옵션 맵
+const SUBREGION_OPTIONS: Record<string, string[]> = {
+  "서울": ["전체"],
+  // ✅ 경기도에 인천 추가
+  "경기": ["전체", "경기도", "인천광역시"],
+  "전라": ["전체", "전라북도", "전라남도", "광주광역시"],
+  "충청": ["전체", "충청북도", "충청남도", "대전광역시", "세종특별자치시"],
+  // ✅ 경상에 울릉도 추가
+  "경상": [
+    "전체",
+    "경상북도",
+    "경상남도",
+    "부산광역시",
+    "울산광역시",
+    "대구광역시",
+    "울릉도",
+  ],
+  "강원": ["전체", "강원도"],
+  "제주": ["전체", "제주특별자치도"],
+};
 
 const UNIT_OPTIONS = [
   "1~3단원",
@@ -82,9 +105,21 @@ export default function StudentPage() {
 
   // 세부 지역 옵션
   const subRegionOptions = useMemo(() => {
-    if (regionGroup === "서울") return SEOUL_GU;
-    if (regionGroup === "경기") return GYEONGGI_CITIES;
-    return [];
+    const isSeoul = regionGroup === "서울";
+    const isGyeonggi = regionGroup === "경기";
+    
+    if (isSeoul) return SEOUL_GU;
+    
+    if (isGyeonggi) {
+      // 경기: 전체, 인천, 그리고 나머지 시군 리스트
+      return [
+        "인천",
+        ...GYEONGGI_CITIES.filter(x => x !== "인천" && x !== "인천광역시")
+      ];
+    }
+    
+    // 그 외는 SUBREGION_OPTIONS 사용
+    return SUBREGION_OPTIONS[regionGroup] || [];
   }, [regionGroup]);
 
   const canProceed = useMemo(() => grade === "2" && selectedGroups.size > 0, [grade, selectedGroups]);
@@ -269,9 +304,10 @@ export default function StudentPage() {
                 className={`${ui.control} pr-10`}
                 disabled={subRegionOptions.length === 0}
               >
-                <option value="">
-                  {subRegionOptions.length ? "전체" : "해당 없음"}
-                </option>
+                {/* 서울/경기는 "전체" 옵션이 없고 바로 구/시군 리스트 */}
+                {regionGroup !== "서울" && regionGroup !== "경기" && (
+                  <option value="">전체</option>
+                )}
                 {subRegionOptions.map((x) => (
                   <option key={x} value={x}>
                     {x}
@@ -306,24 +342,6 @@ export default function StudentPage() {
               </button>
             </div>
 
-            {/* 4) 단원/시험범위 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                단원
-              </label>
-              <select
-                className={`${ui.control} pr-10`}
-                value={unitRange}
-                onChange={(e) => setUnitRange(e.target.value)}
-              >
-                {UNIT_OPTIONS.map((op) => (
-                  <option key={op} value={op}>
-                    {op}
-                  </option>
-                ))}
-              </select>
-            </div>
-
             {/* 5) 학년 */}
             <div>
               <label className="block text-sm font-medium mb-2 text-gray-800">
@@ -349,51 +367,44 @@ export default function StudentPage() {
               </label>
               <input className={ui.control} value={subject} readOnly />
             </div>
+
+            {/* 4) 단원/시험범위 */}
+            <div>
+              <label className="block text-sm font-medium mb-2 text-gray-800">
+                단원
+              </label>
+              <select
+                className={`${ui.control} pr-10`}
+                value={unitRange}
+                onChange={(e) => setUnitRange(e.target.value)}
+              >
+                {UNIT_OPTIONS.map((op) => (
+                  <option key={op} value={op}>
+                    {op}
+                  </option>
+                ))}
+              </select>
+            </div>
           </div>
 
-          {/* 학교 검색 입력 (그리드 밖에서 풀폭) */}
-          <div className="mt-4">
-            <label className="block text-sm font-medium mb-2 text-gray-800">
-              학교 검색
-            </label>
-            <input
-              id="schoolSearchInput"
-              className={ui.control}
-              value={schoolQuery}
-              onChange={(e) => {
-                setSelectedSchool(null);
-                setSchoolQuery(e.target.value);
+          {/* 학교 검색 */}
+          <div className="mt-4 col-span-2">
+            <SchoolSearch
+              region={regionGroup}
+              gu={subRegion === "전체" ? "" : subRegion}
+              onSelect={(s) => {
+                // ✅ 기존 "학교 선택" 드롭다운에 반영되게 연결
+                setSelectedSchool({
+                  code: s.schoolCode,
+                  name: s.name,
+                  location: regionGroup, // regionGroup을 location으로 사용
+                  kind: "", // SchoolSearch에서 kind를 전달하지 않으므로 빈 문자열
+                  address: "", // SchoolSearch에서 address를 전달하지 않으므로 빈 문자열
+                });
+                // 디버그
+                console.log("[SchoolSearch] selected:", s);
               }}
-              placeholder="학교 이름 2글자 이상 입력 (예: 대동, 신어)"
             />
-            <p className="mt-1 text-xs text-slate-500 dark:text-slate-400">
-              검색 결과에서 선택하면 위 '학교' 칸에 적용됩니다.
-            </p>
-
-            {/* 검색 결과 리스트(풀폭) */}
-            {schoolOptions.length > 0 && (
-              <div className="mt-2 rounded-lg border border-slate-200 bg-white dark:border-slate-700 dark:bg-slate-900/40 overflow-hidden">
-                {schoolOptions.slice(0, 10).map((s) => (
-                  <button
-                    key={s.code}
-                    type="button"
-                    className="w-full px-3 py-2 text-left hover:bg-slate-50 dark:hover:bg-slate-800/60 transition-colors"
-                    onClick={() => {
-                      setSelectedSchool(s);
-                      setSchoolQuery(s.name);
-                      setSchoolOptions([]);
-                    }}
-                  >
-                    <div className="font-medium text-gray-900 dark:text-slate-100">
-                      {s.name}
-                    </div>
-                    <div className="text-xs text-slate-500 dark:text-slate-400">
-                      {s.address || s.location || s.code}
-                    </div>
-                  </button>
-                ))}
-              </div>
-            )}
           </div>
 
           <button
