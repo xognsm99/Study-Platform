@@ -1,11 +1,18 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname } from "next/navigation";
+import type { User } from "@supabase/supabase-js";
 import QuizClient from "@/components/QuizClient";
 import type { ProblemItem } from "@/components/QuizClient";
 import { ui } from "@/lib/ui";
 import SchoolSearch from "@/components/SchoolSearch";
+import StudentProfileCard from "@/components/StudentProfileCard";
+import { getMyProfile, upsertMyProfile, isProfileComplete, type StudentProfile } from "@/lib/profile";
+import { supabaseBrowser } from "@/lib/supabase-browser";
+import StudentHomeShell from "@/components/queezy/StudentHomeShell";
+import StudentProfileFormShell from "@/components/queezy/StudentProfileFormShell";
+import PurpleSelect from "@/components/queezy/PurpleSelect";
 
 
 const GRADES = [
@@ -64,21 +71,40 @@ const SUBREGION_OPTIONS: Record<string, string[]> = {
   "제주": ["전체", "제주특별자치도"],
 };
 
-const UNIT_OPTIONS = [
-  "1~3단원",
-  "중간고사",
-  "4~6단원",
-  "기말고사",
-  "종합평가",
-] as const;
+// 단원 옵션 (value와 label 분리)
+const UNIT_OPTIONS: Array<{ value: string; label: string }> = [
+  { value: "1-3", label: "1~3 단원" },
+  { value: "4-6", label: "4~6 단원" },
+  { value: "7-9", label: "7~9 단원" },
+  { value: "10-12", label: "10~12 단원" },
+  { value: "mid1", label: "1학기 중간고사" },
+  { value: "final1", label: "1학기 기말고사" },
+  { value: "mid2", label: "2학기 중간고사" },
+  { value: "final2", label: "2학기 기말고사" },
+  { value: "overall", label: "종합평가" },
+];
 
 export default function StudentPage() {
   const router = useRouter();
+  const pathname = usePathname();
+  
+  // locale 추출 (예: /ko/student -> ko)
+  const locale = pathname?.split("/")[1] || "ko";
+
+  // 인증 관련 state
+  const [user, setUser] = useState<User | null>(null);
+  const [authReady, setAuthReady] = useState(false);
+
+  // 프로필 관련 state
+  const [profile, setProfile] = useState<StudentProfile | null>(null);
+  const [profileLoading, setProfileLoading] = useState(true);
+  const [showForm, setShowForm] = useState(false);
+  const [saving, setSaving] = useState(false);
 
   // grade 값은 항상 DB용 코드값("1","2","3")으로 유지, UI에는 라벨로 표시
   const [grade, setGrade] = useState<string>("2");
   const [subject, setSubject] = useState<string>("영어");
-  const [unitRange, setUnitRange] = useState<string>(UNIT_OPTIONS[0]);
+  const [unitRange, setUnitRange] = useState<string>(UNIT_OPTIONS[0].value);
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(
     new Set(["vocab", "grammar", "reading", "dialogue"])
   );
@@ -103,23 +129,106 @@ export default function StudentPage() {
   } | null>(null);
   const [schoolLoading, setSchoolLoading] = useState(false);
 
-  // 세부 지역 옵션
+  // 인증 상태 확인 및 구독
+  useEffect(() => {
+    const supabase = supabaseBrowser();
+
+    // 초기 세션 확인
+    supabase.auth.getSession().then(({ data }) => {
+      setUser(data.session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    // 인증 상태 변경 구독
+    const {
+      data: { subscription },
+    } = supabase.auth.onAuthStateChange((_event, session) => {
+      setUser(session?.user ?? null);
+      setAuthReady(true);
+    });
+
+    return () => {
+      subscription.unsubscribe();
+    };
+  }, []);
+
+  // authReady가 true이고 user가 null일 때만 리다이렉트
+  useEffect(() => {
+    if (!authReady) return;
+    if (!user) {
+      router.replace(`/auth?next=${encodeURIComponent(`/${locale}/student`)}`);
+    }
+  }, [authReady, user, locale, router]);
+
+  // 프로필 로드 (user가 준비된 후)
+  useEffect(() => {
+    if (!authReady) return;
+
+    async function loadProfile() {
+      try {
+        const data = await getMyProfile(user?.id);
+        setProfile(data);
+        
+        // 프로필이 완성되었는지 확인
+        if (isProfileComplete(data)) {
+          // 프로필이 완성되었으면 폼 숨김, 프로필 정보로 state 초기화
+          setShowForm(false);
+          if (data) {
+            setRegionGroup(data.region || "서울");
+            setSubRegion(data.district || "");
+            setGrade(data.grade || "2");
+            setSubject(data.subject || "영어");
+            setUnitRange(data.term || UNIT_OPTIONS[0].value);
+            if (data.school && data.school_code) {
+              setSelectedSchool({
+                code: data.school_code,
+                name: data.school,
+                location: data.region || undefined,
+              });
+            }
+          }
+        } else {
+          // 프로필이 없거나 불완전하면 폼 표시
+          setShowForm(true);
+        }
+      } catch (e) {
+        console.error("[StudentPage] 프로필 로드 실패:", e);
+        // 에러 시에도 폼 표시
+        setShowForm(true);
+      } finally {
+        setProfileLoading(false);
+      }
+    }
+    loadProfile();
+  }, [authReady, user?.id]);
+
+  // 세부 지역 옵션 (PurpleSelect용으로 변환)
   const subRegionOptions = useMemo(() => {
     const isSeoul = regionGroup === "서울";
     const isGyeonggi = regionGroup === "경기";
     
-    if (isSeoul) return SEOUL_GU;
+    if (isSeoul) {
+      return SEOUL_GU.map((x) => ({ value: x, label: x }));
+    }
     
     if (isGyeonggi) {
-      // 경기: 전체, 인천, 그리고 나머지 시군 리스트
+      // 경기: 인천, 그리고 나머지 시군 리스트
       return [
-        "인천",
-        ...GYEONGGI_CITIES.filter(x => x !== "인천" && x !== "인천광역시")
+        { value: "인천", label: "인천" },
+        ...GYEONGGI_CITIES.filter(x => x !== "인천" && x !== "인천광역시").map((x) => ({ value: x, label: x }))
       ];
     }
     
     // 그 외는 SUBREGION_OPTIONS 사용
-    return SUBREGION_OPTIONS[regionGroup] || [];
+    const options = SUBREGION_OPTIONS[regionGroup] || [];
+    // "전체" 중복 제거
+    const fixedOptions = [
+      { value: "전체", label: "전체" },
+      ...options
+        .filter((x) => x !== "전체")
+        .map((x) => ({ value: x, label: x }))
+    ];
+    return fixedOptions;
   }, [regionGroup]);
 
   const canProceed = useMemo(() => grade === "2" && selectedGroups.size > 0, [grade, selectedGroups]);
@@ -162,6 +271,50 @@ export default function StudentPage() {
       newSet.add(groupKey);
     }
     setSelectedGroups(newSet);
+  };
+
+  // 프로필 저장 핸들러
+  const handleSaveProfile = async () => {
+    if (!selectedSchool) {
+      setError("학교를 선택해주세요.");
+      return;
+    }
+
+    if (!user) {
+      setError("로그인이 필요합니다.");
+      return;
+    }
+
+    setSaving(true);
+    setError(null);
+
+    try {
+      const result = await upsertMyProfile(
+        {
+          region: regionGroup,
+          district: subRegion || null,
+          school: selectedSchool.name,
+          school_code: selectedSchool.code ?? null,
+          grade: grade,
+          subject: subject,
+          term: unitRange,
+        },
+        user.id
+      );
+
+      if (result.success) {
+        // 저장 성공 시 프로필 다시 로드
+        const updatedProfile = await getMyProfile(user.id);
+        setProfile(updatedProfile);
+        setShowForm(false);
+      } else {
+        setError(result.error || "프로필 저장에 실패했습니다.");
+      }
+    } catch (e: any) {
+      setError(e?.message || "프로필 저장 중 오류가 발생했습니다.");
+    } finally {
+      setSaving(false);
+    }
   };
 
   const handleStart = async () => {
@@ -235,6 +388,12 @@ export default function StudentPage() {
     }
   };
 
+  const handleStartReadingAB = () => {
+    // 프로필/선택값을 쿼리로 넘기고 싶으면 여기서 같이 넘겨도 됨
+    // (일단은 페이지 이동만)
+    router.push(`/${locale}/student/reading-ab`);
+  };
+
   if (started && problems.length > 0) {
     const categoryForView =
       selectedGroups.size === 1 ? Array.from(selectedGroups)[0] : "vocab";
@@ -250,223 +409,347 @@ export default function StudentPage() {
     );
   }
 
-  return (
-    <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <div className="mx-auto max-w-xl px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900">학생 모드</h1>
-
-        <div className="mt-8 space-y-5 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-          {/* ✅ 2열 그리드 = 모바일에서도 3줄(=3x3 느낌) */}
-          <div className="grid grid-cols-2 gap-3">
-            {/* 1) 지역 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                지역
-              </label>
-              <select
-                value={regionGroup}
-                onChange={(e) => {
-                  setRegionGroup(e.target.value);
-                  setSubRegion("");
-                  setSelectedSchool(null);
-                  setSchoolQuery("");
-                  setSchoolOptions([]);
-                }}
-                className={`${ui.control} pr-10`}
-              >
-                {["서울", "경기", "충청", "전라", "경상", "강원", "제주"].map(
-                  (g) => (
-                    <option key={g} value={g}>
-                      {g}
-                    </option>
-                  )
-                )}
-              </select>
-            </div>
-
-            {/* 2) 세부지역 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                {regionGroup === "서울"
-                  ? "구"
-                  : regionGroup === "경기"
-                    ? "시/군"
-                    : "세부지역"}
-              </label>
-              <select
-                value={subRegion}
-                onChange={(e) => {
-                  setSubRegion(e.target.value);
-                  setSelectedSchool(null);
-                  setSchoolQuery("");
-                  setSchoolOptions([]);
-                }}
-                className={`${ui.control} pr-10`}
-                disabled={subRegionOptions.length === 0}
-              >
-                {/* 서울/경기는 "전체" 옵션이 없고 바로 구/시군 리스트 */}
-                {regionGroup !== "서울" && regionGroup !== "경기" && (
-                  <option value="">전체</option>
-                )}
-                {subRegionOptions.map((x) => (
-                  <option key={x} value={x}>
-                    {x}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 3) 학교(선택 표시용) */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                학교
-              </label>
-              <button
-                type="button"
-                className={`${ui.control} text-left flex items-center justify-between`}
-                onClick={() => {
-                  // 학교 검색 입력으로 스크롤/포커스
-                  document
-                    .getElementById("schoolSearchInput")
-                    ?.scrollIntoView({ behavior: "smooth", block: "center" });
-                  setTimeout(
-                    () => document.getElementById("schoolSearchInput")?.focus(),
-                    150
-                  );
-                }}
-              >
-                <span className="truncate">
-                  {selectedSchool?.name ? selectedSchool.name : "학교 선택"}
-                </span>
-                <span className="text-slate-400">▾</span>
-              </button>
-            </div>
-
-            {/* 5) 학년 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                학년
-              </label>
-              <select
-                className={`${ui.control} pr-10`}
-                value={grade}
-                onChange={(e) => setGrade(e.target.value)}
-              >
-                {GRADES.map((g) => (
-                  <option key={g.value} value={g.value}>
-                    {g.label}
-                  </option>
-                ))}
-              </select>
-            </div>
-
-            {/* 6) 과목 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                과목
-              </label>
-              <input className={ui.control} value={subject} readOnly />
-            </div>
-
-            {/* 4) 단원/시험범위 */}
-            <div>
-              <label className="block text-sm font-medium mb-2 text-gray-800">
-                단원
-              </label>
-              <select
-                className={`${ui.control} pr-10`}
-                value={unitRange}
-                onChange={(e) => setUnitRange(e.target.value)}
-              >
-                {UNIT_OPTIONS.map((op) => (
-                  <option key={op} value={op}>
-                    {op}
-                  </option>
-                ))}
-              </select>
-            </div>
-          </div>
-
-          {/* 학교 검색 */}
-          <div className="mt-4 col-span-2">
-            <SchoolSearch
-              region={regionGroup}
-              gu={subRegion === "전체" ? "" : subRegion}
-              onSelect={(s) => {
-                // ✅ 기존 "학교 선택" 드롭다운에 반영되게 연결
-                setSelectedSchool({
-                  code: s.schoolCode,
-                  name: s.name,
-                  location: regionGroup, // regionGroup을 location으로 사용
-                  kind: "", // SchoolSearch에서 kind를 전달하지 않으므로 빈 문자열
-                  address: "", // SchoolSearch에서 address를 전달하지 않으므로 빈 문자열
-                });
-                // 디버그
-                console.log("[SchoolSearch] selected:", s);
-              }}
-            />
-          </div>
-
-          <button
-            type="button"
-            className={`${outlineBtn} mt-3`}
-            onClick={() => {
-              const params = new URLSearchParams({
-                grade: grade,
-                subject: subject,
-                region: regionGroup,
-                sub: subRegion,
-                school: selectedSchool?.code ?? "",
-                unit: encodeURIComponent(unitRange),
-              });
-              router.push(`/student/vocab-game?${params.toString()}`);
-            }}
-          >
-            단어 퀴즈 시작
-          </button>
-
-          <div className="block mt-4">
-            <span className="text-sm font-medium text-gray-800">문제 유형 선택</span>
-            <div className="mt-2 grid grid-cols-2 gap-3">
-              {GROUPS.map((group) => (
-                <label
-                  key={group.key}
-                  className="flex items-center space-x-2 rounded-lg border px-3 py-2 cursor-pointer transition-colors border-gray-200 hover:bg-gray-50"
-                >
-                  <input
-                    type="checkbox"
-                    checked={selectedGroups.has(group.key)}
-                    onChange={() => handleGroupToggle(group.key)}
-                    className="h-4 w-4 rounded border-gray-300 text-blue-600 focus:ring-blue-500"
-                  />
-                  <span className="text-sm text-gray-900">{group.label}</span>
-                </label>
-              ))}
-            </div>
-          </div>
-
-          <button
-            onClick={handleStart}
-            disabled={!canProceed || loading}
-            className={`${solidBtn} mt-2 disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300`}
-          >
-            {loading ? "문제 로딩 중..." : "20문항 풀기 시작"}
-          </button>
-
-          {grade !== "2" && (
-            <p className="mt-2 text-xs text-gray-500 text-center">
-              현재는 중2만 이용 가능합니다(준비중)
-            </p>
-          )}
-
-          {error && (
-            <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-              {error}
-            </div>
-          )}
+  // 인증 준비 중이거나 로그인 안 된 경우
+  if (!authReady || !user) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+        <div className="mx-auto max-w-xl px-6 py-10">
+          <div className="text-center text-neutral-600">로딩 중...</div>
         </div>
       </div>
-    </div>
+    );
+  }
+
+  // 프로필 로딩 중
+  if (profileLoading) {
+    return (
+      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
+        <div className="mx-auto max-w-xl px-6 py-10">
+          <div className="text-center text-neutral-600">로딩 중...</div>
+        </div>
+      </div>
+    );
+  }
+
+  // 프로필 정보 포맷팅 함수
+  const formatProfileLocation = () => {
+    if (!profile) return "";
+    const parts: string[] = [];
+    if (profile.region) parts.push(profile.region);
+    if (profile.district) parts.push(profile.district);
+    return parts.join(" · ");
+  };
+
+  const formatProfileInfo = () => {
+    if (!profile) return "";
+    const parts: string[] = [];
+    if (profile.grade) {
+      const gradeLabel = profile.grade === "1" ? "중1" : profile.grade === "2" ? "중2" : profile.grade === "3" ? "중3" : `중${profile.grade}`;
+      parts.push(gradeLabel);
+    }
+    if (profile.subject) parts.push(profile.subject);
+    if (profile.term) parts.push(profile.term);
+    return parts.join(" · ");
+  };
+
+  // 공통 입력 필드 스타일
+  const fieldClass =
+    "w-full rounded-2xl border bg-white/70 px-4 py-3 text-slate-900 shadow-sm outline-none transition " +
+    "border-slate-200/80 " +
+    "hover:border-[#B9B4E4] " +
+    "focus:border-[#B9B4E4] focus:ring-4 focus:ring-[#B9B4E4]/35 focus:ring-offset-0 " +
+    "focus-visible:border-[#B9B4E4] focus-visible:ring-4 focus-visible:ring-[#B9B4E4]/35";
+  
+  // 지역 옵션
+  const regionOptions = [
+    { value: "서울", label: "서울" },
+    { value: "경기", label: "경기" },
+    { value: "충청", label: "충청" },
+    { value: "전라", label: "전라" },
+    { value: "경상", label: "경상" },
+    { value: "강원", label: "강원" },
+    { value: "제주", label: "제주" },
+  ];
+  
+  // 학년 옵션
+  const gradeOptions = GRADES.map((g) => ({ value: g.value, label: g.label }));
+  
+  // 단원 옵션 (이미 { value, label } 형태)
+  const unitOptions = UNIT_OPTIONS;
+
+  return (
+    <>
+        {/* 설정 폼 (showForm이 true일 때만 표시) */}
+        {showForm && (
+          <StudentProfileFormShell title="학생 프로필" subtitle="내신 준비, 게임처럼 쉽게">
+            <div className="space-y-5">
+              {/* ✅ 2열 그리드 = 모바일에서도 3줄(=3x3 느낌) */}
+              <div className="grid grid-cols-2 gap-3">
+                {/* 1) 지역 */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    지역
+                  </label>
+                  <PurpleSelect
+                    value={regionGroup}
+                    onChange={(v) => {
+                      setRegionGroup(v);
+                      setSubRegion("");
+                      setSelectedSchool(null);
+                      setSchoolQuery("");
+                      setSchoolOptions([]);
+                    }}
+                    placeholder="지역"
+                    options={regionOptions}
+                  />
+                </div>
+
+                {/* 2) 세부지역 */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    {regionGroup === "서울"
+                      ? "구"
+                      : regionGroup === "경기"
+                        ? "시/군"
+                        : "세부지역"}
+                  </label>
+                  <PurpleSelect
+                    value={subRegion}
+                    onChange={(v) => {
+                      setSubRegion(v);
+                      setSelectedSchool(null);
+                      setSchoolQuery("");
+                      setSchoolOptions([]);
+                    }}
+                    placeholder={regionGroup === "서울" ? "구" : regionGroup === "경기" ? "시/군" : "세부지역"}
+                    options={subRegionOptions}
+                    disabled={subRegionOptions.length === 0}
+                  />
+                </div>
+
+                {/* 3) 학교(읽기 전용 표시) */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    학교
+                  </label>
+                  <div className="w-full h-12 rounded-full border border-[#E7E5FF] bg-white px-4 flex items-center">
+                    <span className="text-[#2F2A57] font-semibold">
+                      {selectedSchool?.name ?? "학교"}
+                    </span>
+                  </div>
+                  {/* Hidden inputs for form submission */}
+                  <input type="hidden" name="school_code" value={selectedSchool?.code ?? ""} />
+                  <input type="hidden" name="school_name" value={selectedSchool?.name ?? ""} />
+                </div>
+
+                {/* 5) 학년 */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    학년
+                  </label>
+                  <PurpleSelect
+                    value={grade}
+                    onChange={setGrade}
+                    placeholder="학년"
+                    options={gradeOptions}
+                  />
+                </div>
+
+                {/* 6) 과목 */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    과목
+                  </label>
+                  <input 
+                    className={fieldClass} 
+                    value={subject} 
+                    readOnly 
+                  />
+                </div>
+
+                {/* 4) 단원/시험범위 */}
+                <div>
+                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                    단원
+                  </label>
+                  <PurpleSelect
+                    value={unitRange}
+                    onChange={setUnitRange}
+                    placeholder="단원"
+                    options={unitOptions}
+                  />
+                </div>
+              </div>
+
+              {/* 학교 검색 */}
+              <div className="mt-4 col-span-2">
+                <SchoolSearch
+                  region={regionGroup}
+                  gu={subRegion === "전체" ? "" : subRegion}
+                  onSelect={(s) => {
+                    // ✅ 기존 "학교 선택" 드롭다운에 반영되게 연결
+                    setSelectedSchool({
+                      code: s.schoolCode,
+                      name: s.name,
+                      location: regionGroup, // regionGroup을 location으로 사용
+                      kind: "", // SchoolSearch에서 kind를 전달하지 않으므로 빈 문자열
+                      address: "", // SchoolSearch에서 address를 전달하지 않으므로 빈 문자열
+                    });
+                    // 디버그
+                    console.log("[SchoolSearch] selected:", s);
+                  }}
+                />
+              </div>
+
+              {error && (
+                <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+
+              {/* 프로필 저장 버튼 */}
+              <button
+                type="button"
+                onClick={handleSaveProfile}
+                disabled={saving || !selectedSchool || !authReady || !user}
+                className="w-full rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8B7EF0] px-4 py-4 text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6DE8] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 mt-4"
+              >
+                {saving ? "저장 중..." : !authReady ? "로딩 중..." : !user ? "로그인이 필요합니다" : "프로필 저장"}
+              </button>
+
+              {/* 취소 버튼 (프로필이 있을 때만) */}
+              {profile && isProfileComplete(profile) && (
+                <button
+                  type="button"
+                  onClick={() => setShowForm(false)}
+                  className="w-full rounded-2xl border border-[#B9B4E4] bg-white px-4 py-4 text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all mt-2"
+                >
+                  취소
+                </button>
+              )}
+            </div>
+          </StudentProfileFormShell>
+        )}
+
+      {/* StudentHomeShell UI (프로필이 완성되었을 때만 표시) */}
+      {!showForm && profile && isProfileComplete(profile) && (
+        <StudentHomeShell
+          title="학생 모드"
+          subtitle="퀴즈로 실력 올리기"
+          profileCard={
+            <div className="flex items-start justify-between gap-4">
+              <div>
+                {/* 학교명 */}
+                <div className="text-[18px] font-extrabold tracking-tight text-[#2B245A]">
+                  {profile?.school ?? "학교 미설정"}
+                </div>
+                <div className="mt-1 text-sm text-slate-600">
+                  {formatProfileLocation() && `${formatProfileLocation()} · `}
+                  {formatProfileInfo()}
+                </div>
+              </div>
+              <button
+                onClick={() => setShowForm(true)}
+                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+              >
+                프로필
+              </button>
+            </div>
+          }
+          primaryActions={
+            <>
+              <button
+                type="button"
+                onClick={() => {
+                  const params = new URLSearchParams({
+                    grade: grade,
+                    subject: subject,
+                    region: regionGroup,
+                    sub: subRegion,
+                    school: selectedSchool?.code ?? "",
+                    unit: encodeURIComponent(unitRange),
+                  });
+                  router.push(`/student/vocab-game?${params.toString()}`);
+                }}
+                className="w-full rounded-full bg-[#6E63D5] py-4 text-white text-[15px] font-semibold shadow-sm active:scale-[0.99] transition-all"
+              >
+                단어 퀴즈 시작
+              </button>
+
+              <button
+                type="button"
+                onClick={() => router.push("/play")}
+                className="w-full rounded-full bg-[#B9B4E4] py-4 text-[#2B245A] text-[15px] font-semibold shadow-sm active:scale-[0.99] transition-all"
+              >
+                게임 퀴즈 시작 (5분 미션)
+              </button>
+
+              {/* ✅ A/B 본문 선택 퀴즈 */}
+              <button
+                type="button"
+                onClick={handleStartReadingAB}
+                className={[
+                  "w-full rounded-full py-4 text-[15px] font-semibold active:scale-[0.99] transition-all",
+                  "bg-[#5A4FD6] text-white shadow-md",
+                  "disabled:bg-[#B9B4E4] disabled:text-[#2B245A] disabled:opacity-100 disabled:cursor-not-allowed",
+                ].join(" ")}
+              >
+                A/B 본문 선택 퀴즈
+              </button>
+
+              {/* ✅ 버튼 아래 공간 (답답함 해결) */}
+              <div className="h-3" />
+            </>
+          }
+          typeSelector={
+            <div>
+              <div className="text-sm font-semibold text-slate-700 mb-2">문제 유형 선택</div>
+              <div className="grid grid-cols-2 gap-3">
+                {GROUPS.map((group) => (
+                  <label
+                    key={group.key}
+                    className={`flex items-center gap-2 rounded-2xl border bg-white px-4 py-3 cursor-pointer transition-colors ${
+                      selectedGroups.has(group.key)
+                        ? "border-[#6E63D5] bg-[#F0EFFF] hover:bg-[#E6E2FF]"
+                        : "border-[#E6E2FF] hover:border-[#B9B4E4] hover:bg-[#F0EFFF]"
+                    }`}
+                  >
+                    <input
+                      type="checkbox"
+                      checked={selectedGroups.has(group.key)}
+                      onChange={() => handleGroupToggle(group.key)}
+                      className="h-4 w-4 rounded border-gray-300 accent-[#B9B4E4] focus:ring-[#B9B4E4] focus:ring-2 focus:ring-offset-0"
+                    />
+                    <span className="text-sm font-medium text-slate-800">{group.label}</span>
+                  </label>
+                ))}
+              </div>
+            </div>
+          }
+          mainCTA={
+            <>
+              <button
+                onClick={handleStart}
+                disabled={!canProceed || loading}
+                className="w-full rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 py-4 text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              >
+                {loading ? "문제 로딩 중..." : "20문항 풀기 시작"}
+              </button>
+              {grade !== "2" && (
+                <p className="mt-2 text-xs text-slate-500 text-center">
+                  현재는 중2만 이용 가능합니다(준비중)
+                </p>
+              )}
+              {error && (
+                <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                  {error}
+                </div>
+              )}
+            </>
+          }
+        />
+      )}
+    </>
   );
 }
 

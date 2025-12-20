@@ -10,9 +10,13 @@ export default function AuthForm() {
   const [msg, setMsg] = useState<string | null>(null);
   const [socialLoading, setSocialLoading] = useState<string | null>(null);
 
+  // next 파라미터 읽기 (기본값: /ko/student)
+  const next = searchParams?.get("next") || "/ko/student";
+  
+  // redirectTo에 next 파라미터 포함
   const redirectTo =
     typeof window !== "undefined"
-      ? `${window.location.origin}/auth/callback`
+      ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
       : undefined;
 
   async function loginWith(provider: "google" | "kakao" | "naver") {
@@ -20,7 +24,8 @@ export default function AuthForm() {
     setMsg(null);
 
     try {
-      const { error } = await supabaseBrowser.auth.signInWithOAuth({
+      const supabase = supabaseBrowser();
+      const { error } = await supabase.auth.signInWithOAuth({
         provider,
         options: { redirectTo },
       });

@@ -8,8 +8,39 @@
 @theme inline {
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-geist-sans, "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif);
   --font-mono: var(--font-geist-mono);
+  
+  /* Queezy Purple Color Palette */
+  --color-queezy-50: #faf5ff;
+  --color-queezy-100: #f3e8ff;
+  --color-queezy-200: #e9d5ff;
+  --color-queezy-300: #d8b4fe;
+  --color-queezy-400: #c084fc;
+  --color-queezy-500: #a855f7;
+  --color-queezy-600: #9333ea;
+  --color-queezy-700: #7e22ce;
+  --color-queezy-800: #6b21a8;
+  --color-queezy-900: #581c87;
+  --color-queezy-950: #3b0764;
+  
+  /* Radius Tokens */
+  --radius-sm: 0.5rem;
+  --radius-md: 0.75rem;
+  --radius-lg: 1rem;
+  --radius-xl: 1.25rem;
+  --radius-2xl: 1.5rem;
+  --radius-3xl: 2rem;
+  --radius-full: 9999px;
+  
+  /* Shadow Tokens */
+  --shadow-sm: 0 1px 2px 0 rgb(0 0 0 / 0.05);
+  --shadow-md: 0 4px 6px -1px rgb(0 0 0 / 0.1), 0 2px 4px -2px rgb(0 0 0 / 0.1);
+  --shadow-lg: 0 10px 15px -3px rgb(0 0 0 / 0.1), 0 4px 6px -4px rgb(0 0 0 / 0.1);
+  --shadow-xl: 0 20px 25px -5px rgb(0 0 0 / 0.1), 0 8px 10px -6px rgb(0 0 0 / 0.1);
+  --shadow-2xl: 0 25px 50px -12px rgb(0 0 0 / 0.25);
+  --shadow-purple: 0 10px 40px -10px rgb(168 85 247 / 0.4);
+  --shadow-purple-lg: 0 20px 60px -15px rgb(168 85 247 / 0.5);
 }
 
 @media (prefers-color-scheme: dark) {
@@ -22,7 +53,7 @@
 body {
   background: var(--background);
   color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+  font-family: "Pretendard", "Apple SD Gothic Neo", "Noto Sans KR", "system-ui", "-apple-system", "Segoe UI", "Roboto", "Helvetica", "Arial", sans-serif;
 }
 
 /* 프린트 전용 CSS */
@@ -553,4 +584,85 @@ body {
   margin: 12px 0 0;
   border: none;
   border-top: 1px solid #111;
+}
+
+/* =========================
+   Queezy Quiz UI Design System
+   ========================= */
+
+/* 퍼플 그라데이션 배경 */
+.bg-queezy {
+  background: linear-gradient(135deg, #9333ea 0%, #a855f7 50%, #c084fc 100%);
+}
+
+.bg-queezy-dark {
+  background: linear-gradient(135deg, #581c87 0%, #6b21a8 50%, #7e22ce 100%);
+}
+
+.bg-queezy-light {
+  background: linear-gradient(135deg, #f3e8ff 0%, #faf5ff 50%, #ffffff 100%);
+}
+
+/* Glass Card (반투명 블러 카드) */
+.glass-card {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  box-shadow: 0 8px 32px 0 rgba(168, 85, 247, 0.15);
+}
+
+.glass-card-dark {
+  background: rgba(0, 0, 0, 0.2);
+  backdrop-filter: blur(12px);
+  -webkit-backdrop-filter: blur(12px);
+  border: 1px solid rgba(255, 255, 255, 0.1);
+  box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+}
+
+/* 버튼 스타일 */
+.btn-primary {
+  background: linear-gradient(135deg, #9333ea 0%, #a855f7 100%);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  border: none;
+  box-shadow: 0 4px 14px 0 rgba(168, 85, 247, 0.4);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-primary:hover {
+  background: linear-gradient(135deg, #7e22ce 0%, #9333ea 100%);
+  box-shadow: 0 6px 20px 0 rgba(168, 85, 247, 0.5);
+  transform: translateY(-1px);
+}
+
+.btn-primary:active {
+  transform: translateY(0);
+  box-shadow: 0 2px 10px 0 rgba(168, 85, 247, 0.4);
+}
+
+.btn-secondary {
+  background: rgba(255, 255, 255, 0.1);
+  backdrop-filter: blur(8px);
+  -webkit-backdrop-filter: blur(8px);
+  color: white;
+  font-weight: 600;
+  padding: 0.75rem 1.5rem;
+  border-radius: 1rem;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  transition: all 0.2s ease;
+  cursor: pointer;
+}
+
+.btn-secondary:hover {
+  background: rgba(255, 255, 255, 0.15);
+  border-color: rgba(255, 255, 255, 0.3);
+  transform: translateY(-1px);
+}
+
+.btn-secondary:active {
+  transform: translateY(0);
 }

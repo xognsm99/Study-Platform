@@ -81,24 +81,18 @@ export default function SchoolSearch(props: {
 
   return (
     <div className="w-full">
-      <div className="flex w-full gap-2">
+      <div className="flex items-center gap-4">
         <input
+          id="schoolSearchInput"
           value={q}
           onChange={(e) => setQ(e.target.value)}
-          placeholder="학교 이름 2글자 이상 입력 (예: 대동, 신어)"
-          className={
-            "h-12 flex-1 w-full rounded-xl border border-gray-200 px-4 text-sm outline-none " +
-            "bg-white text-gray-900 placeholder:text-gray-400 " +
-            "focus:ring-4 focus:ring-blue-200 " +
-            "dark:border-teal-600 dark:bg-teal-600 dark:text-white dark:placeholder:text-white/70"
-          }
+          placeholder="학교 검색 2글자 이상"
+          className="flex-1 rounded-full border border-[#E7E5FF] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#B9B4E4] focus:ring-2 focus:ring-[#B9B4E4]/30 placeholder:text-[#C9C6F2]"
         />
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="h-12 w-[96px] shrink-0 rounded-xl border border-gray-200 bg-white text-sm font-semibold text-gray-900 shadow-sm
-                     hover:border-blue-500 hover:text-blue-600
-                     dark:border-teal-600 dark:bg-teal-600 dark:text-white dark:hover:bg-teal-700"
+          className="min-w-[110px] rounded-full bg-[#6E63D5] px-7 py-3 font-semibold text-white shadow-md hover:opacity-95 active:scale-[0.99] transition-all"
         >
           {loading ? "검색중" : "검색"}
         </button>
@@ -109,12 +103,18 @@ export default function SchoolSearch(props: {
       </p>
 
       {open && (items.length > 0 || msg) && (
-        <div className="mt-2 rounded-xl border border-gray-200 bg-white p-2 shadow-sm dark:border-teal-600 dark:bg-teal-700/90">
+        <div
+          className="
+            mt-3 overflow-hidden rounded-2xl
+            bg-[#F6F5FF] border border-[#E6E2FF]
+            shadow-[0_18px_60px_rgba(110,99,213,0.18)]
+          "
+        >
           {msg && (
-            <div className="p-2 text-sm text-gray-600 dark:text-white">
+            <div className="px-4 py-3 text-sm text-[#6E63D5]/80">
               {msg}
               {region || gu ? (
-                <div className="mt-1 text-xs text-gray-500 dark:text-gray-400">
+                <div className="mt-1 text-xs text-[#6E63D5]/60">
                   지역/필터 때문에 비어있을 수 있어요.
                 </div>
               ) : null}
@@ -129,12 +129,16 @@ export default function SchoolSearch(props: {
                 onSelect({ name: it.name, schoolCode: it.schoolCode, officeCode: it.officeCode });
                 setOpen(false);
               }}
-              className="w-full rounded-lg px-3 py-2 text-left hover:bg-gray-50 dark:hover:bg-teal-800"
+              className="
+                w-full text-left px-4 py-3
+                hover:bg-[#EEEAFE] active:bg-[#E6E2FF]
+                transition
+              "
             >
-              <div className="text-sm font-semibold text-gray-900 dark:text-gray-100">
+              <div className="text-[#2B235A] font-semibold">
                 {it.name}
               </div>
-              <div className="text-xs text-gray-500 dark:text-gray-400">
+              <div className="text-[#6E63D5]/80 text-xs mt-1">
                 {it.location} · {it.kind} · {it.officeName}
               </div>
             </button>

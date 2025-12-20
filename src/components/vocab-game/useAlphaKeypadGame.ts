@@ -183,6 +183,8 @@ export function useAlphaKeypadGame({
     isComplete,
     availableLetters,
     revealed,
+    usedReveal,
+    hintPenalty,
     handleKeyPress,
     handleBackspace,
     handleBlankClick,

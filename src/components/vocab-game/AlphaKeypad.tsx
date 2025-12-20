@@ -32,11 +32,11 @@ export default function AlphaKeypad({
             className={`
               h-12 md:h-14 
               text-lg md:text-xl font-semibold
-              rounded-lg border-2 transition-all
+              rounded-xl border transition-all
               ${
                 disabled
-                  ? "border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  : "border-slate-300 dark:border-slate-700 bg-white dark:bg-slate-900 text-slate-900 dark:text-slate-100 hover:bg-slate-50 dark:hover:bg-slate-800 hover:border-blue-400 active:bg-blue-100 active:border-blue-500"
+                  ? "border-[#E7E5FF] bg-white/60 text-[#2F2A57]/30 cursor-not-allowed"
+                  : "border-[#E7E5FF] bg-white/70 text-[#2F2A57] ring-2 ring-[#E7E5FF] hover:ring-[#B9B4E4] hover:bg-white/80 active:scale-95"
               }
             `}
           >
@@ -53,11 +53,11 @@ export default function AlphaKeypad({
           className={`
             px-6 py-3 
             text-base font-semibold
-            rounded-lg border-2 transition-all
+            rounded-xl border transition-all
             ${
               disabled
-                ? "border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                : "border-slate-300 dark:border-slate-700 bg-slate-100 dark:bg-slate-800 text-slate-700 dark:text-slate-100 hover:bg-slate-200 dark:hover:bg-slate-700 hover:border-slate-400 active:bg-slate-300"
+                ? "border-[#E7E5FF] bg-white/60 text-[#2F2A57]/30 cursor-not-allowed"
+                : "border-[#E7E5FF] bg-white/70 text-[#2F2A57] ring-2 ring-[#E7E5FF] hover:ring-[#B9B4E4] hover:bg-white/80"
             }
           `}
         >
@@ -71,11 +71,11 @@ export default function AlphaKeypad({
             className={`
               px-6 py-3 
               text-base font-semibold
-              rounded-lg border-2 transition-all
+              rounded-xl border transition-all
               ${
                 disabled
-                  ? "border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  : "border-amber-300 dark:border-amber-500/40 bg-amber-50 dark:bg-amber-950/30 text-amber-900 dark:text-amber-100 hover:bg-amber-100 dark:hover:bg-amber-950/40 hover:border-amber-400 active:bg-amber-200"
+                  ? "border-[#E7E5FF] bg-white/60 text-[#2F2A57]/30 cursor-not-allowed"
+                  : "border-[#E7E5FF] bg-white/70 text-[#2F2A57] ring-2 ring-[#E7E5FF] hover:ring-[#B9B4E4] hover:bg-white/80"
               }
             `}
           >
@@ -91,11 +91,11 @@ export default function AlphaKeypad({
             className={`
               px-6 py-3 
               text-base font-semibold
-              rounded-lg border-2 transition-all
+              rounded-xl transition-all
               ${
                 disabled
-                  ? "border-slate-200 dark:border-slate-800 bg-slate-100 dark:bg-slate-900/50 text-slate-400 dark:text-slate-500 cursor-not-allowed"
-                  : "border-purple-300 dark:border-purple-500/40 bg-purple-50 dark:bg-purple-950/30 text-purple-900 dark:text-purple-100 hover:bg-purple-100 dark:hover:bg-purple-950/40 hover:border-purple-400 active:bg-purple-200"
+                  ? "bg-white/60 text-[#2F2A57]/30 cursor-not-allowed"
+                  : "bg-[#6E63D5] text-white hover:bg-[#5B52C8] active:bg-[#5B52C8] shadow-md"
               }
             `}
           >
