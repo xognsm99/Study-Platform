@@ -229,4 +229,40 @@ export const VOCAB_GAME_SAMPLE: VocabGameItem[] = [
     // translation 없음 (해석 준비중 테스트용)
   },
 ];
+export type KeypadProblem = {
+  id?: string;
+  mode?: "keypad";
+  sentence: string;
+  answers: string[];
+  options: string[];
+  explanation?: string;
+  body?: string | null;
+};
 
+// ✅ DB에서 가져오고 실패하면 기존 배열로 폴백
+export async function loadVocabGameProblems(params?: {
+  grade?: string | number;
+  subject?: string;
+  limit?: number;
+}): Promise<KeypadProblem[]> {
+  const grade = String(params?.grade ?? "2");
+  const subject = String(params?.subject ?? "english");
+  const limit = params?.limit ?? 10;
+
+  const res = await fetch("/api/vocab-game", {
+    method: "POST",
+    headers: { "Content-Type": "application/json" },
+    body: JSON.stringify({ grade, subject, limit }),
+  });
+
+  const json = await res.json().catch(() => null);
+
+  if (res.ok && json?.ok && Array.isArray(json.problems) && json.problems.length) {
+    return json.problems as KeypadProblem[];
+  }
+
+  // ⚠️ 여기서 "기존 10문제 배열 변수명"을 반환해야 함
+  // 아래 return 한 줄만 너 파일에 맞게 바꿔!
+  return (VOCAB_GAME_SAMPLE as any) as KeypadProblem[];
+
+}

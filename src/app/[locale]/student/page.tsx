@@ -13,6 +13,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 import StudentHomeShell from "@/components/queezy/StudentHomeShell";
 import StudentProfileFormShell from "@/components/queezy/StudentProfileFormShell";
 import PurpleSelect from "@/components/queezy/PurpleSelect";
+import { ScreenCard, ScreenTitle } from "@/components/ui/ScreenCard";
 
 
 const GRADES = [
@@ -412,9 +413,9 @@ export default function StudentPage() {
   // 인증 준비 중이거나 로그인 안 된 경우
   if (!authReady || !user) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        <div className="mx-auto max-w-xl px-6 py-10">
-          <div className="text-center text-neutral-600">로딩 중...</div>
+      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
+        <div className="mx-auto w-full max-w-md">
+          {/* 로딩 중: 텍스트 없이 빈 스켈레톤 */}
         </div>
       </div>
     );
@@ -423,9 +424,9 @@ export default function StudentPage() {
   // 프로필 로딩 중
   if (profileLoading) {
     return (
-      <div className="min-h-screen bg-gradient-to-b from-white to-gray-50">
-        <div className="mx-auto max-w-xl px-6 py-10">
-          <div className="text-center text-neutral-600">로딩 중...</div>
+      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
+        <div className="mx-auto w-full max-w-md">
+          {/* 로딩 중: 텍스트 없이 빈 스켈레톤 */}
         </div>
       </div>
     );
@@ -452,13 +453,24 @@ export default function StudentPage() {
     return parts.join(" · ");
   };
 
-  // 공통 입력 필드 스타일
-  const fieldClass =
-    "w-full rounded-2xl border bg-white/70 px-4 py-3 text-slate-900 shadow-sm outline-none transition " +
-    "border-slate-200/80 " +
-    "hover:border-[#B9B4E4] " +
-    "focus:border-[#B9B4E4] focus:ring-4 focus:ring-[#B9B4E4]/35 focus:ring-offset-0 " +
-    "focus-visible:border-[#B9B4E4] focus-visible:ring-4 focus-visible:ring-[#B9B4E4]/35";
+  // Primary 색상 상수 (프로필 저장 버튼과 통일)
+  const PRIMARY_BG = "bg-[#6E63D5] hover:bg-[#5B52C8]";
+  const PRIMARY_TEXT = "text-[#6E63D5]";
+
+  // 공통 입력 필드 스타일 함수
+  function fieldClass(selected: boolean) {
+    const base =
+      "h-12 w-full min-w-0 rounded-full border px-4 text-sm outline-none transition " +
+      "max-[380px]:h-10 max-[380px]:text-xs";
+
+    const normal =
+      "bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-200 focus:ring-2 focus:ring-violet-200";
+
+    const picked =
+      "bg-violet-50 border-violet-300 ring-1 ring-violet-200";
+
+    return `${base} ${selected ? picked : normal}`;
+  }
   
   // 지역 옵션
   const regionOptions = [
@@ -479,15 +491,15 @@ export default function StudentPage() {
 
   return (
     <>
-        {/* 설정 폼 (showForm이 true일 때만 표시) */}
-        {showForm && (
-          <StudentProfileFormShell title="학생 프로필" subtitle="내신 준비, 게임처럼 쉽게">
-            <div className="space-y-5">
+      {/* 설정 폼 (showForm이 true일 때만 표시) */}
+      {showForm && (
+          <StudentProfileFormShell title="학생 프로필">
+            <div className="space-y-5 max-[380px]:space-y-4">
               {/* ✅ 2열 그리드 = 모바일에서도 3줄(=3x3 느낌) */}
-              <div className="grid grid-cols-2 gap-3">
+              <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
                 {/* 1) 지역 */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     지역
                   </label>
                   <PurpleSelect
@@ -501,12 +513,13 @@ export default function StudentPage() {
                     }}
                     placeholder="지역"
                     options={regionOptions}
+                    selected={!!regionGroup}
                   />
                 </div>
 
                 {/* 2) 세부지역 */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     {regionGroup === "서울"
                       ? "구"
                       : regionGroup === "경기"
@@ -524,16 +537,17 @@ export default function StudentPage() {
                     placeholder={regionGroup === "서울" ? "구" : regionGroup === "경기" ? "시/군" : "세부지역"}
                     options={subRegionOptions}
                     disabled={subRegionOptions.length === 0}
+                    selected={!!subRegion}
                   />
                 </div>
 
                 {/* 3) 학교(읽기 전용 표시) */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     학교
                   </label>
-                  <div className="w-full h-12 rounded-full border border-[#E7E5FF] bg-white px-4 flex items-center">
-                    <span className="text-[#2F2A57] font-semibold">
+                  <div className={fieldClass(!!selectedSchool) + " flex items-center"}>
+                    <span className="text-sm max-[380px]:text-xs text-[#2F2A57] font-semibold truncate">
                       {selectedSchool?.name ?? "학교"}
                     </span>
                   </div>
@@ -543,8 +557,8 @@ export default function StudentPage() {
                 </div>
 
                 {/* 5) 학년 */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     학년
                   </label>
                   <PurpleSelect
@@ -552,24 +566,25 @@ export default function StudentPage() {
                     onChange={setGrade}
                     placeholder="학년"
                     options={gradeOptions}
+                    selected={!!grade}
                   />
                 </div>
 
                 {/* 6) 과목 */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     과목
                   </label>
                   <input 
-                    className={fieldClass} 
+                    className={`${fieldClass(!!subject)} text-gray-900 placeholder:text-gray-400`}
                     value={subject} 
                     readOnly 
                   />
                 </div>
 
                 {/* 4) 단원/시험범위 */}
-                <div>
-                  <label className="block text-sm font-medium mb-2 text-gray-800">
+                <div className="min-w-0">
+                  <label className="mb-1 block text-xs text-gray-500">
                     단원
                   </label>
                   <PurpleSelect
@@ -577,12 +592,13 @@ export default function StudentPage() {
                     onChange={setUnitRange}
                     placeholder="단원"
                     options={unitOptions}
+                    selected={!!unitRange}
                   />
                 </div>
               </div>
 
               {/* 학교 검색 */}
-              <div className="mt-4 col-span-2">
+              <div className="mt-4">
                 <SchoolSearch
                   region={regionGroup}
                   gu={subRegion === "전체" ? "" : subRegion}
@@ -602,152 +618,111 @@ export default function StudentPage() {
               </div>
 
               {error && (
-                <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
+                <div className="mt-4 rounded-lg bg-red-50 p-3 max-[380px]:p-2.5 text-sm max-[380px]:text-xs text-red-600">
                   {error}
                 </div>
               )}
 
-              {/* 프로필 저장 버튼 */}
-              <button
-                type="button"
-                onClick={handleSaveProfile}
-                disabled={saving || !selectedSchool || !authReady || !user}
-                className="w-full rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8B7EF0] px-4 py-4 text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6DE8] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 mt-4"
-              >
-                {saving ? "저장 중..." : !authReady ? "로딩 중..." : !user ? "로그인이 필요합니다" : "프로필 저장"}
-              </button>
-
-              {/* 취소 버튼 (프로필이 있을 때만) */}
-              {profile && isProfileComplete(profile) && (
+              {/* 저장/취소 버튼 */}
+              <div className="mt-5 flex flex-col gap-3 max-[380px]:gap-2">
                 <button
                   type="button"
-                  onClick={() => setShowForm(false)}
-                  className="w-full rounded-2xl border border-[#B9B4E4] bg-white px-4 py-4 text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all mt-2"
+                  onClick={handleSaveProfile}
+                  disabled={saving || !selectedSchool || !authReady || !user}
+                  className={`h-12 w-full rounded-full ${PRIMARY_BG} text-sm max-[380px]:h-10 max-[380px]:text-xs text-white font-semibold shadow-sm transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50`}
                 >
-                  취소
+                  {saving ? "저장 중..." : !authReady ? "" : !user ? "로그인이 필요합니다" : "프로필 저장"}
                 </button>
-              )}
-            </div>
-          </StudentProfileFormShell>
-        )}
+
+                {/* 취소 버튼 (프로필이 있을 때만) */}
+                {profile && isProfileComplete(profile) && (
+                  <button
+                    type="button"
+                    onClick={() => setShowForm(false)}
+                    className="h-12 w-full rounded-full border border-[#B9B4E4] bg-white text-sm max-[380px]:h-10 max-[380px]:text-xs text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all"
+                  >
+                    취소
+                  </button>
+                )}
+              </div>
+          </div>
+        </StudentProfileFormShell>
+      )}
 
       {/* StudentHomeShell UI (프로필이 완성되었을 때만 표시) */}
       {!showForm && profile && isProfileComplete(profile) && (
-        <StudentHomeShell
-          title="학생 모드"
-          subtitle="퀴즈로 실력 올리기"
-          profileCard={
-            <div className="flex items-start justify-between gap-4">
-              <div>
-                {/* 학교명 */}
-                <div className="text-[18px] font-extrabold tracking-tight text-[#2B245A]">
-                  {profile?.school ?? "학교 미설정"}
+        <StudentHomeShell>
+          <div className="px-4 pt-6 pb-24">
+            <ScreenTitle>U QUIZ?</ScreenTitle>
+
+            <ScreenCard>
+              {/* 프로필 카드 */}
+              <div className="flex items-start justify-between gap-4 max-[380px]:gap-3">
+                <div className="min-w-0">
+                  {/* 학교명 */}
+                  <div className="text-[18px] max-[380px]:text-base font-extrabold tracking-tight text-[#6E63D5]">
+                    {profile?.school ?? "학교 미설정"}
+                  </div>
+                  <div className="mt-1 text-sm max-[380px]:text-xs text-slate-600">
+                    {formatProfileLocation() && `${formatProfileLocation()} · `}
+                    {formatProfileInfo()}
+                  </div>
                 </div>
-                <div className="mt-1 text-sm text-slate-600">
-                  {formatProfileLocation() && `${formatProfileLocation()} · `}
-                  {formatProfileInfo()}
-                </div>
+                <button
+                  onClick={() => setShowForm(true)}
+                  className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 max-[380px]:px-3 max-[380px]:py-1.5 text-sm max-[380px]:text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                >
+                  프로필
+                </button>
               </div>
-              <button
-                onClick={() => setShowForm(true)}
-                className="rounded-full border border-slate-200 bg-white px-4 py-2 text-sm font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-              >
-                프로필
-              </button>
-            </div>
-          }
-          primaryActions={
-            <>
-              <button
-                type="button"
-                onClick={() => {
-                  const params = new URLSearchParams({
-                    grade: grade,
-                    subject: subject,
-                    region: regionGroup,
-                    sub: subRegion,
-                    school: selectedSchool?.code ?? "",
-                    unit: encodeURIComponent(unitRange),
-                  });
-                  router.push(`/student/vocab-game?${params.toString()}`);
-                }}
-                className="w-full rounded-full bg-[#6E63D5] py-4 text-white text-[15px] font-semibold shadow-sm active:scale-[0.99] transition-all"
-              >
-                단어 퀴즈 시작
-              </button>
 
-              <button
-                type="button"
-                onClick={() => router.push("/play")}
-                className="w-full rounded-full bg-[#B9B4E4] py-4 text-[#2B245A] text-[15px] font-semibold shadow-sm active:scale-[0.99] transition-all"
-              >
-                게임 퀴즈 시작 (5분 미션)
-              </button>
+              {/* 주요 액션 버튼들 */}
+              <div className="mt-4 space-y-3 max-[380px]:mt-3 max-[380px]:space-y-2">
+                <button
+                  type="button"
+                  onClick={() => {
+                    const params = new URLSearchParams({
+                      grade: grade,
+                      subject: subject,
+                      region: regionGroup,
+                      sub: subRegion,
+                      school: selectedSchool?.code ?? "",
+                      unit: encodeURIComponent(unitRange),
+                    });
+                    router.push(`/student/vocab-game?${params.toString()}`);
+                  }}
+                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 text-violet-800 text-sm max-[380px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                >
+                  단어 퀴즈 시작
+                </button>
 
-              {/* ✅ A/B 본문 선택 퀴즈 */}
-              <button
-                type="button"
-                onClick={handleStartReadingAB}
-                className={[
-                  "w-full rounded-full py-4 text-[15px] font-semibold active:scale-[0.99] transition-all",
-                  "bg-[#5A4FD6] text-white shadow-md",
-                  "disabled:bg-[#B9B4E4] disabled:text-[#2B245A] disabled:opacity-100 disabled:cursor-not-allowed",
-                ].join(" ")}
-              >
-                A/B 본문 선택 퀴즈
-              </button>
+                <button
+                  type="button"
+                  onClick={() => router.push("/play")}
+                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 text-violet-900 text-sm max-[380px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                >
+                  게임 퀴즈 시작 (5분 미션)
+                </button>
 
-              {/* ✅ 버튼 아래 공간 (답답함 해결) */}
-              <div className="h-3" />
-            </>
-          }
-          typeSelector={
-            <div>
-              <div className="text-sm font-semibold text-slate-700 mb-2">문제 유형 선택</div>
-              <div className="grid grid-cols-2 gap-3">
-                {GROUPS.map((group) => (
-                  <label
-                    key={group.key}
-                    className={`flex items-center gap-2 rounded-2xl border bg-white px-4 py-3 cursor-pointer transition-colors ${
-                      selectedGroups.has(group.key)
-                        ? "border-[#6E63D5] bg-[#F0EFFF] hover:bg-[#E6E2FF]"
-                        : "border-[#E6E2FF] hover:border-[#B9B4E4] hover:bg-[#F0EFFF]"
-                    }`}
-                  >
-                    <input
-                      type="checkbox"
-                      checked={selectedGroups.has(group.key)}
-                      onChange={() => handleGroupToggle(group.key)}
-                      className="h-4 w-4 rounded border-gray-300 accent-[#B9B4E4] focus:ring-[#B9B4E4] focus:ring-2 focus:ring-offset-0"
-                    />
-                    <span className="text-sm font-medium text-slate-800">{group.label}</span>
-                  </label>
-                ))}
+                {/* ✅ A/B 본문 선택 퀴즈 */}
+                <button
+                  type="button"
+                  onClick={handleStartReadingAB}
+                  className={[
+                    "w-full h-12 max-[380px]:h-10 rounded-full text-sm max-[380px]:text-xs font-semibold active:scale-[0.99] transition-all",
+                    "bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0]",
+                    "disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300",
+                  ].join(" ")}
+                >
+                  A/B 본문 선택 퀴즈
+                </button>
+
+                {/* ✅ 버튼 아래 공간 (답답함 해결) */}
+                <div className="h-3" />
               </div>
-            </div>
-          }
-          mainCTA={
-            <>
-              <button
-                onClick={handleStart}
-                disabled={!canProceed || loading}
-                className="w-full rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 py-4 text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
-              >
-                {loading ? "문제 로딩 중..." : "20문항 풀기 시작"}
-              </button>
-              {grade !== "2" && (
-                <p className="mt-2 text-xs text-slate-500 text-center">
-                  현재는 중2만 이용 가능합니다(준비중)
-                </p>
-              )}
-              {error && (
-                <div className="mt-4 rounded-lg bg-red-50 p-3 text-sm text-red-600">
-                  {error}
-                </div>
-              )}
-            </>
-          }
-        />
+            </ScreenCard>
+          </div>
+        </StudentHomeShell>
       )}
     </>
   );

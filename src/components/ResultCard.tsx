@@ -125,41 +125,41 @@ function SingleResultSection({
   hintUsedCount: number;
 }) {
   return (
-    <div className="grid grid-cols-2 gap-3">
+    <div className="grid grid-cols-2 gap-2">
       {/* 정답 */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">정답</div>
-        <div className="mt-1 text-2xl font-bold">{correct}</div>
+        <div className="mt-1 text-xl font-bold">{correct}</div>
       </div>
 
       {/* 오답 */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">오답</div>
-        <div className="mt-1 text-2xl font-bold">{wrong}</div>
+        <div className="mt-1 text-xl font-bold">{wrong}</div>
       </div>
 
       {/* 총 문항 */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">총 문항</div>
-        <div className="mt-1 text-2xl font-bold">{total}</div>
+        <div className="mt-1 text-xl font-bold">{total}</div>
       </div>
 
       {/* 점수 */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">점수</div>
-        <div className="mt-1 text-2xl font-bold">{scorePct}</div>
+        <div className="mt-1 text-xl font-bold">{scorePct}</div>
       </div>
 
       {/* 문제 풀이 시간 (현재는 고정값 또는 미사용) */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">문제 풀이 시간</div>
-        <div className="mt-1 text-lg font-bold">{formatTime(durationSeconds)}</div>
+        <div className="mt-1 text-base font-bold">{formatTime(durationSeconds)}</div>
       </div>
 
       {/* 힌트 사용 횟수 */}
-      <div className="rounded-xl border bg-white p-4">
+      <div className="rounded-xl border border-violet-500 bg-white p-3">
         <div className="text-xs text-gray-500">힌트 사용 횟수</div>
-        <div className="mt-1 text-lg font-bold">{hintUsedCount}회</div>
+        <div className="mt-1 text-base font-bold">{hintUsedCount}회</div>
       </div>
     </div>
   );
@@ -195,7 +195,7 @@ function TripleResultSection({
         {roundResults.map((roundResult) => {
           const roundScore = Math.round((roundResult.correct / Math.max(roundResult.total, 1)) * 100);
           return (
-            <div key={roundResult.round} className="rounded-xl border bg-white p-4">
+            <div key={roundResult.round} className="rounded-xl border border-violet-500 bg-white p-3">
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-semibold text-gray-900">
                   {roundResult.round}회차
@@ -204,18 +204,18 @@ function TripleResultSection({
                   {formatTimeMs(roundResult.timeMs)} · 힌트 {roundResult.hintUsed}회
                 </div>
               </div>
-              <div className="grid grid-cols-3 gap-3">
+              <div className="grid grid-cols-3 gap-2">
                 <div>
                   <div className="text-xs text-gray-500">정답</div>
-                  <div className="mt-1 text-lg font-bold text-green-600">{roundResult.correct}</div>
+                  <div className="mt-1 text-base font-bold text-green-600">{roundResult.correct}</div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500">오답</div>
-                  <div className="mt-1 text-lg font-bold text-red-600">{roundResult.wrong}</div>
+                  <div className="mt-1 text-base font-bold text-red-600">{roundResult.wrong}</div>
                 </div>
                 <div>
                   <div className="text-xs text-gray-500">정답률</div>
-                  <div className="mt-1 text-lg font-bold">{roundScore}%</div>
+                  <div className="mt-1 text-base font-bold">{roundScore}%</div>
                 </div>
               </div>
             </div>
@@ -224,27 +224,27 @@ function TripleResultSection({
       </div>
 
       {/* 총합 요약 */}
-      <div className="mb-4 rounded-xl border-2 border-blue-200 bg-blue-50 p-4">
+      <div className="mb-4 rounded-xl border-2 border-violet-500 bg-blue-50 p-3">
         <div className="text-xs font-semibold text-blue-900 mb-2">총합</div>
-        <div className="grid grid-cols-2 gap-3">
+        <div className="grid grid-cols-2 gap-2">
           <div>
             <div className="text-xs text-blue-700">총 정답</div>
-            <div className="mt-1 text-xl font-bold text-blue-900">{correct}</div>
+            <div className="mt-1 text-lg font-bold text-blue-900">{correct}</div>
           </div>
           <div>
             <div className="text-xs text-blue-700">총 오답</div>
-            <div className="mt-1 text-xl font-bold text-blue-900">{wrong}</div>
+            <div className="mt-1 text-lg font-bold text-blue-900">{wrong}</div>
           </div>
           <div>
             <div className="text-xs text-blue-700">총 문항</div>
-            <div className="mt-1 text-xl font-bold text-blue-900">{total}</div>
+            <div className="mt-1 text-lg font-bold text-blue-900">{total}</div>
           </div>
           <div>
             <div className="text-xs text-blue-700">평균 정답률</div>
-            <div className="mt-1 text-xl font-bold text-blue-900">{scorePct}%</div>
+            <div className="mt-1 text-lg font-bold text-blue-900">{scorePct}%</div>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-blue-200 grid grid-cols-2 gap-3">
+        <div className="mt-3 pt-3 border-t border-violet-500 grid grid-cols-2 gap-2">
           <div>
             <div className="text-xs text-blue-700">총 풀이 시간</div>
             <div className="mt-1 text-sm font-semibold text-blue-900">{formatTime(durationSeconds)}</div>
@@ -347,16 +347,26 @@ export default function ResultCard({
     return `/${l}/student/${encodeURIComponent(grade)}/${subject}/${category}`;
   };
 
-  // ✅ 다시 풀기 (같은 카테고리로 바로 돌아가서 재시작)
+  // ✅ 다시 풀기 (sessionStorage의 lastQuizHref로 이동, replay=1 추가)
   const onRetry = onRetryProp || (() => {
-    router.push(buildStudentQuizHref());
+    try {
+      const lastQuizHref = sessionStorage.getItem("lastQuizHref");
+      if (lastQuizHref) {
+        // 이미 쿼리 파라미터가 있으면 &replay=1, 없으면 ?replay=1
+        const separator = lastQuizHref.includes("?") ? "&" : "?";
+        router.push(`${lastQuizHref}${separator}replay=1`);
+        return;
+      }
+    } catch (e) {
+      console.error("Failed to read lastQuizHref from sessionStorage", e);
+    }
+    // fallback: lastQuizHref가 없으면 문제 선택 페이지로 이동
+    router.push(`/${locale}/student/problems`);
   });
 
-  // ✅ 다른 문제 생성 (역시 같은 화면으로 가서 새로 시작)
-  // 만약 캐시 때문에 화면이 안 바뀌면 ts를 붙여 강제
+  // ✅ 다른 문제 생성 (문제 선택 페이지로 이동)
   const onNew = onNewProblemsProp || (() => {
-    const href = buildStudentQuizHref();
-    router.push(`${href}?ts=${Date.now()}`);
+    router.push(`/${locale}/student/problems?regen=1`);
   });
 
   // ✅ 부모 리포트 생성 및 공유
@@ -422,12 +432,6 @@ export default function ResultCard({
 
   return (
     <div className="rounded-2xl border bg-white p-6 shadow-sm text-slate-900">
-      <div className="mb-4 text-xs text-gray-500">
-        {grade} · {subjText}
-        {catText && ` · ${catText}`}
-        {isActuallyTripleMode && " · 3회 세트 완료"}
-      </div>
-
       <h2 className="mb-4 text-lg font-bold">학습 결과</h2>
 
       {/* ✅ 조건부 렌더링: 3세트 모드 vs 단일 모드 (완전 분리) */}
@@ -455,9 +459,9 @@ export default function ResultCard({
       )}
 
       {/* 간이 레벨 */}
-      <div className="mt-4 rounded-xl bg-gray-50 p-4">
+      <div className="mt-4 rounded-xl bg-gray-50 p-3">
         <div className="text-xs font-semibold text-gray-600">간이 레벨</div>
-        <div className="mt-1 text-2xl font-bold">{rank}</div>
+        <div className="mt-1 text-xl font-bold">{rank}</div>
         <p className="mt-2 text-sm text-gray-600">{rankMessage}</p>
       </div>
 
@@ -468,14 +472,14 @@ export default function ResultCard({
           <button
             type="button"
             onClick={onRetry}
-            className="rounded-lg bg-slate-200 px-4 py-3 text-sm font-semibold text-slate-900 transition-colors hover:bg-slate-300"
+            className="rounded-lg bg-violet-100 px-4 py-3 text-sm font-semibold text-violet-900 transition-colors hover:bg-violet-200"
           >
             다시 풀기
           </button>
           <button
             type="button"
             onClick={onNew}
-            className="rounded-lg bg-slate-900 px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-slate-800"
+            className="rounded-lg bg-[#6E63D5] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#5B52C8]"
           >
             다른 문제 생성
           </button>

@@ -34,6 +34,8 @@ export type ProblemItem = {
 };
 
 type Props = {
+  items?: ProblemItem[];
+  problems?: ProblemItem[];
   grade: string;
   subject: string;
   category: string;
@@ -45,7 +47,10 @@ type Props = {
  * QuizClient - 라우팅 컴포넌트
  * isTripleMode에 따라 SingleQuizClient 또는 TripleQuizClient로 분기
  */
-export default function QuizClient({ grade, subject, category, initialProblems, categories }: Props) {
+export default function QuizClient(props: Props) {
+  const { grade, subject, category, categories } = props;
+  const items = (props.items ?? props.problems ?? props.initialProblems ?? []) as ProblemItem[];
+
   // ✅ 모드 결정
   const isExamMode = category === "midterm" || category === "final";
   // Triple 모드는 독해(reading) / 대화문(dialogue)만 사용
@@ -55,6 +60,6 @@ export default function QuizClient({ grade, subject, category, initialProblems, 
   return isTripleMode ? (
     <TripleQuizClient grade={grade} subject={subject} category={category} categories={categories} />
   ) : (
-    <SingleQuizClient grade={grade} subject={subject} category={category} initialProblems={initialProblems} categories={categories} />
+    <SingleQuizClient grade={grade} subject={subject} category={category} initialProblems={items} categories={categories} />
   );
 }

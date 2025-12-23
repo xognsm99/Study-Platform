@@ -183,6 +183,13 @@ export default function TeacherPreviewPage() {
   const setId = sp.get("setId");
   const grade = sp.get("grade") ?? "";
   const subject = sp.get("subject") ?? "";
+  const unitRaw = sp.get("unit") ?? "";
+  const unitLabel =
+    unitRaw === "1-3" ? "1~3 단원" :
+    unitRaw === "4-6" ? "4~6 단원" :
+    unitRaw === "7-9" ? "7~9 단원" :
+    unitRaw === "10-12" ? "10~12 단원" :
+    unitRaw ? unitRaw : "종합평가";
 
   useEffect(() => {
     // ✅ setId는 반드시 URL query에서 가져와서 사용
@@ -260,19 +267,19 @@ export default function TeacherPreviewPage() {
 
   if (loading) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center">
-        <div className="text-center text-gray-600">로딩 중...</div>
+      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
+        <div className="text-center text-slate-600 text-sm">로딩 중...</div>
       </div>
     );
   }
 
   if (dataNotFound || items.length === 0) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
-        <div className="max-w-md w-full rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100 text-center">
+      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
+        <div className="mx-auto w-full max-w-[420px] rounded-[28px] bg-white p-6 shadow-sm border border-[#E6E3FF] text-center">
           <div className="mb-4">
             <svg
-              className="mx-auto h-12 w-12 text-gray-400"
+              className="mx-auto h-10 w-10 text-[#6E63D5]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -285,15 +292,15 @@ export default function TeacherPreviewPage() {
               />
             </svg>
           </div>
-          <h2 className="text-xl font-bold text-gray-900 mb-2">
+          <h2 className="text-[15px] font-semibold text-[#6E63D5] mb-2">
             세트 데이터를 찾지 못했습니다
           </h2>
-          <p className="text-sm text-gray-600 mb-6">
+          <p className="text-sm text-slate-600 mb-5">
             세트가 만료되었거나 찾을 수 없습니다. 다시 생성해주세요.
           </p>
           <button
             onClick={handleGoBack}
-            className="w-full rounded-lg bg-blue-600 px-4 py-3 text-sm font-semibold text-white hover:bg-blue-700"
+            className="w-full h-11 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-sm font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all"
           >
             다시 생성하기
           </button>
@@ -303,55 +310,65 @@ export default function TeacherPreviewPage() {
   }
 
   return (
-    <div className="preview-root min-h-screen bg-gradient-to-b from-white to-gray-50">
-      <div className="mx-auto max-w-4xl px-6 py-10">
-        <h1 className="text-2xl font-bold text-gray-900">미리보기</h1>
+    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white px-4 py-6 max-[380px]:px-3">
+      <div className="mx-auto w-full max-w-[420px]">
+        <h1 className="text-[18px] font-semibold text-[#6E63D5]">미리보기</h1>
 
-        <div className="mt-6 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100 dark:bg-gray-900 dark:ring-gray-800">
-          <div className="mb-4 space-y-1">
-            <div className="text-white font-semibold">
-              학년: {grade || "-"}
+        <div className="mt-4 rounded-[28px] bg-white shadow-sm border border-[#E6E3FF] p-5">
+          <div className="mb-4 space-y-2">
+            <div className="flex flex-wrap gap-2 text-xs">
+              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+                학년 {grade || "-"}
+              </span>
+              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+                과목 {subject || "-"}
+              </span>
+              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+                단원 {unitLabel}
+              </span>
+              {items.length > 0 && (
+                <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-slate-600 font-semibold">
+                  총 {items.length}문항
+                </span>
+              )}
             </div>
-            <div className="text-slate-200">
-              과목: {subject || "-"}
-            </div>
-            {items.length > 0 && (() => {
-              const vocab = counts?.vocabulary ?? 0;
-              const gram = counts?.grammar ?? 0;
-              const dial = counts?.dialogue ?? 0;
-              const read = counts?.reading ?? 0;
-              const summary = `총 ${items.length}문항 (어휘 ${vocab} / 문법 ${gram} / 대화문 ${dial} / 본문 ${read})`;
-              return (
-                <div className="text-slate-200 mt-2">
-                  {summary}
-                </div>
-              );
-            })()}
           </div>
 
-          <div className="mb-6 flex items-center justify-between">
+          <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-lg font-bold text-white">문제 목록</h2>
+              <h2 className="text-[15px] font-semibold text-[#5B52C8]">문제 목록</h2>
             </div>
-            <div className="flex gap-2">
+            <div className="grid grid-cols-2 gap-2 ml-4">
               <button
                 onClick={() => handlePrint("question")}
-                className="rounded-lg bg-gray-900 px-4 py-2 text-sm font-semibold text-white hover:bg-gray-800"
+                className="h-9 px-3 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-xs font-semibold shadow-[0_8px_18px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all whitespace-nowrap"
               >
                 문제 인쇄
               </button>
               <button
                 onClick={() => handlePrint("answer")}
-                className="rounded-lg bg-blue-600 px-4 py-2 text-sm font-semibold text-white hover:bg-blue-700"
+                className="h-9 px-3 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-xs font-semibold shadow-[0_8px_18px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all whitespace-nowrap"
               >
                 정답 인쇄
               </button>
             </div>
           </div>
+
+          {items.length > 0 && (() => {
+            const vocab = counts?.vocabulary ?? 0;
+            const gram = counts?.grammar ?? 0;
+            const dial = counts?.dialogue ?? 0;
+            const read = counts?.reading ?? 0;
+            const summary = `어휘 ${vocab} · 문법 ${gram} · 대화문 ${dial} · 본문 ${read}`;
+            return (
+              <div className="mt-2 text-[13px] text-[#2E2A6A]/70">
+                {summary}
+              </div>
+            );
+          })()}
         </div>
 
-        <div className="mt-8 rounded-2xl bg-white p-6 shadow-sm ring-1 ring-gray-100">
-          <div className="space-y-6">
+        <div className="mt-5 space-y-4">
             {items.map((item: any, idx: number) => {
               const qtype = item?.qtype ?? item?.content?.raw?.qtype ?? item?.content?.qtype ?? "";
               const passage = getTeacherPassage(item);
@@ -373,22 +390,21 @@ export default function TeacherPreviewPage() {
               return (
                 <div
                   key={item.id ?? idx}
-                  className="problem-card"
-                  style={{ borderRadius: 12, padding: 12, marginBottom: 10 }}
+                  className="rounded-2xl bg-white border border-[#EAE7FF] shadow-sm p-4"
                 >
-                  <div style={{ fontWeight: 800, marginBottom: 6 }}>문제 {idx + 1}</div>
+                  <div className="text-sm font-bold text-[#6E63D5] mb-2">문제 {idx + 1}</div>
 
                   {/* ✅ 어휘_영영/문법은 "문제 → 지문(정의/해석) → 보기" 순서 */}
                   {shouldQuestionFirst ? (
                     <>
-                      <div className="font-semibold whitespace-pre-wrap leading-relaxed">
+                      <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
                         {text || "(문제 문장을 찾지 못했습니다)"}
                       </div>
 
                       {(passage || tr) && (
-                        <div className="mt-3 rounded-xl bg-gray-50 px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed">
+                        <div className="mt-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
                           {passage && <div>{passage}</div>}
-                          {tr && <div className="mt-2">▶ 해석: {tr}</div>}
+                          {tr && <div className="mt-2 text-slate-700">▶ 해석: {tr}</div>}
                         </div>
                       )}
                     </>
@@ -396,25 +412,25 @@ export default function TeacherPreviewPage() {
                     <>
                       {/* ✅ 나머지는 "지문 → 문제" 유지 */}
                       {passage && (
-                        <div className="mb-3 rounded-xl bg-gray-50 px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed">
+                        <div className="mb-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
                           {passage}
                         </div>
                       )}
 
-                      <div className="font-semibold whitespace-pre-wrap leading-relaxed">
+                      <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
                         {text || "(문제 문장을 찾지 못했습니다)"}
                       </div>
 
                       {/* ✅ 어휘_사전은 해석이 있으면 문제 아래에 노출(teacher 미리보기용) */}
                       {isVocabDict && tr && (
-                        <div className="mt-2 text-sm text-gray-600">▶ 해석: {tr}</div>
+                        <div className="mt-2 text-sm text-slate-700">▶ 해석: {tr}</div>
                       )}
                     </>
                   )}
 
                   {/* ✅ 보기 1~5 */}
                   {choices.length > 0 ? (
-                    <ol className="mt-3 space-y-1 pl-5 text-sm list-decimal">
+                    <ol className="mt-3 space-y-1 pl-5 text-sm list-decimal text-slate-800 leading-relaxed">
                       {choices.map((ch, chIdx) => (
                         <li key={chIdx} className="whitespace-pre-wrap leading-relaxed">
                           {ch}
@@ -432,7 +448,6 @@ export default function TeacherPreviewPage() {
           </div>
         </div>
       </div>
-    </div>
   );
 }
 

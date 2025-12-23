@@ -1,7 +1,7 @@
 "use client";
 
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
-import { useRouter } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import { DEFAULT_QUIZ_SIZE } from "@/lib/utils/constants";
 import ResultCard from "./ResultCard";
 import { buildExamTitle } from "@/lib/utils/exam";
@@ -50,6 +50,8 @@ function pickMeaningful(values: any[]): string {
 
 export default function SingleQuizClient({ grade, subject, category, initialProblems, categories }: Props) {
   const router = useRouter();
+  const pathname = usePathname();
+  const searchParams = useSearchParams();
   
   // ✅ 모든 Hook 선언 (early return 전에 모두 선언)
   const [loading, setLoading] = useState(true);
@@ -104,6 +106,25 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
   // ✅ 데이터 로드 (첫 마운트)
   useEffect(() => {
+    // ✅ replay=1 쿼리가 있으면 sessionStorage에서 문제 세트 복원
+    const isReplay = searchParams?.get("replay") === "1";
+    if (isReplay) {
+      try {
+        const storedSet = sessionStorage.getItem("lastQuizSet");
+        if (storedSet) {
+          const parsedProblems = JSON.parse(storedSet) as ProblemItem[];
+          if (parsedProblems && parsedProblems.length > 0) {
+            setProblems(parsedProblems);
+            setLoading(false);
+            return;
+          }
+        }
+      } catch (e) {
+        console.error("Failed to load quiz from sessionStorage", e);
+        // fallback to normal flow
+      }
+    }
+
     if (initialProblems && initialProblems.length > 0) {
       // 학생 모드: 미리 로드한 문제 사용
       setProblems(initialProblems);
@@ -113,7 +134,7 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
       fetchProblemsRef.current();
     }
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [initialProblems]);
+  }, [initialProblems, searchParams]);
 
   // ✅ 퀴즈 시작 시 힌트 상태 초기화 (시간 측정 비활성화)
   useEffect(() => {
@@ -129,11 +150,23 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
           category,
           isTripleMode: false,
         }));
+        
+        // ✅ lastQuizHref 저장: 오직 실제 퀴즈 화면에서만 저장
+        // 문제 생성/선택 페이지('/student/problems')와 결과 페이지('/student/result')는 제외
+        if (
+          pathname &&
+          !pathname.includes("/student/problems") &&
+          !pathname.includes("/student/result")
+        ) {
+          sessionStorage.setItem("lastQuizHref", pathname);
+        }
+        
+        sessionStorage.setItem("lastQuizSet", JSON.stringify(problems));
       } catch (e) {
         console.error("Failed to save quiz to localStorage", e);
       }
     }
-  }, [loading, problems, grade, subject, category]);
+  }, [loading, problems, grade, subject, category, pathname]);
 
   // ✅ 문제 변경 시 힌트 상태만 리셋 (타이머 비활성화)
   useEffect(() => {
@@ -283,15 +316,10 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
   // ✅ early return (모든 Hook 선언 후)
   if (loading) {
     return (
-      <div className="rounded-2xl border bg-white p-6 text-slate-900">
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 w-1/3 rounded bg-gray-200" />
-          <div className="h-6 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
+      <div className="rounded-2xl border border-violet-200 bg-transparent p-6">
+        <div className="flex items-center justify-center py-8">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600"></div>
         </div>
-        <p className="mt-4 text-sm text-gray-500">문제를 생성 중입니다...</p>
       </div>
     );
   }
@@ -421,16 +449,8 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
   
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm text-slate-900">
-      {/* 메타 정보 */}
-      {examMeta && (
-        <div className="mb-3 text-xs text-gray-500">
-          {examMeta.schoolName && `${examMeta.schoolName} · `}
-          {examMeta.grade} · {subjectLabel(examMeta.subject)} · {categoryLabel(examMeta.category)}
-        </div>
-      )}
-
       {/* 결과 보기 버튼 */}
-      <div className="mb-3">
+      <div className="mb-3 flex items-center justify-between">
         <button
           type="button"
           onClick={handleResultPreview}
@@ -438,20 +458,7 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
         >
           결과 보기
         </button>
-      </div>
-
-      {/* 상단 메타 */}
-      <div className="mb-3 flex items-center justify-between text-xs">
-        <span className="text-gray-500">{grade} · {subjText} · {catText}</span>
-        <div className="flex items-center gap-2">
-          {difficultyText && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-              {difficultyText}
-              {current.frequent && " · 자주 출제"}
-            </span>
-          )}
-          <span className="text-gray-500">{progressText}</span>
-        </div>
+        <span className="text-xs text-slate-500">{progressText}</span>
       </div>
 
       {/* ✅ 연습용(채점불가) 표시 */}
@@ -481,37 +488,6 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
           {renderWithBlanks(finalPassage)}
         </div>
       )}
-
-      {/* 힌트 (타임스탑 비활성화) */}
-      <div className="mb-4 flex items-center justify-end gap-2">
-        <button
-          type="button"
-          onClick={() => {
-            if (!currentHintUsed && remainingHints > 0) {
-              setRemainingHints((prev) => Math.max(0, prev - 1));
-              setCurrentHintUsed(true);
-            }
-          }}
-          disabled={currentHintUsed || submitted || remainingHints === 0}
-          className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
-            currentHintUsed || submitted || remainingHints === 0
-              ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-              : "bg-blue-50 text-blue-700 hover:bg-blue-100"
-          }`}
-        >
-          {currentHintUsed ? "✓ 힌트 사용됨" : remainingHints === 0 ? `💡 힌트(0)` : `💡 힌트(${remainingHints})`}
-        </button>
-      </div>
-
-      {/* 힌트 표시 */}
-      <div className="mb-4 min-h-[56px]">
-        {currentHintUsed && (
-          <div className="rounded-lg border-2 border-blue-200 bg-blue-50 p-3">
-            <div className="text-xs font-semibold text-blue-700 mb-1">💡 힌트</div>
-            <div className="text-sm text-blue-900">{generateHint(current, category)}</div>
-          </div>
-        )}
-      </div>
 
       {/* 선택지 */}
       {current.choices && current.choices.length > 0 ? (
@@ -548,6 +524,14 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
         </div>
       )}
 
+      {/* 힌트 표시 */}
+      {currentHintUsed && (
+        <div className="mt-3 mb-3 rounded-lg border-2 border-blue-200 bg-blue-50 p-4">
+          <div className="text-xs font-semibold text-blue-700 mb-1">💡 힌트</div>
+          <div className="text-sm text-blue-900">{generateHint(current, category)}</div>
+        </div>
+      )}
+
       {/* 해설 */}
       {submitted && finalExplanation && (
         <div className="mt-4 rounded-xl bg-gray-50 p-3">
@@ -558,13 +542,32 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
       <div className="mt-4 flex items-center justify-between">
         <div className="text-xs text-gray-500">정답 {correctCount} · 오답 {wrongCount}</div>
-        <button
-          onClick={next}
-          disabled={!submitted}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-40"
-        >
-          다음
-        </button>
+        <div className="flex items-center gap-2">
+          <button
+            type="button"
+            onClick={() => {
+              if (!currentHintUsed && remainingHints > 0) {
+                setRemainingHints((prev) => Math.max(0, prev - 1));
+                setCurrentHintUsed(true);
+              }
+            }}
+            disabled={currentHintUsed || submitted || remainingHints === 0}
+            className={`rounded-lg px-4 py-2 text-sm font-medium transition-colors ${
+              currentHintUsed || submitted || remainingHints === 0
+                ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                : "bg-blue-50 text-blue-700 hover:bg-blue-100"
+            }`}
+          >
+            {currentHintUsed ? "✓ 힌트 사용됨" : remainingHints === 0 ? `💡 힌트(0)` : `💡 힌트(${remainingHints})`}
+          </button>
+          <button
+            onClick={next}
+            disabled={!submitted}
+            className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-40"
+          >
+            다음
+          </button>
+        </div>
       </div>
     </div>
   );

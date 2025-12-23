@@ -45,7 +45,41 @@ const ALLOWED_QTYPES = new Set<string>([
   "대화문_빈칸",
   "대화문_흐름",
   "대화문_응답",
+  "퀴즈_키패드",
 ]);
+
+function normKey(s: any) {
+  return String(s ?? "").trim().replace(/\s+/g, ""); // 모든 공백 제거
+}
+
+function getCell(row: Record<string, any>, key: string) {
+  // row의 key가 "보기 1", "보기1 " 등이어도 찾게 해줌
+  const nk = normKey(key);
+  return row[nk] ?? row[key] ?? "";
+}
+
+function isKeypadQuiz(qtype: string) {
+  return String(qtype ?? "").trim() === "퀴즈_키패드";
+}
+
+function normalizeBlankToken(s: string) {
+  // "( )"든 "()"든 전부 "()"로 통일
+  return String(s ?? "").replace(/\(\s*\)/g, "()").trim();
+}
+
+function buildKeypadOptions(answerText: string, maxKeys = 8) {
+  const base = "etaoinshrdlucmfwypvbgkjqxz"; // 자주 쓰는 알파벳
+  const letters = new Set<string>();
+
+  for (const ch of answerText.toLowerCase()) {
+    if (/[a-z]/.test(ch)) letters.add(ch);
+  }
+  for (const ch of base) {
+    if (letters.size >= maxKeys) break;
+    if (!letters.has(ch)) letters.add(ch);
+  }
+  return Array.from(letters);
+}
 
 // ✅ 파일명/헤더 기반 qtype 보조 추론
 function inferQtypeFromFilename(filePath: string): string | null {
@@ -92,6 +126,7 @@ function categoryFromQtype(qtype: string): string {
   if (qt.startsWith("문법_")) return "grammar";
   if (qt.startsWith("본문_")) return "reading";
   if (qt.startsWith("대화문_")) return "dialogue";
+  if (qt.startsWith("퀴즈_")) return "vocab";
   return "vocab"; // fallback
 }
 
@@ -119,6 +154,7 @@ const COLUMN_ALIASES: Record<string, string[]> = {
   해설: ["해설", "explain", "explanation", "설명"],
   qtype: ["qtype", "소분류", "유형"],
   번호: ["번호", "number", "num", "no"],
+  정답텍스트: ["정답텍스트", "정답(텍스트)", "answerText", "answer_text", "answer_texts", "정답텍스트(복수)"],
 };
 
 // ✅ 헤더 맵 생성 (정규화된 헤더 → 컬럼 인덱스)
@@ -139,7 +175,7 @@ function findColumnIndex(headerMap: Map<string, number>, targetKey: string): num
   if (headerMap.has(targetKey)) {
     return headerMap.get(targetKey)!;
   }
-  
+
   // 2) aliases로 찾기
   const aliases = COLUMN_ALIASES[targetKey] || [];
   for (const alias of aliases) {
@@ -148,13 +184,13 @@ function findColumnIndex(headerMap: Map<string, number>, targetKey: string): num
       return headerMap.get(normalized)!;
     }
   }
-  
+
   // 3) 정규화된 targetKey로 찾기
   const normalizedTarget = normalizeHeader(targetKey);
   if (headerMap.has(normalizedTarget)) {
     return headerMap.get(normalizedTarget)!;
   }
-  
+
   return null;
 }
 
@@ -168,10 +204,6 @@ function getColumnValueByIndex(row: any[], colIndex: number | null): any {
 
 // 유틸리티 함수
 const t = (v: any): string => (v ?? "").toString().trim();
-const toInt = (v: any): number | null => {
-  const n = parseInt(t(v), 10);
-  return Number.isFinite(n) ? n : null;
-};
 
 // ✅ 번호 정규화: 문자열에서 앞쪽 숫자만 추출 (예: "Q01-1" → 1)
 function normalizeNo(v: any): number | null {
@@ -182,15 +214,8 @@ function normalizeNo(v: any): number | null {
 
 // ✅ content_hash용 정규화/해시 함수
 const norm = (v: any) => (v ?? "").toString().trim();
-
 const makeContentHash = (x: any): string =>
   crypto.createHash("sha256").update(JSON.stringify(x)).digest("hex");
-
-// 번호를 5자리 문자열로 변환
-function formatNumber(num: number | null): string {
-  if (num === null) return "00000";
-  return String(num).padStart(5, "0");
-}
 
 // 배치 upsert (중복 체크 포함)
 async function upsertBatch(rows: any[]): Promise<{ success: number; failed: number; skipped: number; duplicate: number }> {
@@ -200,7 +225,7 @@ async function upsertBatch(rows: any[]): Promise<{ success: number; failed: numb
   let duplicate = 0;
 
   // 중복 체크: content_hash로 기존 데이터 확인
-  const contentHashes = rows.map(r => r.content_hash);
+  const contentHashes = rows.map((r) => r.content_hash);
   const { data: existingData, error: checkError } = await supabase
     .from(TABLE)
     .select("content_hash")
@@ -210,10 +235,10 @@ async function upsertBatch(rows: any[]): Promise<{ success: number; failed: numb
     console.warn(`⚠️  중복 체크 실패: ${checkError.message}, upsert 계속 진행`);
   } else {
     const existingHashes = new Set((existingData ?? []).map((r: any) => r.content_hash));
-    duplicate = rows.filter(r => existingHashes.has(r.content_hash)).length;
+    duplicate = rows.filter((r) => existingHashes.has(r.content_hash)).length;
   }
 
-  const { data, error } = await supabase
+  const { error } = await supabase
     .from(TABLE)
     .upsert(rows, { onConflict: "content_hash" })
     .select();
@@ -221,12 +246,9 @@ async function upsertBatch(rows: any[]): Promise<{ success: number; failed: numb
   if (error) {
     console.error("UPSERT_ERROR", error);
     console.error(`❌ 배치 upsert 실패: ${error.message}`);
-    // 에러가 있으면 throw하여 실패로 끝내기 (성공 카운트 뻥 금지)
     throw new Error(`배치 upsert 실패: ${error.message}`);
   }
 
-  // upsert 결과 확인 (insert 또는 update 모두 성공으로 처리)
-  // 에러가 없을 때만 성공 카운트 증가
   success += rows.length;
   return { success, failed, skipped, duplicate };
 }
@@ -242,7 +264,7 @@ async function main() {
     console.error("예시 1 (혼합 qtype): tsx scripts/importProblemsFromXlsx.ts data/inbox/questions.xlsx --grade 2 --subject english");
     console.error("예시 2 (단일 qtype): tsx scripts/importProblemsFromXlsx.ts data/inbox/questions.xlsx --grade 2 --subject english --qtype 어휘_영영");
     console.error("\n허용된 qtype:");
-    console.error("  어휘_사전, 어휘_영영, 어휘_문맥");
+    console.error("  어휘_사전, 어휘_영영, 어휘_문맥, 퀴즈_키패드");
     console.error("  문법_어법오류, 문법_빈칸, 문법_배열");
     console.error("  본문_제목, 본문_물음, 본문_일치");
     console.error("  대화문_빈칸, 대화문_흐름, 대화문_응답");
@@ -264,21 +286,14 @@ async function main() {
     else if (key === "--category") {
       userCategory = value;
       console.warn(`⚠️  --category 옵션은 무시됩니다. qtype에서 자동으로 category가 매핑됩니다.`);
-    }
-    else if (key === "--qtype") {
+    } else if (key === "--qtype") {
       globalQtype = value;
-      // qtype 허용 목록 검증
       if (!ALLOWED_QTYPES.has(globalQtype)) {
         console.error(`❌ 허용되지 않은 qtype: ${globalQtype}`);
-        console.error("\n허용된 qtype:");
-        console.error("  어휘_사전, 어휘_영영, 어휘_문맥");
-        console.error("  문법_어법오류, 문법_빈칸, 문법_배열");
-        console.error("  본문_제목, 본문_물음, 본문_일치");
-        console.error("  대화문_빈칸, 대화문_흐름, 대화문_응답");
+        console.error("   허용 qtype:", Array.from(ALLOWED_QTYPES).join(", "));
         process.exit(1);
       }
-    }
-    else if (key === "--sample") {
+    } else if (key === "--sample") {
       const limit = parseInt(value, 10);
       if (isNaN(limit) || limit <= 0) {
         console.error(`❌ --sample 옵션은 양수여야 합니다: ${value}`);
@@ -326,12 +341,12 @@ async function main() {
   let totalSuccess = 0;
   let totalFailed = 0;
   let totalSkipped = 0;
-  let totalDuplicate = 0; // 중복된 content_hash (upsert에서 update된 경우)
-  const qtypeCounts = new Map<string, number>(); // qtype별 업로드 개수
-  const categoryCounts = new Map<string, number>(); // category별 업로드 개수 (샘플링용)
-  let explanationNonEmptyCount = 0; // 해설(explanationText) 비어있지 않은 row 수
-  const explanationQtypeCounts = new Map<string, number>(); // qtype별 해설 보유 개수
-  
+  let totalDuplicate = 0;
+  const qtypeCounts = new Map<string, number>();
+  const categoryCounts = new Map<string, number>();
+  let explanationNonEmptyCount = 0;
+  const explanationQtypeCounts = new Map<string, number>();
+
   // 스킵 사유별 카운트
   const skipReasons = {
     샘플링제한: 0,
@@ -340,19 +355,19 @@ async function main() {
     정답번호유효하지않음: 0,
     보기없음: 0,
     qtype불일치: 0,
+    정답텍스트없음: 0,
   };
 
   // 배치 처리
   let payloads: any[] = [];
   let batchCount = 0;
   let totalRowsRead = 0;
-  
+
   // ✅ 샘플 저장용 배열 (전역)
   const samplePayloads: any[] = [];
 
   // 시트별로 처리
   for (const sheetName of sheetNames) {
-    // README 같은 안내 시트는 스킵
     if (sheetName.toUpperCase() === "README" || sheetName.toUpperCase().includes("README")) {
       console.log(`⏭️  시트 스킵: ${sheetName} (안내 시트)`);
       continue;
@@ -370,11 +385,11 @@ async function main() {
       console.log(`⏭️  시트 스킵: ${sheetName} (데이터 없음)`);
       continue;
     }
-    
+
     const headers = sheetData[0] as string[];
     const headerMap = createHeaderMap(headers);
 
-    // ✅ 실제 헤더 디버깅 (매핑 확인용) + qtype 컬럼 인덱스 탐색
+    // ✅ 실제 헤더 디버깅 + qtype 컬럼 인덱스 탐색
     let qtypeColIndex = -1;
     const fallbackQtype = inferQtypeFromFilename(filePath);
     try {
@@ -390,15 +405,12 @@ async function main() {
       console.warn("RAW_HEADER_KEYS 로깅 중 오류:", e);
     }
 
-    // RAW_HEADER_KEYS에서 찾지 못했으면, 엑셀 헤더 행에서도 한 번 더 시도
     if (qtypeColIndex < 0) {
       qtypeColIndex = findQtypeColIndex(headers as string[]);
     }
 
-    console.log(
-      `📋 qtype 소스: ${qtypeColIndex >= 0 ? "엑셀 컬럼" : "파일명 fallback"} (fallback=${fallbackQtype ?? "없음"})`
-    );
-    
+    console.log(`📋 qtype 소스: ${qtypeColIndex >= 0 ? "엑셀 컬럼" : "파일명 fallback"} (fallback=${fallbackQtype ?? "없음"})`);
+
     // ✅ 컬럼 인덱스 찾기
     const colIndex = {
       번호: findColumnIndex(headerMap, "번호"),
@@ -414,84 +426,79 @@ async function main() {
       비고: findColumnIndex(headerMap, "비고"),
       메모: findColumnIndex(headerMap, "메모"),
       qtype: findColumnIndex(headerMap, "qtype"),
+      정답텍스트: findColumnIndex(headerMap, "정답텍스트"),
     };
 
-    // ✅ 해설 컬럼 인덱스 디버깅 (괄호 제거/정규화 후에도 제대로 잡히는지 확인)
     console.log("해설 colIndex:", colIndex.해설, "헤더:", headers);
-
     console.log(`📄 시트: ${sheetName} (${sheetData.length - 1}행, 헤더: ${headers.join(", ")})`);
     totalRowsRead += sheetData.length - 1;
 
-    // 시트명을 qtype으로 사용 (컬럼이 비어있을 때)
-    const sheetQtype = sheetName.trim();
-
-    // 데이터 행 처리 (첫 번째 행은 헤더이므로 1부터 시작)
+    // 데이터 행 처리
     for (let i = 1; i < sheetData.length; i++) {
       const row = sheetData[i] as any[];
 
-      // ✅ 컬럼 읽기 (헤더 맵 사용)
       const rawNo = getColumnValueByIndex(row, colIndex.번호);
       const 번호 = normalizeNo(rawNo);
+
       const 문제 = t(getColumnValueByIndex(row, colIndex.문제));
+
       // ✅ 지문(없으면 비움) / 지문 컬럼 + B열(index 1) fallback
       let rawStimulus = getColumnValueByIndex(row, colIndex.지문);
       if ((rawStimulus === undefined || rawStimulus === null || rawStimulus === "") && Array.isArray(row) && row.length > 1) {
-        rawStimulus = row[1]; // B열(인덱스 1) 값으로 fallback
+        rawStimulus = row[1]; // B열 fallback
       }
       const 지문 = t(rawStimulus);
+
       const 보기1 = t(getColumnValueByIndex(row, colIndex.보기1));
       const 보기2 = t(getColumnValueByIndex(row, colIndex.보기2));
       const 보기3 = t(getColumnValueByIndex(row, colIndex.보기3));
       const 보기4 = t(getColumnValueByIndex(row, colIndex.보기4));
       const 보기5 = t(getColumnValueByIndex(row, colIndex.보기5));
+
       const 해설원본 = t(getColumnValueByIndex(row, colIndex.해설));
       const 비고원본 = t(getColumnValueByIndex(row, colIndex.비고));
       const 메모원본 = t(getColumnValueByIndex(row, colIndex.메모));
-      // ✅ 해설 후보: 해설 > 비고 > 메모 (trim만, 줄바꿈 유지)
+
+      // ✅ 해설 후보: 해설 > 비고 > 메모
       const explanationText = 해설원본 || 비고원본 || 메모원본;
-      
-      // ✅ 정답번호 파싱 강화: "3" / 3 / " 3 " 모두 인식
+
+      // ✅ 정답텍스트: 컬럼 있으면 그걸 우선, 없으면 보기1 fallback
+      const 정답텍스트 = t(getColumnValueByIndex(row, colIndex.정답텍스트)) || 보기1;
+
+      // ✅ 정답번호 파싱 강화
       let 정답번호원본: any = getColumnValueByIndex(row, colIndex.정답번호);
       let 정답번호: number | null = null;
-      
-      if (정답번호원본 !== undefined && 정답번호원본 !== null && 정답번호원본 !== '') {
+
+      if (정답번호원본 !== undefined && 정답번호원본 !== null && 정답번호원본 !== "") {
         const s = String(정답번호원본).trim();
         const n = parseInt(s, 10);
-        // ✅ 정답번호 1~5 검증 강화
         if (Number.isInteger(n) && n >= 1 && n <= 5) {
           정답번호 = n;
         }
       }
-      
+
       // qtype 결정: --qtype 옵션 > 엑셀 qtype 컬럼 > 파일명 fallback
       let rowQtype = "";
-
-      // 1) --qtype 옵션이 있으면 그 값을 우선 사용
       if (globalQtype) {
         rowQtype = globalQtype;
       } else {
-        // 2) 엑셀에 qtype 컬럼이 있으면 그걸 우선
         if (qtypeColIndex >= 0) {
           rowQtype = (row[qtypeColIndex] ?? "").toString().trim();
         }
-        // 3) 없거나 비어있으면 파일명에서 추출한 qtype 사용
         if (!rowQtype) {
           rowQtype = (fallbackQtype ?? "").toString().trim();
         }
       }
 
-      // qtype 누락 또는 허용 목록 외 값이면 즉시 중단
+      // qtype 누락/허용 목록 외면 중단
       if (!rowQtype || !ALLOWED_QTYPES.has(rowQtype)) {
-        console.error("❌ qtype을 결정할 수 없습니다. 엑셀에 qtype 컬럼이 없고, 파일명에서도 추출 실패했습니다.");
-        console.error(
-          "   파일명 예: 20251219_2_english_문법_어법오류_TEACHER_frompdf_v1.xlsx"
-        );
+        console.error("❌ qtype을 결정할 수 없습니다. 엑셀 qtype 컬럼/파일명 추출 실패");
         console.error("   허용 qtype:", Array.from(ALLOWED_QTYPES).join(", "));
         process.exit(1);
       }
 
-      // ✅ category는 qtype prefix로만 결정 (어휘_/문법_/본문_/대화문_)
       const category = categoryFromQtype(rowQtype);
+      const keypad = isKeypadQuiz(rowQtype);
 
       // 샘플링 제한 적용 (카테고리별)
       if (sampleLimit !== null) {
@@ -499,7 +506,7 @@ async function main() {
         if (currentCount >= sampleLimit) {
           skipReasons.샘플링제한++;
           totalSkipped++;
-          continue; // 이미 해당 카테고리에서 sampleLimit개를 처리했으므로 스킵
+          continue;
         }
         categoryCounts.set(category, currentCount + 1);
       }
@@ -509,7 +516,7 @@ async function main() {
         skipReasons.번호없음++;
         console.warn(`⚠️  [${sheetName}] ${i + 1}행: 번호 파싱 실패, row=`, row);
         totalSkipped++;
-        continue; // 번호 없으면 스킵 (throw 하지 않음)
+        continue;
       }
 
       if (!문제) {
@@ -519,94 +526,155 @@ async function main() {
         continue;
       }
 
-      if (!정답번호) {
-        skipReasons.정답번호유효하지않음++;
-        console.warn(`⚠️  [${sheetName}] ${i + 1}행: 정답번호가 유효하지 않아 스킵합니다.`);
-        console.log('INVALID_ANSWER_RAW =', 정답번호원본);
-        totalSkipped++;
-        continue;
+      // ✅ 키패드 퀴즈는 정답번호/보기5지선다 강제하지 않는다
+      if (!keypad) {
+        if (!정답번호) {
+          skipReasons.정답번호유효하지않음++;
+          console.warn(`⚠️  [${sheetName}] ${i + 1}행: 정답번호가 유효하지 않아 스킵합니다.`);
+          console.log("INVALID_ANSWER_RAW =", 정답번호원본);
+          totalSkipped++;
+          continue;
+        }
+
+        // ✅ 보기1~보기5 모두 필수 (5지선다 표준화)
+        if (!보기1 || !보기2 || !보기3 || !보기4 || !보기5) {
+          skipReasons.보기없음++;
+          console.warn(
+            `⚠️  [${sheetName}] ${i + 1}행: 보기1~보기5가 모두 필요합니다. (현재: 보기1=${!!보기1}, 보기2=${!!보기2}, 보기3=${!!보기3}, 보기4=${!!보기4}, 보기5=${!!보기5})`
+          );
+          totalSkipped++;
+          continue;
+        }
+      } else {
+        // 키패드는 정답텍스트(또는 보기1)가 필수
+        if (!정답텍스트) {
+          skipReasons.정답텍스트없음++;
+          console.warn(`⚠️  [${sheetName}] ${i + 1}행: (퀴즈_키패드) 정답텍스트/보기1이 비어 있어 스킵`);
+          totalSkipped++;
+          continue;
+        }
       }
 
-      // ✅ 보기1~보기5 모두 필수 (5지선다 표준화)
-      if (!보기1 || !보기2 || !보기3 || !보기4 || !보기5) {
-        skipReasons.보기없음++;
-        console.warn(`⚠️  [${sheetName}] ${i + 1}행: 보기1~보기5가 모두 필요합니다. (현재: 보기1=${!!보기1}, 보기2=${!!보기2}, 보기3=${!!보기3}, 보기4=${!!보기4}, 보기5=${!!보기5})`);
-        totalSkipped++;
-        continue;
-      }
-
-      // 보기 배열 생성 (5지선다)
-      const choices = [보기1, 보기2, 보기3, 보기4, 보기5];
-
-      // ✅ stimulus용 지문 문자열 (줄바꿈 유지, 앞뒤만 trim)
-      //    "선지:" 같은 프리픽스는 제거
+      // ✅ stimulus용 지문 문자열 (줄바꿈 유지, 앞뒤만 trim) + "선지:" 제거
       const stimulusRaw = String(지문 ?? "");
       const stimulus = stimulusRaw.replace(/^\s*선지:\s*/g, "").trim();
 
-      // ✅ 표준 content 스키마로 정규화
-      //  - stem: 문제 질문(한 줄)
-      //  - body: 지문/본문/대화 등 (여러 줄 가능, 없으면 "")
-      //  - choices: 항상 5개 문자열
-      //  - answer: 1~5 정답번호
-      //  - explanation: 해설(없으면 "")
-      const stem = String(문제 ?? "").trim();
-      const body = stimulus; // 엑셀 지문/B열을 그대로 사용 (줄바꿈 유지)
-      const stdChoices = [보기1, 보기2, 보기3, 보기4, 보기5].map((v) =>
-        String(v ?? "").trim()
-      );
-      const stdAnswer = 정답번호 as number; // 위에서 1~5로 검증 완료
-      const stdExplanation = String(explanationText ?? "").trim();
+      // difficulty 기본값
+      const difficulty = "1";
 
-      const content = {
-        stem,
-        body,
-        choices: stdChoices,
-        answer: stdAnswer,
-        explanation: stdExplanation,
-        // 📝 호환용 필드(raw/qtype)는 유지하되, UI/로직은 표준 스키마를 우선 사용
-        raw: {
-          문제,
-          지문,
-          보기1,
-          보기2,
-          보기3,
-          보기4,
-          보기5,
-          정답번호,
-          해설: explanationText || null,
+      // =========================
+      // ✅ content 생성 (qtype별)
+      // =========================
+      let content: any;
+      let contentForHash: any;
+
+      if (keypad) {
+        // 문장: () 토큰 통일
+        const sentence = normalizeBlankToken(문제);
+        const blanks = (sentence.match(/\(\)/g) || []).length;
+
+        // 정답텍스트: "A,B" 같이 들어올 수 있으니 콤마 분리
+        const answers = String(정답텍스트)
+          .split(",")
+          .map((s) => s.trim())
+          .filter(Boolean);
+
+        if (answers.length === 0) {
+          skipReasons.정답텍스트없음++;
+          console.warn(`⚠️  [${sheetName}] ${i + 1}행: (퀴즈_키패드) answers 파싱 결과가 비어 스킵`);
+          totalSkipped++;
+          continue;
+        }
+
+        if (blanks > 0 && answers.length !== blanks) {
+          console.warn(
+            `⚠️  [${sheetName}] ${i + 1}행: (퀴즈_키패드) 빈칸(${blanks})과 정답(${answers.length}) 개수가 다릅니다. sentence="${sentence}", answers="${answers.join(",")}"`
+          );
+          // 경고만, 업로드는 진행
+        }
+
+        const mergedAnswerText = answers.join("");
+        const options = buildKeypadOptions(mergedAnswerText, 8);
+
+        content = {
+          mode: "keypad",
+          sentence, // "He () his room ..." 형태
+          body: stimulus, // 지문이 있으면 사용
+          answers, // ["cleans"] or ["apple","banana"]
+          options, // ["c","l","e","a","n","s","t","o"] (예시)
+          explanation: String(explanationText ?? "").trim(),
+          raw: {
+            문제,
+            지문,
+            정답텍스트,
+            qtype: rowQtype,
+          },
           qtype: rowQtype,
-        },
-        qtype: rowQtype,
-      };
+        };
 
-      // difficulty 기본값 설정
-      const difficulty = "1"; // 기본값
+        contentForHash = {
+          grade,
+          subject,
+          category,
+          qtype: rowQtype,
+          mode: "keypad",
+          sentence: norm(sentence),
+          body: norm(stimulus),
+          answers: answers.map(norm),
+          options: options.map(norm),
+          explanation: norm(String(explanationText ?? "")),
+        };
+      } else {
+        const choices = [보기1, 보기2, 보기3, 보기4, 보기5];
+        const stem = String(문제 ?? "").trim();
+        const body = stimulus;
+        const stdChoices = choices.map((v) => String(v ?? "").trim());
+        const stdAnswer = 정답번호 as number;
+        const stdExplanation = String(explanationText ?? "").trim();
 
-      // ✅ content_hash 생성 (표준 content 기반: stem/body/choices/answer/explanation + 메타정보)
-      const contentForHash = {
-        grade,
-        subject,
-        category,
-        qtype: rowQtype,
-        stem: norm(stem),
-        body: norm(body),
-        choices: stdChoices.map(norm),
-        answer: norm(stdAnswer),
-        explanation: norm(stdExplanation),
-      };
+        content = {
+          stem,
+          body,
+          choices: stdChoices,
+          answer: stdAnswer,
+          explanation: stdExplanation,
+          raw: {
+            문제,
+            지문,
+            보기1,
+            보기2,
+            보기3,
+            보기4,
+            보기5,
+            정답번호,
+            해설: explanationText || null,
+            qtype: rowQtype,
+          },
+          qtype: rowQtype,
+        };
+
+        contentForHash = {
+          grade,
+          subject,
+          category,
+          qtype: rowQtype,
+          stem: norm(stem),
+          body: norm(body),
+          choices: stdChoices.map(norm),
+          answer: norm(stdAnswer),
+          explanation: norm(stdExplanation),
+        };
+      }
 
       const content_hash = makeContentHash(contentForHash);
-      
-      // UNIQUE_HASHES 추적
       allHashes.add(content_hash);
 
-      // 해설 통계 집계 (비어있지 않은 explanationText만)
+      // 해설 통계
       if (explanationText) {
         explanationNonEmptyCount++;
         explanationQtypeCounts.set(rowQtype, (explanationQtypeCounts.get(rowQtype) ?? 0) + 1);
       }
 
-      // payload 생성
       const payload = {
         grade,
         subject,
@@ -615,11 +683,31 @@ async function main() {
         content_hash,
         content,
       };
-      
+
       payloads.push(payload);
-      
-      // ✅ 샘플 저장 (최대 3개)
+
+      // ✅ 샘플 저장 (최대 3개) — contentRaw 포함(기존 코드 버그 수정)
       if (samplePayloads.length < 3) {
+        const contentRaw = keypad
+          ? {
+              문제,
+              지문: 지문 || null,
+              정답텍스트: 정답텍스트 || null,
+              qtype: rowQtype,
+            }
+          : {
+              문제,
+              지문: 지문 || null,
+              보기1,
+              보기2,
+              보기3,
+              보기4,
+              보기5,
+              정답번호: 정답번호 ?? null,
+              해설: explanationText || null,
+              qtype: rowQtype,
+            };
+
         samplePayloads.push({
           번호,
           문제,
@@ -629,22 +717,19 @@ async function main() {
           보기3,
           보기4,
           보기5,
-          정답번호,
+          정답번호: 정답번호 ?? null,
           해설: explanationText || "(없음)",
           qtype: rowQtype,
+          contentRaw,
         });
       }
 
-      // qtype별 개수 추적 (성공 예상)
       qtypeCounts.set(rowQtype, (qtypeCounts.get(rowQtype) ?? 0) + 1);
 
       // 200개 단위로 배치 upsert
       if (payloads.length >= 200) {
-        // ✅ 배치 내 content_hash 중복 제거 (완전 동일 문제는 1개만 upsert)
         const map = new Map<string, any>();
-        for (const p of payloads) {
-          map.set(p.content_hash, p);
-        }
+        for (const p of payloads) map.set(p.content_hash, p);
         const deduped = Array.from(map.values());
         if (deduped.length !== payloads.length) {
           console.warn(`DUP_IN_PAYLOAD = ${payloads.length - deduped.length}`);
@@ -655,24 +740,20 @@ async function main() {
 
         let agg = { success: 0, failed: 0, skipped: 0, duplicate: 0 };
 
-for (let j = 0; j < deduped.length; j++) {
-  const one = deduped[j];
+        for (let j = 0; j < deduped.length; j++) {
+          const one = deduped[j];
+          const r = await upsertBatch([one]);
+          agg.success += r.success;
+          agg.failed += r.failed;
+          agg.skipped += r.skipped;
+          agg.duplicate += r.duplicate;
 
-  // 🔥 1행씩 upsert (21000 방지)
-  const r = await upsertBatch([one]);
+          if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
+            process.stdout.write(` (${j + 1}/${deduped.length})`);
+          }
+        }
 
-  agg.success += r.success;
-  agg.failed += r.failed;
-  agg.skipped += r.skipped;
-  agg.duplicate += r.duplicate;
-
-  if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
-    process.stdout.write(` (${j + 1}/${deduped.length})`);
-  }
-}
-
-const result = agg;
-
+        const result = agg;
 
         totalSuccess += result.success;
         totalFailed += result.failed;
@@ -686,11 +767,8 @@ const result = agg;
 
   // 남은 payload 처리
   if (payloads.length > 0) {
-    // ✅ 마지막 배치도 content_hash 기준으로 dedupe
     const map = new Map<string, any>();
-    for (const p of payloads) {
-      map.set(p.content_hash, p);
-    }
+    for (const p of payloads) map.set(p.content_hash, p);
     const deduped = Array.from(map.values());
     if (deduped.length !== payloads.length) {
       console.warn(`DUP_IN_PAYLOAD = ${payloads.length - deduped.length}`);
@@ -698,27 +776,23 @@ const result = agg;
 
     batchCount++;
     process.stdout.write(`\n🔄 배치 ${batchCount} 처리 중... `);
-    
+
     let agg = { success: 0, failed: 0, skipped: 0, duplicate: 0 };
 
-for (let j = 0; j < deduped.length; j++) {
-  const one = deduped[j];
+    for (let j = 0; j < deduped.length; j++) {
+      const one = deduped[j];
+      const r = await upsertBatch([one]);
+      agg.success += r.success;
+      agg.failed += r.failed;
+      agg.skipped += r.skipped;
+      agg.duplicate += r.duplicate;
 
-  // 🔥 1행씩 upsert (21000 방지)
-  const r = await upsertBatch([one]);
+      if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
+        process.stdout.write(` (${j + 1}/${deduped.length})`);
+      }
+    }
 
-  agg.success += r.success;
-  agg.failed += r.failed;
-  agg.skipped += r.skipped;
-  agg.duplicate += r.duplicate;
-
-  if ((j + 1) % 20 === 0 || j === deduped.length - 1) {
-    process.stdout.write(` (${j + 1}/${deduped.length})`);
-  }
-}
-
-const result = agg;
-
+    const result = agg;
 
     totalSuccess += result.success;
     totalFailed += result.failed;
@@ -751,11 +825,16 @@ const result = agg;
   console.log(`📝 읽은 전체 행 수: ${totalRowsRead}행`);
   console.log(`✅ 업로드된 수: ${totalSuccess}개`);
   console.log(`⚠️  스킵된 수: ${totalSkipped}개`);
-  
-  // 스킵 사유별 상세 카운트 (중복/형식오류/qtype불일치)
-  const formatErrors = skipReasons.번호없음 + skipReasons.문제없음 + skipReasons.정답번호유효하지않음 + skipReasons.보기없음;
+
+  const formatErrors =
+    skipReasons.번호없음 +
+    skipReasons.문제없음 +
+    skipReasons.정답번호유효하지않음 +
+    skipReasons.보기없음 +
+    skipReasons.정답텍스트없음;
+
   const hasSkips = totalSkipped > 0 || totalDuplicate > 0;
-  
+
   if (hasSkips) {
     console.log("\n📋 스킵 사유별 상세:");
     if (totalDuplicate > 0) console.log(`  중복: ${totalDuplicate}개 (content_hash 중복, upsert로 업데이트됨)`);
@@ -765,10 +844,10 @@ const result = agg;
     if (skipReasons.문제없음 > 0) console.log(`    - 문제 없음: ${skipReasons.문제없음}개`);
     if (skipReasons.정답번호유효하지않음 > 0) console.log(`    - 정답번호 유효하지 않음: ${skipReasons.정답번호유효하지않음}개`);
     if (skipReasons.보기없음 > 0) console.log(`    - 보기 없음: ${skipReasons.보기없음}개`);
+    if (skipReasons.정답텍스트없음 > 0) console.log(`    - 정답텍스트 없음: ${skipReasons.정답텍스트없음}개`);
     if (skipReasons.qtype불일치 > 0) console.log(`  qtype불일치: ${skipReasons.qtype불일치}개`);
   }
-  
-  // qtype별 업로드 개수 요약
+
   if (qtypeCounts.size > 0) {
     console.log("\n📋 qtype별 업로드 개수:");
     const sortedQtypes = Array.from(qtypeCounts.entries()).sort((a, b) => a[0].localeCompare(b[0]));
@@ -777,14 +856,13 @@ const result = agg;
       console.log(`  ${qtype} (${category}): ${count}개`);
     }
   }
-  
-  // category별 업로드 개수 요약 (summary)
+
   const summary: Record<string, number> = {};
   for (const [qtype, count] of qtypeCounts.entries()) {
     const category = categoryFromQtype(qtype);
     summary[category] = (summary[category] || 0) + count;
   }
-  
+
   if (Object.keys(summary).length > 0) {
     console.log("\n📋 category별 업로드 개수 (summary):");
     const sortedCategories = Object.entries(summary).sort((a, b) => a[0].localeCompare(b[0]));
@@ -792,15 +870,13 @@ const result = agg;
       console.log(`  ${category}: ${count}개`);
     }
   }
-  
+
   console.log("=".repeat(50));
 
   // 실제 DB row count 확인
   console.log("\n🔍 실제 DB row count 확인 중...");
-  const { data: countRows, error: countErr } = await supabase
-    .from(TABLE)
-    .select("id");
-  
+  const { data: countRows, error: countErr } = await supabase.from(TABLE).select("id");
+
   if (countErr) {
     console.error("❌ DB count 조회 실패:", countErr);
   } else {
@@ -811,11 +887,11 @@ const result = agg;
       console.warn(`⚠️  경고: 업로드 성공 카운트(${totalSuccess})와 실제 DB count(${count})가 다릅니다.`);
     }
   }
-  
+
   console.log("\n📋 확인 SQL:");
   console.log("select count(*) total, count(*) filter (where created_at > now()-interval '2 hours') last_2h from public.problems;");
 
-  // ✅ stimulus 필드 저장 검증 (content->>'stimulus'가 비어있지 않은 레코드 수)
+  // ✅ body 필드 저장 여부 확인 (기존 로직 유지)
   console.log("\n🔍 body(stem/body 스키마) 필드 저장 여부 확인 중...");
   const { data: bodyRows, error: stimulusErr } = await supabase
     .from(TABLE)
@@ -828,22 +904,21 @@ const result = agg;
     const stimulusCount = Array.isArray(bodyRows) ? bodyRows.length : 0;
     console.log(`✅ content->>'body'가 NOT NULL인 레코드 수: ${stimulusCount}개`);
     console.log(`body saved count: ${stimulusCount}`);
-    
+
     // ✅ body가 0개면 즉시 실패 처리 (엑셀 매핑 문제)
     if (!stimulusCount || stimulusCount === 0) {
       throw new Error("지문(body)이 DB에 저장되지 않았습니다. 엑셀 헤더/매핑을 확인하세요.");
     }
-    
-    // ✅ body가 있는 레코드 1개를 조회해 120자 프리뷰 출력
-    const first = bodyRows && bodyRows[0] as any;
+
+    const first = bodyRows && (bodyRows[0] as any);
     if (first?.content?.body) {
       const s = String(first.content.body ?? "").trim();
       const preview = s.length > 120 ? `${s.slice(0, 120)}...` : s;
       console.log(`body preview (first record, 120 chars): ${preview}`);
     }
   }
-  
-  // ✅ 업로드 마지막에 샘플 3개 로그 출력
+
+  // ✅ 업로드 마지막에 샘플 3개 로그 출력 (버그 수정)
   if (samplePayloads.length > 0) {
     console.log("\n" + "=".repeat(50));
     console.log("📋 샘플 데이터 (content.raw 저장 확인용)");
@@ -851,7 +926,7 @@ const result = agg;
     samplePayloads.forEach((sample, idx) => {
       console.log(`\n[샘플 ${idx + 1}]`);
       console.log(`  번호: ${sample.번호}`);
-      console.log(`  문제: ${sample.문제.substring(0, 50)}${sample.문제.length > 50 ? "..." : ""}`);
+      console.log(`  문제: ${String(sample.문제).substring(0, 50)}${String(sample.문제).length > 50 ? "..." : ""}`);
       console.log(`  지문: ${sample.지문}`);
       console.log(`  보기1: ${sample.보기1}`);
       console.log(`  보기2: ${sample.보기2}`);
@@ -862,16 +937,10 @@ const result = agg;
       console.log(`  해설: ${sample.해설}`);
       console.log(`  qtype: ${sample.qtype}`);
       console.log(`\n  ✅ 실제 저장될 content.raw:`);
-      console.log(`    content.raw["문제"] = "${sample.contentRaw.문제}"`);
-      console.log(`    content.raw["지문"] = ${sample.contentRaw.지문 === null ? "null" : `"${sample.contentRaw.지문}"`}`);
-      console.log(`    content.raw["보기1"] = "${sample.contentRaw.보기1}"`);
-      console.log(`    content.raw["보기2"] = "${sample.contentRaw.보기2}"`);
-      console.log(`    content.raw["보기3"] = "${sample.contentRaw.보기3}"`);
-      console.log(`    content.raw["보기4"] = "${sample.contentRaw.보기4}"`);
-      console.log(`    content.raw["보기5"] = "${sample.contentRaw.보기5}"`);
-      console.log(`    content.raw["정답번호"] = ${sample.contentRaw.정답번호}`);
-      console.log(`    content.raw["해설"] = ${sample.contentRaw.해설 === null ? "null" : `"${sample.contentRaw.해설}"`}`);
-      console.log(`    content.raw["qtype"] = "${sample.contentRaw.qtype}"`);
+      const cr = sample.contentRaw || {};
+      Object.keys(cr).forEach((k) => {
+        console.log(`    ${k}: ${cr[k] === null ? "null" : JSON.stringify(cr[k])}`);
+      });
     });
     console.log("=".repeat(50));
   }
@@ -881,5 +950,3 @@ main().catch((error) => {
   console.error("❌ 실행 중 오류:", error);
   process.exit(1);
 });
-
-

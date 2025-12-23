@@ -81,24 +81,24 @@ export default function SchoolSearch(props: {
 
   return (
     <div className="w-full">
-      <div className="flex items-center gap-4">
+      <div className="grid grid-cols-[1fr_auto] gap-3 max-[380px]:gap-2">
         <input
           id="schoolSearchInput"
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="학교 검색 2글자 이상"
-          className="flex-1 rounded-full border border-[#E7E5FF] bg-white px-4 py-3 text-slate-900 outline-none transition focus:border-[#B9B4E4] focus:ring-2 focus:ring-[#B9B4E4]/30 placeholder:text-[#C9C6F2]"
+          className="h-12 w-full min-w-0 rounded-full border border-[#E7E5FF] bg-white px-4 text-sm max-[380px]:h-10 max-[380px]:text-xs text-slate-900 outline-none transition focus:border-[#B9B4E4] focus:ring-2 focus:ring-[#B9B4E4]/30 placeholder:text-[#C9C6F2]"
         />
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="min-w-[110px] rounded-full bg-[#6E63D5] px-7 py-3 font-semibold text-white shadow-md hover:opacity-95 active:scale-[0.99] transition-all"
+          className="h-12 w-24 shrink-0 rounded-full bg-[#6E63D5] hover:bg-[#5B52C8] text-sm max-[380px]:h-10 max-[380px]:w-20 max-[380px]:text-xs font-semibold text-white shadow-md active:scale-[0.99] transition-all"
         >
           {loading ? "검색중" : "검색"}
         </button>
       </div>
 
-      <p className="mt-2 text-xs text-gray-500 dark:text-gray-400">
+      <p className="mt-2 text-xs text-gray-400 max-[380px]:text-[11px]">
         검색 결과에서 선택하면 위 &quot;학교&quot; 칸에 적용됩니다.
       </p>
 

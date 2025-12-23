@@ -154,109 +154,54 @@ export default function Flash4Quiz({
   };
 
   return (
-    <div className="relative min-h-[600px] overflow-hidden rounded-3xl flex flex-col">
-      {/* 배경: Queezy 톤 그라데이션 (부드러운 보라) */}
-      <div className="absolute inset-0 bg-gradient-to-b from-[#6E63D5] to-[#B9B4E4]">
-        {/* 반투명 오버레이 */}
-        <div className="absolute inset-0 bg-white/60 backdrop-blur-sm" />
-        {/* 중앙 광원 (빛기둥/글로우) */}
-        <div className="absolute inset-0 flex items-center justify-center">
-          <div className="absolute w-96 h-96 bg-[#B9B4E4]/20 rounded-full blur-3xl" />
-          <div className="absolute w-64 h-64 bg-white/10 rounded-full blur-2xl" />
-        </div>
+    <div className="relative w-full min-h-[100svh] h-[100svh] overflow-hidden">
+      {/* ✅ 배경: 우리 톤 연보라 그라데이션 + 은은한 하이라이트 블러 */}
+      <div className="absolute inset-0 -z-10 bg-gradient-to-b from-[#F6F4FF] via-[#E9E6FF] to-[#DCD6FF]">
+        <div className="absolute -top-24 -left-24 h-72 w-72 rounded-full bg-white/60 blur-3xl" />
+        <div className="absolute -bottom-28 -right-28 h-80 w-80 rounded-full bg-[#6E63D5]/20 blur-3xl" />
 
-        {/* 안개/구름 오버레이 (blur된 원형 gradient) */}
-        <div className="absolute inset-0">
-          <div className="absolute top-0 left-1/4 w-64 h-64 bg-[#B9B4E4]/10 rounded-full blur-3xl" />
-          <div className="absolute bottom-0 right-1/4 w-80 h-80 bg-[#B9B4E4]/10 rounded-full blur-3xl" />
-          <div className="absolute top-1/2 right-0 w-48 h-48 bg-[#B9B4E4]/10 rounded-full blur-2xl" />
-        </div>
-
-        {/* 별빛 스파클 (CSS 기반) */}
-        <div className="absolute inset-0">
-          {Array.from({ length: 15 }).map((_, i) => {
-            const seed = `${payload.focusWord}-${i}`;
-            let hash = 0;
-            for (let j = 0; j < seed.length; j++) {
-              hash = ((hash << 5) - hash + seed.charCodeAt(j)) | 0;
-            }
-            const rng = (() => {
-              let state = Math.abs(hash);
-              return () => {
-                state = (state * 9301 + 49297) % 233280;
-                return state / 233280;
-              };
-            })();
-            const left = 10 + rng() * 80;
-            const top = 10 + rng() * 80;
-            const delay = rng() * 3;
-            const duration = 2 + rng() * 2;
-            return (
-              <motion.div
-                key={i}
-                className="absolute w-1.5 h-1.5 bg-white rounded-full"
-                style={{
-                  left: `${left}%`,
-                  top: `${top}%`,
-                  boxShadow: "0 0 4px rgba(255, 255, 255, 0.8)",
-                }}
-                animate={{
-                  opacity: [0, 1, 0],
-                  scale: [0, 1.2, 0],
-                }}
-                transition={{
-                  duration,
+        {/* 배경 decoys 단어들 (떠다니는 애니메이션) */}
+        <div className="absolute inset-0 z-0 overflow-hidden">
+          {decoyPositions.map((item, idx) => (
+            <motion.div
+              key={idx}
+              className={`absolute ${item.fontSize} font-bold text-white/90 font-sans pointer-events-none blur-[1px] drop-shadow-sm`}
+              style={{
+                left: `${item.x}%`,
+                top: `${item.y}%`,
+                opacity: item.opacity,
+                transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
+                textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
+              }}
+              initial={{ opacity: 0 }}
+              animate={{
+                opacity: item.opacity,
+                y: [0, -20, 0],
+                x: [0, 15, 0],
+              }}
+              transition={{
+                opacity: { duration: 0.5, delay: idx * 0.1 },
+                y: {
+                  duration: item.floatDuration,
                   repeat: Infinity,
-                  delay,
                   ease: "easeInOut",
-                }}
-              />
-            );
-          })}
+                  delay: item.floatDelay,
+                },
+                x: {
+                  duration: item.floatDuration * 1.3,
+                  repeat: Infinity,
+                  ease: "easeInOut",
+                  delay: item.floatDelay * 1.2,
+                },
+              }}
+            >
+              {item.word}
+            </motion.div>
+          ))}
         </div>
       </div>
 
-      {/* 배경 decoys 단어들 (떠다니는 애니메이션) */}
-      <div className="absolute inset-0 z-0 overflow-hidden">
-        {decoyPositions.map((item, idx) => (
-          <motion.div
-            key={idx}
-            className={`absolute ${item.fontSize} font-bold text-white/90 font-sans pointer-events-none blur-[1px] drop-shadow-sm`}
-            style={{
-              left: `${item.x}%`,
-              top: `${item.y}%`,
-              opacity: item.opacity,
-              transform: `translate(-50%, -50%) rotate(${item.rotation}deg)`,
-              textShadow: "0 1px 2px rgba(0, 0, 0, 0.1)",
-            }}
-            initial={{ opacity: 0 }}
-            animate={{
-              opacity: item.opacity,
-              y: [0, -20, 0],
-              x: [0, 15, 0],
-            }}
-            transition={{
-              opacity: { duration: 0.5, delay: idx * 0.1 },
-              y: {
-                duration: item.floatDuration,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: item.floatDelay,
-              },
-              x: {
-                duration: item.floatDuration * 1.3,
-                repeat: Infinity,
-                ease: "easeInOut",
-                delay: item.floatDelay * 1.2,
-              },
-            }}
-          >
-            {item.word}
-          </motion.div>
-        ))}
-      </div>
-
-      {/* 카운트다운 오버레이 */}
+      {/* 카운트다운 오버레이: 숫자만, 배경 제거 */}
       <AnimatePresence mode="wait">
         {countdown !== null && countdown > 0 && (
           <motion.div
@@ -265,17 +210,12 @@ export default function Flash4Quiz({
             animate={{ scale: 1, opacity: 1 }}
             exit={{ scale: 1.8, opacity: 0 }}
             transition={{ duration: 0.3, ease: "easeOut" }}
-            className="absolute inset-0 z-40 flex items-center justify-center bg-black/10 backdrop-blur-sm"
+            className="fixed inset-0 z-40 flex items-center justify-center pointer-events-none"
           >
             <motion.div
-              className="relative text-9xl md:text-[12rem] font-bold text-white font-sans drop-shadow-[0_0_30px_rgba(255,255,255,0.8)]"
+              className="relative text-7xl md:text-[12rem] font-extrabold text-[#6E63D5] drop-shadow-[0_10px_30px_rgba(0,0,0,0.15)]"
               animate={{
                 scale: [1, 1.15, 1],
-                textShadow: [
-                  "0 0 30px rgba(255, 255, 255, 0.8)",
-                  "0 0 50px rgba(255, 255, 255, 1)",
-                  "0 0 30px rgba(255, 255, 255, 0.8)",
-                ],
               }}
               transition={{
                 duration: 0.6,
@@ -289,116 +229,105 @@ export default function Flash4Quiz({
         )}
       </AnimatePresence>
 
-      {/* 콘텐츠 레이아웃 (3구역: 상단 배경, 중앙 단어, 하단 선택지) */}
-      <div className="relative flex flex-col h-full min-h-[600px] z-10">
-        {/* 상단 영역: decoy 단어 배경 (absolute로 배경 유지) */}
-        <div className="relative flex-1" />
+      {/* ✅ 메인 콘텐츠: 단어 + 보기 한 화면에 딱 맞추기 */}
+      <div className="flex h-full flex-col px-4 py-5">
+        <div className="flex-1 flex flex-col items-center justify-start gap-4 min-h-0 pt-6">
+          {/* ✅ 단어(문제) 영역 */}
+          <div className="w-full max-w-[520px]">
+            {showWord && (
+              <motion.div
+                initial={{ scale: 0, opacity: 0 }}
+                animate={{ scale: 1, opacity: 1 }}
+                transition={{ type: "spring", stiffness: 300, damping: 20, mass: 0.8 }}
+                className="flex flex-col items-center justify-center relative z-20"
+              >
+                <motion.div
+                  className="relative rounded-full border border-[#E7E5FF] bg-white px-8 py-4 shadow-[0_4px_20px_rgba(110,99,213,0.25)] backdrop-blur-sm"
+                  animate={{
+                    boxShadow: [
+                      "0 4px 20px rgba(110, 99, 213, 0.25)",
+                      "0 6px 30px rgba(110, 99, 213, 0.35)",
+                      "0 4px 20px rgba(110, 99, 213, 0.25)",
+                    ],
+                  }}
+                  transition={{ duration: 3, repeat: Infinity, ease: "easeInOut" }}
+                >
+                  <div className="relative font-sans text-4xl md:text-5xl font-bold tracking-tight text-[#2A2457] text-center">
+                    {payload.focusWord}
+                  </div>
+                </motion.div>
+              </motion.div>
+            )}
+          </div>
 
-        {/* 중앙 영역: focusWord 캡슐 (세로 중앙 정렬) */}
-        {showWord && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{
-              type: "spring",
-              stiffness: 300,
-              damping: 20,
-              mass: 0.8,
-            }}
-            className="flex flex-col items-center justify-center flex-1 min-h-[220px] relative z-20"
-          >
-            <motion.div
-              className="relative rounded-full border border-[#E7E5FF] bg-white px-8 py-4 shadow-[0_4px_20px_rgba(110,99,213,0.25)] backdrop-blur-sm"
-              animate={{
-                boxShadow: [
-                  "0 4px 20px rgba(110, 99, 213, 0.25)",
-                  "0 6px 30px rgba(110, 99, 213, 0.35)",
-                  "0 4px 20px rgba(110, 99, 213, 0.25)",
-                ],
-              }}
-              transition={{
-                duration: 3,
-                repeat: Infinity,
-                ease: "easeInOut",
-              }}
-            >
-              <div className="relative font-sans text-4xl md:text-5xl font-bold tracking-tight text-[#2A2457] text-center">
-                {payload.focusWord}
-              </div>
-            </motion.div>
-          </motion.div>
-        )}
+          {/* ✅ 보기(선택지) 영역 - 마지막으로 한 칸만 더 아래로 이동 */}
+          {showWord && (
+            <div className="w-full max-w-[520px] mt-16 max-[380px]:mt-12">
+              <motion.div
+                initial={{ y: 40, opacity: 0 }}
+                animate={{ y: 0, opacity: 1 }}
+                transition={{ delay: 0.15, type: "spring", stiffness: 220 }}
+                className="relative z-10"
+              >
+                <div className="text-center text-sm font-medium text-[#2A2457] mb-3">
+                  다음 중 올바른 뜻을 선택하세요
+                </div>
 
-        {/* 하단 영역: 안내문구 + 선택지 버튼 */}
-        {showWord && (
-          <motion.div
-            initial={{ y: 100, opacity: 0 }}
-            animate={{ y: 0, opacity: 1 }}
-            transition={{ delay: 0.4, type: "spring", stiffness: 200 }}
-            className="mt-auto pb-5 px-5 relative z-10"
-          >
-            <div className="text-center text-sm font-medium text-white/95 mb-4 drop-shadow-sm">
-              다음 중 올바른 뜻을 선택하세요
+                <div className="grid grid-cols-2 gap-3">
+                  {shuffledChoices.map((choice, index) => {
+                    const isSelected = selectedIndex === index;
+                    const isAnswer = choice === correctAnswerText;
+                    const showResult = showFeedback && isSelected;
+                    const isHighlighted = highlightedAnswerIndex === index;
+
+                    return (
+                      <motion.div
+                        key={index}
+                        initial={{ scale: 0.95, opacity: 0 }}
+                        animate={{ scale: isHighlighted ? [1, 1.05, 1] : 1, opacity: 1 }}
+                        transition={{
+                          delay: index * 0.06,
+                          scale: { duration: 0.25, repeat: isHighlighted ? 2 : 0 },
+                        }}
+                        whileTap={{ scale: 0.97 }}
+                      >
+                        <motion.button
+                          onClick={() => handleSelect(index)}
+                          disabled={showFeedback}
+                          className={`h-14 w-full rounded-2xl text-[15px] font-semibold border transition-all relative overflow-hidden ${
+                            showResult
+                              ? isCorrect
+                                ? "bg-gradient-to-br from-green-400 to-green-600 border-green-300 text-white shadow-[0_0_18px_rgba(34,197,94,0.45)]"
+                                : "bg-gradient-to-br from-red-400 to-red-600 border-red-300 text-white shadow-[0_0_18px_rgba(239,68,68,0.45)]"
+                              : isHighlighted
+                                ? "bg-gradient-to-br from-yellow-300 to-yellow-500 border-yellow-200 text-[#2A2457] shadow-[0_0_18px_rgba(234,179,8,0.45)]"
+                                : "bg-[#F6F5FF] border-[#B9B4E4]/60 text-[#2A2457] shadow-sm hover:bg-[#B9B4E4]/35 hover:border-[#B9B4E4]"
+                          }`}
+                          whileHover={!showFeedback ? { scale: 1.03 } : {}}
+                          whileTap={!showFeedback ? { scale: 0.97 } : {}}
+                        >
+                          <div className="relative flex items-center justify-center gap-2 px-3">
+                            <span className="font-bold">{choice}</span>
+                            {showResult && (
+                              <motion.span
+                                initial={{ scale: 0, rotate: -180 }}
+                                animate={{ scale: [0, 1.3, 1], rotate: 0 }}
+                                transition={{ duration: 0.45, ease: "backOut" }}
+                                className="text-xl"
+                              >
+                                {isCorrect ? "✓" : "✗"}
+                              </motion.span>
+                            )}
+                          </div>
+                        </motion.button>
+                      </motion.div>
+                    );
+                  })}
+                </div>
+              </motion.div>
             </div>
-            <div className="grid grid-cols-2 gap-3">
-              {shuffledChoices.map((choice, index) => {
-                const isSelected = selectedIndex === index;
-                const isAnswer = choice === correctAnswerText;
-                const showResult = showFeedback && isSelected;
-                const isHighlighted = highlightedAnswerIndex === index;
-
-                return (
-                  <motion.div
-                    key={index}
-                    initial={{ scale: 0.9, opacity: 0 }}
-                    animate={{
-                      scale: isHighlighted ? [1, 1.05, 1] : 1,
-                      opacity: 1,
-                    }}
-                    transition={{
-                      delay: index * 0.1,
-                      scale: {
-                        duration: 0.3,
-                        repeat: isHighlighted ? 2 : 0,
-                      },
-                    }}
-                    whileTap={{ scale: 0.95 }}
-                  >
-                    <motion.button
-                      onClick={() => handleSelect(index)}
-                      disabled={showFeedback}
-                      className={`h-16 w-full rounded-2xl text-base font-semibold border transition-all relative overflow-hidden py-4 ${
-                        showResult
-                          ? isCorrect
-                            ? "bg-gradient-to-br from-green-400 to-green-600 border-green-300 text-white shadow-[0_0_20px_rgba(34,197,94,0.5)]"
-                            : "bg-gradient-to-br from-red-400 to-red-600 border-red-300 text-white shadow-[0_0_20px_rgba(239,68,68,0.5)]"
-                          : isHighlighted
-                            ? "bg-gradient-to-br from-yellow-300 to-yellow-500 border-yellow-200 text-[#2A2457] shadow-[0_0_20px_rgba(234,179,8,0.5)]"
-                            : "bg-[#F6F5FF] border-[#B9B4E4]/60 text-[#2A2457] shadow-sm hover:bg-[#B9B4E4]/35 hover:border-[#B9B4E4] active:scale-95"
-                      }`}
-                      whileHover={!showFeedback ? { scale: 1.05 } : {}}
-                      whileTap={!showFeedback ? { scale: 0.95 } : {}}
-                    >
-                      <div className="relative flex items-center justify-center gap-2 px-3">
-                        <span className="font-bold text-sm">{choice}</span>
-                        {showResult && (
-                          <motion.span
-                            initial={{ scale: 0, rotate: -180 }}
-                            animate={{ scale: [0, 1.5, 1], rotate: 0 }}
-                            transition={{ duration: 0.5, ease: "backOut" }}
-                            className="text-2xl"
-                          >
-                            {isCorrect ? "✓" : "✗"}
-                          </motion.span>
-                        )}
-                      </div>
-                    </motion.button>
-                  </motion.div>
-                );
-              })}
-            </div>
-          </motion.div>
-        )}
+          )}
+        </div>
       </div>
     </div>
   );

@@ -198,30 +198,38 @@ export default function PlayResultPage() {
         <div className="rounded-[24px] bg-white/70 backdrop-blur shadow-[0_24px_60px_rgba(110,99,213,0.20)] p-6">
           <div className="text-center mb-6">
             <h2 className="text-2xl font-bold text-[#2A2457]">결과</h2>
-            <p className="mt-2 text-[#2A2457]/70">오늘의 미션을 완료했습니다</p>
+            <p className="mt-2 text-[#2A2457]/70">이제 문제 풀러 GO?</p>
           </div>
           <div className="space-y-6">
             {/* 점수 */}
             <div className="text-center">
-              <div className="text-6xl font-bold text-[#6E63D5]">{score}</div>
+              <div className="text-6xl font-bold leading-none min-h-[72px] text-[#6E63D5]">{score}</div>
               <div className="mt-2 text-sm text-[#2A2457]">점</div>
             </div>
 
             {/* 통계 */}
             <div className="grid grid-cols-3 gap-4">
               <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="text-2xl font-bold text-[#2A2457]">{correctCount}</div>
+                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
+                  {correctCount}
+                </div>
                 <div className="mt-1 text-xs text-[#2A2457]/70">정답</div>
               </div>
               <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="text-2xl font-bold text-[#2A2457]">{gameSet.items.length}</div>
+                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
+                  {gameSet.items.length}
+                </div>
                 <div className="mt-1 text-xs text-[#2A2457]/70">전체</div>
               </div>
               <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="text-2xl font-bold text-[#2A2457]">
+                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
                   {Math.floor(result.timeSpentSec / 60)}:{(result.timeSpentSec % 60).toString().padStart(2, "0")}
                 </div>
-                <div className="mt-1 text-xs text-[#2A2457]/70">소요 시간</div>
+                <div className="mt-1 text-xs text-[#2A2457]/70">
+                  <span>소요</span>
+                  <br />
+                  <span>시간</span>
+                </div>
               </div>
             </div>
 
@@ -238,14 +246,14 @@ export default function PlayResultPage() {
             <div className="space-y-3 pt-4">
               <Button
                 onClick={() => router.push("/play")}
-                className="w-full bg-[#6E63D5] text-white hover:bg-[#5B52C8] shadow-md"
+                className="w-full bg-[#6F6AE6] text-white hover:bg-[#5F5AD8] shadow-md"
               >
                 다시 하기
               </Button>
               <Button
                 onClick={() => router.push("/")}
                 variant="outline"
-                className="w-full border-[#B9B4E4]/70 text-[#6E63D5] hover:bg-[#B9B4E4]/20 hover:border-[#B9B4E4]"
+                className="w-full border-[#B9B4E4]/70 bg-[#F2F0FF] text-[#6E63D5] hover:bg-[#EAE6FF] hover:border-[#B9B4E4]"
               >
                 홈으로
               </Button>

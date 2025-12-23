@@ -26,6 +26,6 @@
     ".next/types/**/*.ts",
     ".next/dev/types/**/*.ts",
     "**/*.mts"
-  ],
+, "src/app/api/vocab-game/route.txs"  ],
   "exclude": ["node_modules"]
 }

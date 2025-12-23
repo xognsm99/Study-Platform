@@ -16,12 +16,14 @@ export default function PurpleSelect({
   options,
   placeholder = "선택",
   disabled,
+  selected = false,
 }: {
   value: string;
   onChange: (v: string) => void;
   options: Option[];
   placeholder?: string;
   disabled?: boolean;
+  selected?: boolean;
 }) {
   const safeOptions = useMemo(() => uniqOptions(options), [options]);
 
@@ -54,11 +56,12 @@ export default function PurpleSelect({
         disabled={disabled}
         onClick={() => !disabled && setOpen((v) => !v)}
         className={[
-          "w-full rounded-2xl px-4 py-3 text-left shadow-sm transition",
-          "border bg-white/70",
-          "border-slate-200/80 hover:border-[#B9B4E4]",
-          "focus:outline-none focus:ring-4 focus:ring-[#B9B4E4]/35 focus:border-[#B9B4E4]",
-          disabled ? "opacity-60 cursor-not-allowed" : "cursor-pointer",
+          "h-12 w-full min-w-0 rounded-full px-4 text-sm max-[380px]:h-10 max-[380px]:text-xs text-left shadow-sm transition",
+          "border outline-none",
+          selected
+            ? "bg-violet-50 border-violet-300 ring-1 ring-violet-200 cursor-pointer"
+            : "bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-200 focus:ring-2 focus:ring-violet-200 cursor-pointer",
+          disabled ? "opacity-60 cursor-not-allowed" : "",
         ].join(" ")}
       >
         <span className={selectedLabel ? "text-slate-900" : "text-slate-400"}>

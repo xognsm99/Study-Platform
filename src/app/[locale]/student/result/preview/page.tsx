@@ -99,19 +99,6 @@ export default function ResultPreviewPage() {
 
   return (
     <div className="mx-auto max-w-4xl p-6">
-      <div className="mb-4">
-        <button
-          onClick={() => {
-            const pathname = window.location.pathname;
-            const locale = pathname.split("/")[1] || "ko";
-            router.back();
-          }}
-          className="text-sm text-blue-600 hover:text-blue-700"
-        >
-          ← 돌아가기
-        </button>
-      </div>
-
       <ResultCard
         total={previewData.totalCount}
         correct={previewData.correctCount}
@@ -123,16 +110,6 @@ export default function ResultPreviewPage() {
         hintUsedCount={previewData.hintUsedCount}
         isTripleMode={isTripleMode}
         roundResults={isTripleMode && meta.roundResults ? meta.roundResults : []}
-        onRetry={() => {
-          const pathname = window.location.pathname;
-          const locale = pathname.split("/")[1] || "ko";
-          router.push(`/${locale}/student/setup`);
-        }}
-        onNewProblems={() => {
-          const pathname = window.location.pathname;
-          const locale = pathname.split("/")[1] || "ko";
-          router.push(`/${locale}/student/setup`);
-        }}
       />
     </div>
   );

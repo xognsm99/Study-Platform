@@ -3,6 +3,18 @@
 :root {
   --background: #ffffff;
   --foreground: #171717;
+  
+  --bg: #F8F7FC;
+  --surface: #FFFFFF;
+  --text: #24272D;
+  --muted: #9D9BA8;
+  
+  --primary: #6A5AE0;   /* Queezy 메인 퍼플 */
+  --secondary: #B9B4E4; /* 대표님이 확인한 값 */
+  --accent: #FFCCD7;    /* 대표님이 확인한 값 */
+  
+  --radius: 20px;
+  --btn-h: 48px;
 }
 
 @theme inline {
@@ -665,4 +677,15 @@ body {
 
 .btn-secondary:active {
   transform: translateY(0);
+}
+
+/* =========================
+   전역 배경색 (흰색 플래시 방지)
+   ========================= */
+html, body {
+  background: #f5f3ff !important;
+}
+
+main {
+  background: transparent !important;
 }

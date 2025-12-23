@@ -1,8 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import { useSearchParams, useRouter } from "next/navigation";
-import { extractProblemText } from "@/lib/problem-text";
+import { useSearchParams } from "next/navigation";
 import { ProblemRenderer } from "@/components/teacher/ProblemRenderer";
 
 function escapeHtml(s: string) {
@@ -52,9 +51,14 @@ function pickAnswerNo(it: any) {
   return it?.answer_no ?? raw?.answer_no ?? null;
 }
 
+type PrintData = {
+  grade: string;
+  subject: string;
+  items: any[];
+};
+
 export default function TeacherPrintPage() {
   const sp = useSearchParams();
-  const router = useRouter();
   const [printData, setPrintData] = useState<PrintData | null>(null);
   const [dataNotFound, setDataNotFound] = useState(false);
 
@@ -115,7 +119,7 @@ export default function TeacherPrintPage() {
   };
 
   const handleGoBack = () => {
-    router.push(`/teacher/build?grade=${grade}&subject=${subject}`);
+    window.location.href = `/teacher/build?grade=${grade}&subject=${subject}`;
   };
 
   if (dataNotFound || !printData) {
@@ -326,15 +330,15 @@ export default function TeacherPrintPage() {
                 ...(grade && { grade }),
                 ...(subject && { subject }),
               });
-              router.push(`/teacher/print?${params.toString()}`);
+              window.location.href = `/teacher/print?${params.toString()}`;
             }}
-            className="no-print rounded-lg bg-gray-600 px-4 py-2 text-sm font-semibold text-white shadow-lg hover:bg-gray-700"
+            className="no-print h-11 px-5 rounded-2xl bg-[#E9E6FF] text-[#4B3CC4] font-semibold shadow-sm border border-[#D7D0FF] hover:bg-[#DED8FF] transition"
           >
             {showAnswer ? "문제 보기" : "정답 보기"}
           </button>
           <button
             onClick={handlePrint}
-            className="no-print rounded-lg bg-blue-600 px-6 py-3 font-semibold text-white shadow-lg hover:bg-blue-700"
+            className="no-print h-11 px-5 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition"
           >
             인쇄하기
           </button>

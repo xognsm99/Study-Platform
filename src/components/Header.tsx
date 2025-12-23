@@ -70,8 +70,8 @@ export default function Header() {
     <header className="border-b bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         {/* ✅ 앱 이름 */}
-        <Link href="/" className="text-base font-semibold text-slate-900">
-          스터디 플랫폼
+        <Link href="/" className="text-base font-semibold text-slate-900 whitespace-nowrap">
+          STUDY PICK
         </Link>
 
         {/* ✅ 우측 메뉴 */}

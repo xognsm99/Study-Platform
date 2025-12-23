@@ -1,195 +1,231 @@
-import { useState, useEffect, useCallback, useMemo } from "react";
-
-export interface GameState {
-  activeBlankIndex: number;
-  userAnswers: string[];
-  score: number;
-  isComplete: boolean;
-}
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 export interface UseAlphaKeypadGameProps {
-  sentence: string;
-  answers: string[];
-  onComplete?: () => void;
+  sentence: string; // "()" 포함
+  answers: string[]; // 빈칸 수와 동일
+  onComplete?: (result: {
+    correct: boolean;
+    points: number;
+    usedHint: boolean;
+    usedReveal: boolean;
+  }) => void;
 }
 
-/**
- * 알파벳 키패드 게임 상태 관리 훅
- */
+/** a-z만 남김 */
+function norm(s: string) {
+  return (s ?? "").toLowerCase().replace(/[^a-z]/g, "");
+}
+
 export function useAlphaKeypadGame({
   sentence,
   answers,
   onComplete,
 }: UseAlphaKeypadGameProps) {
-  // 빈칸 수와 정답 수가 일치하는지 확인
-  const blankCount = (sentence.match(/\(\)/g) || []).length;
-
-  if (blankCount !== answers.length) {
-    return {
-      isValid: false,
-      error: "게임 모드 미지원 문제",
-    };
-  }
-
-  // 정답을 소문자로 normalize
-  const normAnswers = useMemo(
-    () => answers.map((a) => a.toLowerCase().trim()),
-    [answers]
+  const blankCount = useMemo(
+    () => (sentence.match(/\(\)/g) || []).length,
+    [sentence]
   );
+  const normAnswers = useMemo(() => answers.map((a) => norm(a)), [answers]);
 
-  // 키패드 키 배열 생성 (문제가 바뀔 때마다 1회씩 셔플)
-  const availableLetters = useMemo(() => {
-    const lettersSet = new Set<string>();
-    normAnswers.forEach((answer) => {
-      answer.split("").forEach((char) => {
-        if (char.match(/[a-z]/)) {
-          lettersSet.add(char);
-        }
-      });
-    });
-    const letters = Array.from(lettersSet);
-    // 셔플 (Fisher-Yates) - 문제당 1회만 셔플
-    for (let i = letters.length - 1; i > 0; i--) {
-      const j = Math.floor(Math.random() * (i + 1));
-      [letters[i], letters[j]] = [letters[j], letters[i]];
-    }
-    return letters;
-  }, [normAnswers.join("|")]); // normAnswers가 바뀔 때만 재생성
+  const isValid = blankCount === answers.length;
+  const error = isValid
+    ? null
+    : `문장 빈칸(()) 개수(${blankCount})와 answers 개수(${answers.length})가 다릅니다.`;
 
   const [activeBlankIndex, setActiveBlankIndex] = useState(0);
-  const [userAnswers, setUserAnswers] = useState<string[]>(
-    Array(normAnswers.length).fill("")
+  const [userAnswers, setUserAnswers] = useState<string[]>(() =>
+    Array(blankCount).fill("")
   );
-  const [hintPenalty, setHintPenalty] = useState(0); // 힌트 사용 횟수
-  const [score, setScore] = useState(0);
-  const [isComplete, setIsComplete] = useState(false);
   const [revealed, setRevealed] = useState<boolean[]>(() =>
     Array(blankCount).fill(false)
   );
+
+  // ✅ UI 표시용 state
+  const [usedHint, setUsedHint] = useState(false);
   const [usedReveal, setUsedReveal] = useState(false);
 
-  // 문제가 바뀌면 reset
+  // ✅ 점수 계산 “즉시 반영”용 ref (state 지연 문제 해결)
+  const usedHintRef = useRef(false);
+  const usedRevealRef = useRef(false);
+
+  const [isComplete, setIsComplete] = useState(false);
+
+  // 문제 바뀌면 리셋
   useEffect(() => {
     setActiveBlankIndex(0);
-    setUserAnswers(Array(normAnswers.length).fill(""));
-    setHintPenalty(0);
-    setScore(0);
-    setIsComplete(false);
+    setUserAnswers(Array(blankCount).fill(""));
     setRevealed(Array(blankCount).fill(false));
+    setUsedHint(false);
     setUsedReveal(false);
-  }, [sentence, normAnswers.join("|"), blankCount]);
+    usedHintRef.current = false;
+    usedRevealRef.current = false;
+    setIsComplete(false);
+  }, [sentence, blankCount]);
 
-  // 완료 체크: 모든 빈칸이 채워졌는지 확인
-  useEffect(() => {
-    if (isComplete) return;
+  // ✅ 현재 활성 빈칸의 정답 글자만 키패드 표시 (안정 정렬)
+  const letters = useMemo(() => {
+    const target = normAnswers[activeBlankIndex] ?? "";
+    const set = new Set<string>();
+    target.split("").forEach((c) => c && set.add(c));
+    return Array.from(set).sort();
+  }, [normAnswers, activeBlankIndex]);
 
-    const allFilled = userAnswers.every(
-      (answer, index) => answer.length === normAnswers[index].length
-    );
-
-    if (allFilled) {
-      let correctCount = 0;
-      userAnswers.forEach((userAnswer, index) => {
-        // userAnswer와 normAnswers는 모두 소문자로 normalize되어 있음
-        if (userAnswer === normAnswers[index]) {
-          correctCount++;
-        }
-      });
-      setIsComplete(true);
-      // 최종 점수 = 정답 공개 사용 시 0점, 그 외에는 정답 개수 - 힌트 사용 횟수
-      const finalScore = usedReveal ? 0 : Math.max(0, correctCount - hintPenalty);
-      setScore(finalScore);
-      onComplete?.();
-    }
-  }, [userAnswers, normAnswers, isComplete, hintPenalty, usedReveal, onComplete]);
-
-  // 키 입력 처리
-  const handleKeyPress = useCallback(
-    (letter: string) => {
-      if (isComplete) return;
-
-      const normalizedLetter = letter.toLowerCase();
-      const currentAnswer = userAnswers[activeBlankIndex];
-      const targetLength = normAnswers[activeBlankIndex].length;
-
-      if (currentAnswer.length < targetLength) {
-        const newAnswers = [...userAnswers];
-        newAnswers[activeBlankIndex] = currentAnswer + normalizedLetter;
-        setUserAnswers(newAnswers);
-
-        // 정답 길이만큼 채워지면 다음 빈칸으로 이동
-        if (newAnswers[activeBlankIndex].length === targetLength) {
-          const nextIndex = activeBlankIndex + 1;
-          if (nextIndex < normAnswers.length) {
-            setActiveBlankIndex(nextIndex);
-          }
-        }
-      }
-    },
-    [activeBlankIndex, userAnswers, normAnswers, isComplete]
+  const checkAllCorrect = useCallback(
+    (ua: string[]) => ua.every((v, i) => norm(v) === normAnswers[i]),
+    [normAnswers]
   );
 
-  // Backspace 처리
-  const handleBackspace = useCallback(() => {
-    if (isComplete) return;
+  const finalizeIfDone = useCallback(
+    (ua: string[]) => {
+      const done = ua.every(
+        (v, i) => norm(v).length === (normAnswers[i]?.length ?? 0)
+      );
+      if (!done) return;
 
-    const currentAnswer = userAnswers[activeBlankIndex];
-    if (currentAnswer.length > 0) {
-      const newAnswers = [...userAnswers];
-      newAnswers[activeBlankIndex] = currentAnswer.slice(0, -1);
-      setUserAnswers(newAnswers);
+      const correct = checkAllCorrect(ua);
+
+      // ✅ 점수 규칙 (요청 반영)
+      // - 정답 기본: +2
+      // - 힌트 사용: -1
+      // - 정답보기 사용: -2
+      // - 오답이면 기본 0에서 패널티만 적용 → 음수 가능
+      const base = correct ? 2 : 0;
+      const points =
+        base - (usedHintRef.current ? 1 : 0) - (usedRevealRef.current ? 2 : 0);
+
+      setIsComplete(true);
+      onComplete?.({
+        correct,
+        points,
+        usedHint: usedHintRef.current,
+        usedReveal: usedRevealRef.current,
+      });
+    },
+    [checkAllCorrect, normAnswers, onComplete]
+  );
+
+  const onKeyPress = useCallback(
+    (letter: string) => {
+      if (!isValid || isComplete) return;
+      const l = norm(letter);
+      if (!l) return;
+
+      const target = normAnswers[activeBlankIndex] ?? "";
+      const cur = userAnswers[activeBlankIndex] ?? "";
+      if (cur.length >= target.length) return;
+
+      const next = [...userAnswers];
+      next[activeBlankIndex] = (cur + l).slice(0, target.length);
+      setUserAnswers(next);
+
+      // 채우면 다음 빈칸으로 이동
+      if (next[activeBlankIndex].length === target.length) {
+        const ni = activeBlankIndex + 1;
+        if (ni < blankCount) setActiveBlankIndex(ni);
+        finalizeIfDone(next);
+      }
+    },
+    [
+      isValid,
+      isComplete,
+      normAnswers,
+      activeBlankIndex,
+      userAnswers,
+      blankCount,
+      finalizeIfDone,
+    ]
+  );
+
+  const onBackspace = useCallback(() => {
+    if (!isValid || isComplete) return;
+    const cur = userAnswers[activeBlankIndex] ?? "";
+    if (!cur) return;
+
+    const next = [...userAnswers];
+    next[activeBlankIndex] = cur.slice(0, -1);
+    setUserAnswers(next);
+  }, [isValid, isComplete, userAnswers, activeBlankIndex]);
+
+  // 힌트: 현재 빈칸에 다음 글자 1개 채움 (1회만)
+  const onHint = useCallback(() => {
+    if (!isValid || isComplete) return;
+
+    const target = normAnswers[activeBlankIndex] ?? "";
+    const cur = userAnswers[activeBlankIndex] ?? "";
+    if (cur.length >= target.length) return;
+
+    if (!usedHintRef.current) {
+      usedHintRef.current = true;
+      setUsedHint(true);
     }
-  }, [activeBlankIndex, userAnswers, isComplete]);
 
-  // 빈칸 클릭 처리
-  const handleBlankClick = useCallback((index: number) => {
-    if (isComplete) return;
-    setActiveBlankIndex(index);
-  }, [isComplete]);
+    const next = [...userAnswers];
+    next[activeBlankIndex] = target.slice(0, cur.length + 1);
+    setUserAnswers(next);
 
-  // 힌트 (첫 글자 자동 채우기)
-  const handleHint = useCallback(() => {
-    if (isComplete) return;
-
-    const currentAnswer = userAnswers[activeBlankIndex];
-    const targetAnswer = normAnswers[activeBlankIndex];
-
-    if (currentAnswer.length === 0 && targetAnswer.length > 0) {
-      const newAnswers = [...userAnswers];
-      newAnswers[activeBlankIndex] = targetAnswer[0].toLowerCase();
-      setUserAnswers(newAnswers);
-      setHintPenalty((prev) => prev + 1); // 힌트 사용 횟수 증가
+    if (next[activeBlankIndex].length === target.length) {
+      const ni = activeBlankIndex + 1;
+      if (ni < blankCount) setActiveBlankIndex(ni);
+      finalizeIfDone(next);
     }
-  }, [activeBlankIndex, userAnswers, normAnswers, isComplete]);
-
-  // 정답 공개
-  const revealAnswer = useCallback(() => {
-    if (isComplete) return;
-
-    setRevealed((prev) => {
-      const next = [...prev];
-      next[activeBlankIndex] = true;
-      return next;
-    });
-    // 정답 공개는 "치트"니까 점수 박살내기: 완료 시 score=0 되게 플래그
-    setUsedReveal(true);
-  }, [activeBlankIndex, isComplete]);
-
-  return {
-    isValid: true,
+  }, [
+    isValid,
+    isComplete,
+    normAnswers,
     activeBlankIndex,
     userAnswers,
-    score,
+    blankCount,
+    finalizeIfDone,
+  ]);
+
+  // 정답 보기: 현재 빈칸을 정답으로 채우고 revealed 표시 (1회만)
+  const onReveal = useCallback(() => {
+    if (!isValid || isComplete) return;
+
+    if (!usedRevealRef.current) {
+      usedRevealRef.current = true;
+      setUsedReveal(true);
+    }
+
+    const nextR = [...revealed];
+    nextR[activeBlankIndex] = true;
+    setRevealed(nextR);
+
+    const next = [...userAnswers];
+    next[activeBlankIndex] = normAnswers[activeBlankIndex] ?? "";
+    setUserAnswers(next);
+
+    const ni = activeBlankIndex + 1;
+    if (ni < blankCount) setActiveBlankIndex(ni);
+    finalizeIfDone(next);
+  }, [
+    isValid,
     isComplete,
-    availableLetters,
     revealed,
+    activeBlankIndex,
+    userAnswers,
+    normAnswers,
+    blankCount,
+    finalizeIfDone,
+  ]);
+
+  return {
+    isValid,
+    error,
+
+    letters,
+    onKeyPress,
+    onBackspace,
+    onHint,
+    onReveal,
+
+    activeBlankIndex,
+    setActiveBlankIndex,
+    userAnswers,
+    revealed,
+
+    isComplete,
+    usedHint,
     usedReveal,
-    hintPenalty,
-    handleKeyPress,
-    handleBackspace,
-    handleBlankClick,
-    handleHint,
-    revealAnswer,
   };
 }
-

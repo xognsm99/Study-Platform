@@ -326,15 +326,10 @@ export default function TripleQuizClient({ grade, subject, category, categories 
   // ✅ early return (모든 Hook 선언 후)
   if (loading) {
     return (
-      <div className="rounded-2xl border bg-white p-6 text-slate-900">
-        <div className="animate-pulse space-y-3">
-          <div className="h-4 w-1/3 rounded bg-gray-200" />
-          <div className="h-6 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
-          <div className="h-10 w-full rounded bg-gray-200" />
+      <div className="rounded-2xl border border-violet-200 bg-transparent p-6">
+        <div className="flex items-center justify-center py-8">
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600"></div>
         </div>
-        <p className="mt-4 text-sm text-gray-500">문제를 생성 중입니다...</p>
       </div>
     );
   }
@@ -450,21 +445,6 @@ export default function TripleQuizClient({ grade, subject, category, categories 
         </button>
       </div>
 
-      {/* 상단 메타 */}
-      <div className="mb-3 flex items-center justify-between text-xs">
-        <span className="text-gray-500">
-          {grade} · {subjText} · {catText} · {round}회차
-        </span>
-        <div className="flex items-center gap-2">
-          {difficultyText && (
-            <span className="rounded-full bg-blue-50 px-2 py-0.5 text-[11px] font-medium text-blue-700">
-              {difficultyText}
-              {current.frequent && " · 자주 출제"}
-            </span>
-          )}
-          <span className="text-gray-500">{progressText}</span>
-        </div>
-      </div>
 
       {/* ✅ 연습용(채점불가) 표시 */}
       {current.isPracticeMode && (
