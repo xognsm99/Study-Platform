@@ -19,7 +19,7 @@ export default function AuthForm() {
       ? `${window.location.origin}/auth/callback?next=${encodeURIComponent(next)}`
       : undefined;
 
-  async function loginWith(provider: "google" | "kakao" | "naver") {
+  async function loginWith(provider: "google" | "kakao") {
     setSocialLoading(provider);
     setMsg(null);
 
@@ -74,18 +74,7 @@ export default function AuthForm() {
           {socialLoading === "kakao" ? "처리 중..." : "kakao 로그인"}
         </button>
 
-        {/* Naver */}
-        <button
-          onClick={() => loginWith("naver")}
-          disabled={!!socialLoading}
-          className="relative w-full rounded-xl bg-[#03C75A] py-2.5 pl-12 pr-4 text-base font-semibold text-white transition-colors hover:bg-[#02B350] active:bg-[#029640] disabled:cursor-not-allowed disabled:opacity-50 disabled:hover:bg-[#03C75A]"
-        >
-          <span className="absolute left-4 top-1/2 -translate-y-1/2 flex h-8 w-8 items-center justify-center rounded-lg bg-white/70">
-            <Image src="/naver.png" alt="Naver" width={20} height={20} />
-          </span>
-          {socialLoading === "naver" ? "처리 중..." : "Naver 로그인"}
-        </button>
-      </div>
+            </div>
 
       {/* 메시지 */}
       {msg && (

@@ -4,9 +4,13 @@ import { createServerClient } from "@supabase/ssr";
 /**
  * 서버 컴포넌트/API에서 사용하는 Supabase 클라이언트
  * SSR 세션 쿠키를 자동으로 관리합니다.
+ *
+ * ✅ 호환 버전:
+ * - createSupabaseServerAsync(): 정석(await cookies())
+ * - createSupabaseServer(): 기존 코드 호환용(내부에서 즉시 Promise 반환)
  */
-export function createSupabaseServer() {
-  const cookieStore = cookies();
+export async function createSupabaseServerAsync() {
+  const cookieStore = await cookies();
 
   return createServerClient(
     process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -30,5 +34,13 @@ export function createSupabaseServer() {
   );
 }
 
-// 하위 호환성을 위한 별칭
+/**
+ * ✅ 기존 코드가 await 없이 호출해도 "일단" 안 깨지게 하기 위한 래퍼
+ * - 반환값은 Promise(=thenable)라서, 기존 코드가 await 하는 곳은 그대로 동작
+ */
+export function createSupabaseServer() {
+  return createSupabaseServerAsync();
+}
+
+// 하위 호환성: 기존 이름 유지
 export const supabaseServer = createSupabaseServer;

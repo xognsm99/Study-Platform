@@ -38,7 +38,9 @@ async function seedVocabDefinition() {
       // 정규화 적용
       const normalizedSubject = normalizeSubject(sample.subject) ?? SUBJECT_CODE.ENGLISH;
       const normalizedGrade = normalizeGrade(sample.grade) ?? sample.grade;
-      const normalizedCategory = sample.category === "vocabulary" ? CATEGORY.VOCABULARY : sample.category;
+      const normalizedCategory =
+            sample.category === "vocab" ? CATEGORY.VOCABULARY : sample.category;
+ 
 
       const { error } = await supabase
         .from("problems")

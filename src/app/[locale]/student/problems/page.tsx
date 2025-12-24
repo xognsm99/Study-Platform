@@ -256,11 +256,11 @@ export default function StudentProblemsPage() {
     return (
       <div className="mx-auto max-w-4xl p-6">
         <QuizClient
-          items={problems}
-          category={categoryForView}
-          grade={grade}
-          subject="english"
-        />
+  grade={String(grade ?? "")}
+  subject="english"
+  category={String(categoryForView)}
+/>
+
       </div>
     );
   }

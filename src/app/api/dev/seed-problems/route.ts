@@ -62,10 +62,12 @@ export async function GET() {
 
     // 1) 모든 샘플 데이터를 하나의 배열로 합치기
     const allSamples = [
-      ...(DIALOGUE_FLOW_SAMPLES as any[]),
-      ...(VOCAB_DEFINITION_MATCH_SAMPLES as any[]),
-      ...(READING_TITLE_DIEGO_SAMPLES as any[]),
-    ];
+  ...Array.from(DIALOGUE_FLOW_SAMPLES),
+  ...Array.from(VOCAB_DEFINITION_MATCH_SAMPLES),
+  ...Array.from(READING_TITLE_DIEGO_SAMPLES),
+] as any[];
+
+
 
     console.log(`[seed-problems] 총 ${allSamples.length}개 샘플 로드됨`);
 

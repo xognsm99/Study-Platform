@@ -401,11 +401,11 @@ export default function StudentPage() {
     return (
       <div className="mx-auto max-w-4xl p-6">
         <QuizClient
-          grade={grade}
-          subject="english"
-          category={categoryForView}
-          initialProblems={problems}
-        />
+  grade={String(grade ?? "")}
+  subject="english"
+  category={String(categoryForView)}
+/>
+
       </div>
     );
   }

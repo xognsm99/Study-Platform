@@ -1,6 +1,5 @@
 import { redirect } from "next/navigation";
 
-// Redirect to locale-based route
-export default function TeacherRedirect() {
+export default function Page() {
   redirect("/ko/teacher");
 }

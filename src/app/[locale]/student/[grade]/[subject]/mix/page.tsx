@@ -22,8 +22,7 @@ export default async function MixPage({
       <QuizClient
         grade={decodedGrade}
         subject={subject}
-        category="mix"
-        categories={categoriesArray}
+        category="mix"        
       />
     </div>
   );
