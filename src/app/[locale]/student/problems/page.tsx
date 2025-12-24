@@ -293,14 +293,14 @@ export default function StudentProblemsPage() {
 
   return (
     <StudentHomeShell>
-      <div className="px-4 pt-6 pb-24">
+      <div className="px-1 pt-3 pb-24">
         <ScreenTitle>문제 PICK</ScreenTitle>
 
         <ScreenCard>
             {/* 문제 유형 선택 */}
             <div>
               <div>
-                <div className="text-sm font-semibold text-[#2A2457] mb-3">
+                <div className="text-sm font-semibold text-[#2A2457] mb-4">
                   문제 유형 선택
                 </div>
                 <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
@@ -333,7 +333,7 @@ export default function StudentProblemsPage() {
                 disabled={!canProceed || loading}
                 className="w-full h-12 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-sm max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
               >
-                20문항 풀기 시작
+                20 문항 풀기 시작
               </button>
               {grade !== "2" && (
                 <p className="mt-2 max-[380px]:mt-1.5 text-xs max-[380px]:text-[10px] text-slate-500 text-center">

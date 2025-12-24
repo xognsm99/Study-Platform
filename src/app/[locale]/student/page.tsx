@@ -652,7 +652,7 @@ export default function StudentPage() {
       {/* StudentHomeShell UI (프로필이 완성되었을 때만 표시) */}
       {!showForm && profile && isProfileComplete(profile) && (
         <StudentHomeShell>
-          <div className="px-4 pt-6 pb-24">
+          <div className="px-1 pt-3 pb-24">
             <ScreenTitle>U QUIZ?</ScreenTitle>
 
             <ScreenCard>
@@ -691,17 +691,17 @@ export default function StudentPage() {
                     });
                     router.push(`/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 text-violet-800 text-sm max-[380px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 text-violet-800 text-sm max-[180px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
                 >
-                  단어 퀴즈 시작
+                  단어 퀴즈 (10문제)
                 </button>
 
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 text-violet-900 text-sm max-[380px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 text-violet-900 text-sm max-[180px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
                 >
-                  게임 퀴즈 시작 (5분 미션)
+                  단어/숙어 퀴즈 (4지선다)
                 </button>
 
                 {/* ✅ A/B 본문 선택 퀴즈 */}
@@ -709,12 +709,12 @@ export default function StudentPage() {
                   type="button"
                   onClick={handleStartReadingAB}
                   className={[
-                    "w-full h-12 max-[380px]:h-10 rounded-full text-sm max-[380px]:text-xs font-semibold active:scale-[0.99] transition-all",
+                    "w-full h-12 max-[380px]:h-10 rounded-full text-sm max-[180px]:text-xs font-semibold active:scale-[0.99] transition-all",
                     "bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0]",
                     "disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300",
                   ].join(" ")}
                 >
-                  A/B 본문 선택 퀴즈
+                  A/B 본문 선택 퀴즈 (O X 퀴즈)
                 </button>
 
                 {/* ✅ 버튼 아래 공간 (답답함 해결) */}
