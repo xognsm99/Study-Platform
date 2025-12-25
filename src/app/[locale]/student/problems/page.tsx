@@ -169,7 +169,7 @@ export default function StudentProblemsPage() {
   };
 
   const handleStart = async () => {
-    if (!canProceed) return;
+    if (!canProceed || loading) return;
 
     setLoading(true);
     setError(null);
@@ -181,11 +181,16 @@ export default function StudentProblemsPage() {
       // 선택된 그룹을 카테고리 값으로 변환 (vocab/grammar/reading/dialogue)
       const categories = Array.from(selectedGroups);
 
+      if (process.env.NODE_ENV === "development") {
+        console.log("[student/problems] START categories", categories, "count", categories.length);
+      }
+
       // ✅ /api/student/random에는 쿼리스트링으로 grade/subject/categories를 CSV 형태로 전달
       const sp = new URLSearchParams();
       sp.set("grade", gradeDbValue);
       sp.set("subject", "english");
       sp.set("categories", categories.join(","));
+      sp.set("count", "20");
       sp.set("unit", encodeURIComponent(unitRange));
 
       const res = await fetch(`/api/student/random?${sp.toString()}`, {
@@ -224,9 +229,11 @@ export default function StudentProblemsPage() {
         if (process.env.NODE_ENV === "development" && data?.errorDetails) {
           console.error("문제 로드 실패 상세:", data.errorDetails);
         }
+        // 디버그 URL에 실제 선택된 카테고리 반영 (단일 선택 시)
+        const debugCategory = categories.length === 1 ? categories[0] : "vocab";
         throw new Error(
           "문제를 불러올 수 없습니다. " +
-          `(디버그: /api/debug/problems?grade=2&subject=english&category=vocab 확인)`
+          `(디버그: /api/debug/problems?grade=2&subject=english&category=${debugCategory} 확인)`
         );
       }
 
@@ -253,14 +260,18 @@ export default function StudentProblemsPage() {
   if (started && problems.length > 0) {
     const categoryForView =
       selectedGroups.size === 1 ? Array.from(selectedGroups)[0] : "vocab";
+    const categoriesArray = Array.from(selectedGroups);
+
     return (
       <div className="mx-auto max-w-4xl p-6">
         <QuizClient
-  grade={String(grade ?? "")}
-  subject="english"
-  category={String(categoryForView)}
-/>
-
+          grade={String(grade ?? "")}
+          subject="english"
+          category={String(categoryForView)}
+          categories={categoriesArray}
+          initialProblems={problems}
+          requestedTotal={20}
+        />
       </div>
     );
   }

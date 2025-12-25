@@ -31,6 +31,12 @@ export type ProblemItem = {
 
   // ✅ 연습용 플래그 (보기/정답 없어서 채점 불가)
   isPracticeMode?: boolean;
+
+  // ✅ 카테고리 (단일)
+  category?: string;
+
+  // ✅ 카테고리들 (배열)
+  categories?: string[];
 };
 
 type Props = {
@@ -41,6 +47,7 @@ type Props = {
   category: string;
   initialProblems?: ProblemItem[]; // 학생 모드에서 미리 로드한 문제
   categories?: string[]; // 여러 카테고리 선택 시
+  requestedTotal?: number; // 요청한 총 문제 개수
 };
 
 /**
@@ -48,7 +55,7 @@ type Props = {
  * isTripleMode에 따라 SingleQuizClient 또는 TripleQuizClient로 분기
  */
 export default function QuizClient(props: Props) {
-  const { grade, subject, category, categories } = props;
+  const { grade, subject, category, categories, requestedTotal } = props;
   const items = (props.items ?? props.problems ?? props.initialProblems ?? []) as ProblemItem[];
 
   // ✅ 모드 결정
@@ -58,8 +65,8 @@ export default function QuizClient(props: Props) {
 
   // ✅ 모드에 따라 적절한 컴포넌트 렌더링 (Hook은 각 컴포넌트 내부에서 처리)
   return isTripleMode ? (
-    <TripleQuizClient grade={grade} subject={subject} category={category} categories={categories} />
+    <TripleQuizClient grade={grade} subject={subject} category={category} categories={categories} requestedTotal={requestedTotal} />
   ) : (
-    <SingleQuizClient grade={grade} subject={subject} category={category} initialProblems={items} categories={categories} />
+    <SingleQuizClient grade={grade} subject={subject} category={category} initialProblems={items} categories={categories} requestedTotal={requestedTotal} />
   );
 }

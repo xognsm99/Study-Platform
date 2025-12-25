@@ -24,6 +24,7 @@ type Props = {
   category: string;
   initialProblems?: ProblemItem[]; // 학생 모드에서 미리 로드한 문제
   categories?: string[]; // 여러 카테고리 선택 시
+  requestedTotal?: number; // 요청한 총 문제 개수
 };
 
 const TIME_LIMIT = 20;
@@ -48,7 +49,7 @@ function pickMeaningful(values: any[]): string {
   return "";
 }
 
-export default function SingleQuizClient({ grade, subject, category, initialProblems, categories }: Props) {
+export default function SingleQuizClient({ grade, subject, category, initialProblems, categories, requestedTotal }: Props) {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -175,9 +176,9 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
   // ✅ useMemo/useCallback
   const progressText = useMemo(() => {
-    const total = problems.length || DEFAULT_QUIZ_SIZE;
+    const total = requestedTotal || problems.length || DEFAULT_QUIZ_SIZE;
     return `${Math.min(idx + 1, total)}/${total}`;
-  }, [idx, problems.length]);
+  }, [idx, problems.length, requestedTotal]);
 
   const correctCount = useMemo(() => results.filter(Boolean).length, [results]);
   const wrongCount = useMemo(() => results.filter((v) => v === false).length, [results]);
@@ -311,7 +312,8 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
     typeof category === "string" &&
     category.length > 0 &&
     problems.length > 0;
-  const isInsufficient = problems.length > 0 && problems.length < DEFAULT_QUIZ_SIZE;
+  const targetTotal = requestedTotal || DEFAULT_QUIZ_SIZE;
+  const isInsufficient = problems.length > 0 && problems.length < targetTotal;
 
   // ✅ early return (모든 Hook 선언 후)
   if (loading) {
@@ -446,11 +448,41 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
     current?.explanation,           // ✅ 루트 explanation은 맨 마지막 fallback
   ]);
   const finalExplanation = resolvedExplanation || "해설이 제공되지 않았습니다.";
-  
+
+  // ✅ 현재 문제의 카테고리/qtype 라벨
+  const leftLabel = (() => {
+    // 1) current의 qtype 우선
+    if (current) {
+      const qtype = String(current?.content?.qtype ?? current?.content?.raw?.qtype ?? "");
+      if (qtype) return qtype;
+    }
+
+    // 2) categories prop fallback (단일 선택 시)
+    if (categories && categories.length === 1) {
+      const c = categories[0].toLowerCase();
+      if (c === "vocab") return "어휘";
+      if (c === "dialogue") return "대화문";
+      if (c === "reading") return "본문";
+      if (c === "grammar") return "문법";
+    }
+
+    // 3) current.category mapping
+    if (current) {
+      const cat = String(current?.category ?? "").toLowerCase();
+      if (cat === "vocab") return "어휘";
+      if (cat === "dialogue") return "대화문";
+      if (cat === "reading") return "본문";
+      if (cat) return cat;
+    }
+
+    // 4) 최종 fallback
+    return "문제";
+  })();
+
   return (
     <div className="rounded-2xl border bg-white p-5 shadow-sm text-slate-900">
-      {/* 결과 보기 버튼 */}
-      <div className="mb-3 flex items-center justify-between">
+      {/* 상단 표시 영역: 결과보기 버튼(왼쪽) + 카테고리라벨 + 진행도(오른쪽) */}
+      <div className="mb-3 flex items-center justify-between gap-2">
         <button
           type="button"
           onClick={handleResultPreview}
@@ -458,7 +490,14 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
         >
           결과 보기
         </button>
-        <span className="text-xs text-slate-500">{progressText}</span>
+        <div className="flex items-center gap-2">
+          <div className="rounded-md bg-blue-50 px-3 py-1.5 text-xs text-blue-700 font-medium border border-blue-200">
+            {leftLabel}
+          </div>
+          <div className="rounded-md bg-gray-100 px-3 py-1.5 text-xs text-gray-700 font-semibold border border-gray-300">
+            {progressText}
+          </div>
+        </div>
       </div>
 
       {/* ✅ 연습용(채점불가) 표시 */}
@@ -475,6 +514,13 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
         </div>
       )}
 
+      {/* ✅ 지문(본문) 먼저 - reading/본문 전용 */}
+      {finalPassage && leftLabel && (leftLabel.includes("본문") || leftLabel.startsWith("본문_")) && (
+        <div className="mb-4 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
+          {renderWithBlanks(finalPassage)}
+        </div>
+      )}
+
       {/* ✅ 1) 문제 */}
       <h2 className="text-xl font-bold mb-4">
         <div className="whitespace-pre-line leading-relaxed">
@@ -482,8 +528,8 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
         </div>
       </h2>
 
-      {/* ✅ 2) 지문(영영풀이/본문/해석) - stimulus 포함 */}
-      {finalPassage && (
+      {/* ✅ 2) 지문(영영풀이/해석) - 본문 이외 */}
+      {finalPassage && (!leftLabel || (!leftLabel.includes("본문") && !leftLabel.startsWith("본문_"))) && (
         <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
           {renderWithBlanks(finalPassage)}
         </div>

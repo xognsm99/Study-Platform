@@ -22,6 +22,7 @@ type Props = {
   subject: string;
   category: string;
   categories?: string[]; // 여러 카테고리 선택 시
+  requestedTotal?: number; // 요청한 총 문제 개수
 };
 
 const MAX_HINTS = 3;
