@@ -231,10 +231,24 @@ export default function StudentProblemsPage() {
         }
         // 디버그 URL에 실제 선택된 카테고리 반영 (단일 선택 시)
         const debugCategory = categories.length === 1 ? categories[0] : "vocab";
-        throw new Error(
-          "문제를 불러올 수 없습니다. " +
-          `(디버그: /api/debug/problems?grade=2&subject=english&category=${debugCategory} 확인)`
-        );
+
+        let errorMsg = "문제를 불러올 수 없습니다.";
+
+        // errorMessage가 있으면 우선 사용
+        if (data?.errorMessage) {
+          errorMsg = data.errorMessage;
+        }
+
+        // 개발 환경에서만 errorDetails도 표시
+        if (process.env.NODE_ENV === "development" && data?.errorDetails) {
+          const details = JSON.stringify(data.errorDetails, null, 2);
+          errorMsg += `\n\n[개발 모드 상세]\n${details}`;
+        }
+
+        // 디버그 링크 추가
+        errorMsg += `\n\n디버그: /api/debug/problems?grade=2&subject=english&category=${debugCategory}`;
+
+        throw new Error(errorMsg);
       }
 
       setProblems(data.problems);

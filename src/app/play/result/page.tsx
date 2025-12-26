@@ -17,6 +17,150 @@ type GameResult = {
   timeSpentSec: number;
 };
 
+type ResultTheme = {
+  emoji: string;
+  title: string;
+  desc: string;
+  motion: {
+    initial: any;
+    animate: any;
+    transition: any;
+  };
+};
+
+function getResultTheme(score: number): ResultTheme {
+  if (score >= 100) {
+    return {
+      emoji: "🎉",
+      title: "완벽합니다!",
+      desc: "모든 문제를 맞추셨습니다!",
+      motion: {
+        initial: { scale: 0, opacity: 0, rotate: -8 },
+        animate: { scale: 1, opacity: 1, rotate: 0 },
+        transition: { type: "spring", stiffness: 220, damping: 14 },
+      },
+    };
+  }
+  if (score >= 90) {
+    return {
+      emoji: "🏆",
+      title: "거의 완벽!",
+      desc: "한 끗 차이. 다시 하면 100점!",
+      motion: {
+        initial: { y: -16, opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        transition: { type: "spring", stiffness: 180 },
+      },
+    };
+  }
+  if (score >= 80) {
+    return {
+      emoji: "😎",
+      title: "아주 좋아요!",
+      desc: "이 페이스면 금방 90+ 갑니다.",
+      motion: {
+        initial: { scale: 0.9, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        transition: { type: "spring", stiffness: 160 },
+      },
+    };
+  }
+  if (score >= 70) {
+    return {
+      emoji: "👍",
+      title: "괜찮습니다!",
+      desc: "실수만 줄이면 점수 확 올라가요.",
+      motion: {
+        initial: { x: -12, opacity: 0 },
+        animate: { x: 0, opacity: 1 },
+        transition: { type: "spring", stiffness: 170 },
+      },
+    };
+  }
+  if (score >= 60) {
+    return {
+      emoji: "🙂",
+      title: "기본은 탄탄!",
+      desc: "조금만 더 하면 됩니다.",
+      motion: {
+        initial: { opacity: 0 },
+        animate: { opacity: 1 },
+        transition: { duration: 0.35 },
+      },
+    };
+  }
+  if (score >= 50) {
+    return {
+      emoji: "😅",
+      title: "반은 성공!",
+      desc: "여기서부터 성장 구간입니다.",
+      motion: {
+        initial: { scale: 1.06, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        transition: { type: "spring", stiffness: 150 },
+      },
+    };
+  }
+  if (score >= 40) {
+    return {
+      emoji: "🧩",
+      title: "조금만 더!",
+      desc: "틀린 것만 복습하면 바로 올라가요.",
+      motion: {
+        initial: { y: 12, opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        transition: { type: "spring", stiffness: 160 },
+      },
+    };
+  }
+  if (score >= 30) {
+    return {
+      emoji: "😵",
+      title: "헷갈렸죠?",
+      desc: "정리할 타이밍. 다시 한 판!",
+      motion: {
+        initial: { rotate: -6, opacity: 0 },
+        animate: { rotate: 0, opacity: 1 },
+        transition: { type: "spring", stiffness: 140 },
+      },
+    };
+  }
+  if (score >= 20) {
+    return {
+      emoji: "🥶",
+      title: "지금부터 시작!",
+      desc: "10분만 더 하면 달라집니다.",
+      motion: {
+        initial: { scale: 0.88, opacity: 0 },
+        animate: { scale: 1, opacity: 1 },
+        transition: { type: "spring", stiffness: 150 },
+      },
+    };
+  }
+  if (score >= 10) {
+    return {
+      emoji: "😭",
+      title: "한 번만 더!",
+      desc: "이번엔 진짜 됩니다. 다시 가자!",
+      motion: {
+        initial: { y: -10, opacity: 0 },
+        animate: { y: 0, opacity: 1 },
+        transition: { type: "spring", stiffness: 170 },
+      },
+    };
+  }
+  return {
+    emoji: "💀",
+    title: "0점은 레전드…",
+    desc: "오히려 좋아요. 이제 올라갈 일만 남았음.",
+    motion: {
+      initial: { x: 0, opacity: 0 },
+      animate: { x: [0, -8, 8, -6, 6, 0], opacity: 1 },
+      transition: { duration: 0.45 },
+    },
+  };
+}
+
 export default function PlayResultPage() {
   const router = useRouter();
   const [gameSet, setGameSet] = useState<GameSet | null>(null);
@@ -175,25 +319,25 @@ export default function PlayResultPage() {
     );
   }
 
+  const theme = getResultTheme(score);
+
   return (
     <div
       className="min-h-screen bg-[#F6F5FF]"
       onClick={handleUserInteraction}
       onTouchStart={handleUserInteraction}
     >
-      <div className="mx-auto max-w-2xl px-4 py-16">
-        {isPerfect && (
-          <motion.div
-            initial={{ scale: 0, opacity: 0 }}
-            animate={{ scale: 1, opacity: 1 }}
-            transition={{ type: "spring", stiffness: 200 }}
-            className="mb-8 text-center"
-          >
-            <div className="text-6xl mb-4">🎉</div>
-            <h1 className="text-4xl font-bold text-[#6E63D5]">완벽합니다!</h1>
-            <p className="mt-2 text-lg text-[#2A2457]">모든 문제를 맞추셨습니다!</p>
-          </motion.div>
-        )}
+      <div className="mx-auto max-w-2xl px-4 py-1">
+        <motion.div
+          initial={theme.motion.initial}
+          animate={theme.motion.animate}
+          transition={theme.motion.transition}
+          className="mb-8 text-center"
+        >
+          <div className="text-6xl mb-4">{theme.emoji}</div>
+          <h1 className="text-4xl font-bold text-[#6E63D5]">{theme.title}</h1>
+          <p className="mt-2 text-lg text-[#2A2457]">{theme.desc}</p>
+        </motion.div>
 
         <div className="rounded-[24px] bg-white/70 backdrop-blur shadow-[0_24px_60px_rgba(110,99,213,0.20)] p-6">
           <div className="text-center mb-6">
@@ -245,7 +389,16 @@ export default function PlayResultPage() {
             {/* 버튼 */}
             <div className="space-y-3 pt-4">
               <Button
-                onClick={() => router.push("/play")}
+                onClick={() => {
+                  if (typeof window !== "undefined") {
+                    const params = new URLSearchParams(window.location.search);
+                    const seed = params.get("seed");
+                    router.replace(seed ? `/play?seed=${seed}` : `/play`);
+                    router.refresh?.();
+                  } else {
+                    router.push("/play");
+                  }
+                }}
                 className="w-full bg-[#6F6AE6] text-white hover:bg-[#5F5AD8] shadow-md"
               >
                 다시 하기
