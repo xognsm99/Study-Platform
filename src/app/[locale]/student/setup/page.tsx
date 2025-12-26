@@ -1,6 +1,7 @@
 "use client";
 
-import React, { useMemo, useState } from "react";
+import React, { useEffect, useMemo, useState } from "react";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 type LeaderRow = {
   rank: number;
@@ -9,20 +10,69 @@ type LeaderRow = {
   badge?: "gold" | "silver" | "bronze";
 };
 
-export default function StudentReportPage() {
-  // ✅ 나중에 Supabase user/profile에서 가져오면 됨
-  const userName = "학생";
-  const points = 590;
-  const worldRank = 1438;
-  const localRank = 56;
+type ReportData = {
+  userName: string;
+  points: number;
+  played: number;
+  correct: number;
+  accuracyPct: number;
+  createdProblems: number;
+  monthlyGoal: number;
+  period: string;
+};
 
-  // ✅ 목표 설정 (나중에 사용자 설정으로)
-  const monthlyGoal = 50;
-  const playedThisMonth = 37;
+export default function StudentReportPage() {
+  const [period, setPeriod] = useState<"weekly" | "monthly">("monthly");
+  const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
+  const [reportData, setReportData] = useState<ReportData | null>(null);
+
+  const userName = reportData?.userName || "학생";
+  const points = reportData?.points || 0;
+  const monthlyGoal = reportData?.monthlyGoal || 50;
+  const playedThisMonth = reportData?.played || 0;
+  const accuracyPct = reportData?.accuracyPct || 0;
 
   const progressPct = Math.min(100, Math.round((playedThisMonth / monthlyGoal) * 100));
 
-  const [period, setPeriod] = useState<"weekly" | "monthly">("monthly");
+  // 데이터 로드
+  useEffect(() => {
+    const fetchReport = async () => {
+      try {
+        setLoading(true);
+        setError(null);
+
+        const supabase = supabaseBrowser();
+        const {
+          data: { user },
+        } = await supabase.auth.getUser();
+
+        if (!user) {
+          setError("로그인이 필요합니다.");
+          setLoading(false);
+          return;
+        }
+
+        const res = await fetch(`/api/student-report?userId=${user.id}&period=${period}`);
+        const json = await res.json();
+
+        if (!json.ok) {
+          setError(json.error || "데이터를 불러오지 못했습니다.");
+          setLoading(false);
+          return;
+        }
+
+        setReportData(json.data);
+        setLoading(false);
+      } catch (e: any) {
+        console.error("student report fetch error:", e);
+        setError(e?.message || "알 수 없는 오류");
+        setLoading(false);
+      }
+    };
+
+    fetchReport();
+  }, [period]);
 
   const leaderboard: LeaderRow[] = useMemo(
     () => [
@@ -36,7 +86,7 @@ export default function StudentReportPage() {
   );
 
   const advice = useMemo(() => {
-    // ✅ 나중에 카테고리별 정답률/오답률 기반으로 생성
+    // TODO: 카테고리별 정답률/오답률 기반으로 생성
     return [
       { title: "오늘 10문항", desc: "문법(빈칸) 10문항만 풀고 마무리하세요." },
       { title: "약점 보완", desc: "최근 오답이 많은 유형: 본문 일치 → 내일 15문항 추천" },
@@ -44,18 +94,60 @@ export default function StudentReportPage() {
     ];
   }, []);
 
+  // 로딩 중
+  if (loading) {
+    return (
+      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
+        <div className="mx-auto w-full max-w-md">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
+              학습 리포트
+            </h1>
+          </div>
+          <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
+            <div className="text-sm text-gray-500">데이터를 불러오는 중...</div>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
+  // 에러 발생
+  if (error) {
+    return (
+      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
+        <div className="mx-auto w-full max-w-md">
+          <div className="flex items-center justify-between">
+            <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
+              학습 리포트
+            </h1>
+          </div>
+          <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
+            <div className="text-sm text-red-600 mb-4">{error}</div>
+            <button
+              onClick={() => window.location.reload()}
+              className="rounded-full bg-[#6E63D5] px-4 py-2 text-sm text-white hover:bg-[#584FAA]"
+            >
+              다시 시도
+            </button>
+          </div>
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
       <div className="mx-auto w-full max-w-md">
         {/* Header */}
         <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-violet-800 max-[380px]:text-base">
+          <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
             학습 리포트
           </h1>
 
           <button
             type="button"
-            className="rounded-full border border-violet-200 bg-white/70 px-3 py-1.5 text-xs text-violet-700"
+            className="rounded-full border border-[#D9D5F6] bg-white/70 px-3 py-1.5 text-xs text-[#2B245A]/80"
             onClick={() => setPeriod((p) => (p === "monthly" ? "weekly" : "monthly"))}
           >
             {period === "monthly" ? "월간" : "주간"} 보기
@@ -67,19 +159,22 @@ export default function StudentReportPage() {
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-semibold text-gray-900">{userName}</div>
-              <div className="mt-1 text-xs text-gray-500">지금까지 {points.toLocaleString()} 점</div>
+              <div className="mt-1 text-xs text-gray-500">
+                {period === "monthly" ? "이번 달" : "이번 주"} {points.toLocaleString()} 점
+                {accuracyPct > 0 && <span className="ml-2 text-[#6E63D5]">· 정답률 {accuracyPct}%</span>}
+              </div>
             </div>
 
             <div className="flex gap-2">
-              <StatPill label="WORLD" value={`#${worldRank.toLocaleString()}`} />
-              <StatPill label="LOCAL" value={`#${localRank.toLocaleString()}`} />
+              <StatPill label="WORLD" value="—" />
+              <StatPill label="LOCAL" value="—" />
             </div>
           </div>
 
           {/* Progress */}
-          <div className="mt-4 rounded-2xl bg-violet-50 p-4">
+          <div className="mt-4 rounded-2xl bg-[#F3F1FF] p-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-violet-800">
+              <div className="text-sm font-semibold text-[#2B245A]">
                 {period === "monthly" ? "이번 달" : "이번 주"} 진행률
               </div>
               <div className="text-xs text-gray-500">
@@ -91,7 +186,7 @@ export default function StudentReportPage() {
               <ProgressRing value={progressPct} label={`${playedThisMonth}/${monthlyGoal}`} />
               <div className="flex-1">
                 <div className="text-sm text-gray-700">
-                  현재 <span className="font-semibold text-violet-800">{progressPct}%</span> 달성
+                  현재 <span className="font-semibold text-[#6E63D5]">{progressPct}%</span> 달성
                 </div>
                 <div className="mt-1 text-xs text-gray-500">
                   오늘 {Math.max(0, Math.ceil((monthlyGoal - playedThisMonth) / 7))}~{Math.max(1, Math.ceil((monthlyGoal - playedThisMonth) / 5))}문항씩 하면 목표 달성 가능
@@ -99,7 +194,7 @@ export default function StudentReportPage() {
 
                 <div className="mt-3 h-2 w-full rounded-full bg-white">
                   <div
-                    className="h-2 rounded-full bg-violet-500"
+                    className="h-2 rounded-full bg-[#6E63D5]"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
@@ -112,8 +207,8 @@ export default function StudentReportPage() {
             <div className="mb-2 text-sm font-semibold text-gray-900">추천 학습</div>
             <div className="grid gap-2">
               {advice.map((a) => (
-                <div key={a.title} className="rounded-2xl border border-violet-100 bg-white p-3">
-                  <div className="text-sm font-semibold text-violet-800">{a.title}</div>
+                <div key={a.title} className="rounded-2xl border border-[#D9D5F6] bg-white p-3">
+                  <div className="text-sm font-semibold text-[#6E63D5]">{a.title}</div>
                   <div className="mt-1 text-xs text-gray-600">{a.desc}</div>
                 </div>
               ))}
@@ -134,7 +229,7 @@ export default function StudentReportPage() {
                 key={`${r.rank}-${r.name}`}
                 className={`flex items-center justify-between rounded-2xl border p-3 ${
                   r.name === userName
-                    ? "border-violet-200 bg-violet-50"
+                    ? "border-[#D9D5F6] bg-[#F3F1FF]"
                     : "border-gray-100 bg-white"
                 }`}
               >
@@ -146,14 +241,14 @@ export default function StudentReportPage() {
                   {r.badge && <BadgeDot type={r.badge} />}
                 </div>
 
-                <div className="text-sm font-semibold text-violet-800">{r.points.toLocaleString()}P</div>
+                <div className="text-sm font-semibold text-[#6E63D5]">{r.points.toLocaleString()}P</div>
               </div>
             ))}
           </div>
 
           <button
             type="button"
-            className="mt-3 w-full rounded-full bg-violet-600 py-3 text-sm font-semibold text-white hover:bg-violet-700 max-[380px]:py-2.5 max-[380px]:text-xs"
+            className="mt-3 w-full rounded-full bg-[#6E63D5] py-3 text-sm font-semibold text-white hover:bg-[#584FAA] active:bg-[#4D4595] max-[380px]:py-2.5 max-[380px]:text-xs"
           >
             내 약점 분석 보기
           </button>
@@ -165,7 +260,7 @@ export default function StudentReportPage() {
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-full bg-violet-600 px-3 py-2 text-center max-[380px]:px-2.5 max-[380px]:py-1.5">
+    <div className="rounded-full bg-[#6E63D5] px-3 py-2 text-center max-[380px]:px-2.5 max-[380px]:py-1.5">
       <div className="text-[10px] font-medium text-white/80">{label}</div>
       <div className="text-xs font-semibold text-white">{value}</div>
     </div>
@@ -209,12 +304,12 @@ function ProgressRing({ value, label }: { value: number; label: string }) {
           strokeDasharray={c}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="fill-none stroke-violet-500"
+          className="fill-none stroke-[#6E63D5]"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
       <div className="absolute text-center">
-        <div className="text-lg font-extrabold text-violet-800">{value}%</div>
+        <div className="text-lg font-extrabold text-[#6E63D5]">{value}%</div>
         <div className="text-[11px] text-gray-500">{label}</div>
       </div>
     </div>

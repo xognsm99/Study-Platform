@@ -13,14 +13,6 @@ function shuffle<T>(arr: T[]): T[] {
   return a;
 }
 
-// ✅ 카테고리 한/영 매핑 (조회용 확장)
-const CATEGORY_KO_MAP: Record<string, string[]> = {
-  vocab: ["vocab", "어휘"],
-  reading: ["reading", "본문"],
-  dialogue: ["dialogue", "대화문"],
-  grammar: ["grammar", "문법"],
-};
-
 type NormalizedCategory = "vocab" | "reading" | "dialogue" | "grammar";
 
 // ✅ grade 정규화: "중2", "중 2", "2학년" 등 → "2"
@@ -74,17 +66,6 @@ function normalizeCategory(input: string | null | undefined): NormalizedCategory
   if (v === "문법") return "grammar";
   if (v === "vocab" || v === "reading" || v === "dialogue" || v === "grammar") return v as NormalizedCategory;
   return "";
-}
-
-// ✅ 조회용 카테고리 확장 (예: "grammar" → ["grammar","문법"])
-function expandCategories(normalized: NormalizedCategory[]): string[] {
-  const out = new Set<string>();
-  for (const c of normalized) {
-    const key = normalizeCategory(c);
-    if (!key) continue;
-    for (const v of CATEGORY_KO_MAP[key]) out.add(v);
-  }
-  return Array.from(out);
 }
 
 async function handleStudentRandom(req: NextRequest) {
@@ -156,6 +137,7 @@ async function handleStudentRandom(req: NextRequest) {
 
     // ✅ 그룹별 풀 가져오기
     const byGroup: Record<string, any[]> = {};
+    const debugCounts: Record<string, { exact: number; fallback: number }> = {};
 
     // vocab/dialogue는 category로 직접 조회
     for (const g of groupsInOrder) {
@@ -177,16 +159,65 @@ async function handleStudentRandom(req: NextRequest) {
           );
         }
         byGroup[g] = data ?? [];
+        debugCounts[g] = { exact: (data ?? []).length, fallback: 0 };
       }
     }
 
-    // grammar/reading은 category="reading"에서 qtype으로 분리
-    const needsReading = groupsInOrder.some(g => g === "grammar" || g === "reading");
-    if (needsReading) {
-      const readingLimit = Math.max(
-        (desired["grammar"] || 0) * 10 + (desired["reading"] || 0) * 10,
-        80
-      );
+    // grammar는 fallback 지원: category="grammar" 먼저, 0개면 qtype="문법_%"
+    if (groupsInOrder.includes("grammar")) {
+      const grammarLimit = Math.max((desired["grammar"] || 0) * 10, 40);
+
+      // (A) category="grammar"로 먼저 조회
+      const { data: exactGrammar, error: exactError } = await supabase
+        .from("problems")
+        .select("id, grade, subject, category, difficulty, content, content_hash, created_at")
+        .eq("grade", grade)
+        .eq("subject", subject)
+        .eq("category", "grammar")
+        .limit(grammarLimit);
+
+      if (exactError) {
+        console.error(`❌ Supabase 쿼리 에러 (grammar exact):`, exactError);
+        return NextResponse.json(
+          { ok: false, error: "db_error", errorMessage: exactError?.message ?? "" },
+          { status: 500 },
+        );
+      }
+
+      const exactRows = exactGrammar ?? [];
+      debugCounts["grammar"] = { exact: exactRows.length, fallback: 0 };
+
+      // (B) 0개면 fallback: qtype LIKE '문법_%'
+      if (exactRows.length === 0) {
+        console.warn(`[student/random] category=grammar 0개, fallback to qtype='문법_%'`);
+
+        const { data: allRows, error: fallbackError } = await supabase
+          .from("problems")
+          .select("id, grade, subject, category, difficulty, content, content_hash, created_at")
+          .eq("grade", grade)
+          .eq("subject", subject)
+          .limit(grammarLimit * 2);
+
+        if (fallbackError) {
+          console.error(`❌ Supabase 쿼리 에러 (grammar fallback):`, fallbackError);
+          return NextResponse.json(
+            { ok: false, error: "db_error", errorMessage: fallbackError?.message ?? "" },
+            { status: 500 },
+          );
+        }
+
+        const fallbackRows = (allRows ?? []).filter((row: any) => getQtype(row).startsWith("문법_"));
+        byGroup["grammar"] = fallbackRows;
+        debugCounts["grammar"].fallback = fallbackRows.length;
+        console.log(`[student/random] grammar fallback 결과: ${fallbackRows.length}개`);
+      } else {
+        byGroup["grammar"] = exactRows;
+      }
+    }
+
+    // reading은 category="reading"에서 qtype으로 분리
+    if (groupsInOrder.includes("reading")) {
+      const readingLimit = Math.max((desired["reading"] || 0) * 10, 80);
       const { data, error } = await supabase
         .from("problems")
         .select("id, grade, subject, category, difficulty, content, content_hash, created_at")
@@ -204,21 +235,10 @@ async function handleStudentRandom(req: NextRequest) {
       }
 
       const readingRows = data ?? [];
-
-      // 디버그: 처음 5개 행의 qtype 경로 확인
-      console.log("[student/random] sample qtypes", readingRows.slice(0,5).map((r: any) => ({
-        id: r.id, category: r.category,
-        q1: r.qtype,
-        q2: r?.content?.qtype,
-        q3: r?.content?.raw?.qtype
-      })));
-
-      if (groupsInOrder.includes("grammar")) {
-        byGroup["grammar"] = readingRows.filter((row: any) => getQtype(row).startsWith("문법_"));
-      }
-      if (groupsInOrder.includes("reading")) {
-        byGroup["reading"] = readingRows.filter((row: any) => getQtype(row).startsWith("본문_"));
-      }
+      const readingFiltered = readingRows.filter((row: any) => getQtype(row).startsWith("본문_"));
+      byGroup["reading"] = readingFiltered;
+      debugCounts["reading"] = { exact: readingFiltered.length, fallback: 0 };
+      console.log(`[student/random] reading 필터 결과: ${readingFiltered.length}개`);
     }
 
     // ✅ 그룹별로 정확히 desired[g]개 선택
@@ -411,11 +431,68 @@ async function handleStudentRandom(req: NextRequest) {
       });
     }
 
+    // 요청된 문제가 0개이면 상세 에러 반환
+    if (mapped.length === 0) {
+      const debugInfo: any = {
+        requested: { grade, subject, categories: selected, targetCount },
+        poolSizes: {},
+        rawPoolSizes: {},
+        hint: "",
+        solution: "",
+      };
+
+      for (const g of groupsInOrder) {
+        const poolSize = (byGroup[g] || []).length;
+        debugInfo.poolSizes[g] = poolSize;
+
+        // 원본 조회 결과도 기록
+        if (g === "grammar" || g === "reading") {
+          const readingRows = byGroup[g] || [];
+          const qtypes = readingRows.slice(0, 10).map((r: any) => getQtype(r));
+          debugInfo.rawPoolSizes[g] = {
+            count: poolSize,
+            sampleQtypes: qtypes,
+          };
+        }
+      }
+
+      if (selected.includes("grammar") && (byGroup["grammar"] || []).length === 0) {
+        debugInfo.hint =
+          "DB에 문법 문제가 없습니다. " +
+          "문법 문제는 category='reading'에서 qtype='문법_'로 시작하는 것들입니다.";
+        debugInfo.solution =
+          `1. /api/debug/problems?grade=${grade}&subject=${subject}&category=grammar 에서 DB 상태 확인\n` +
+          `2. DB에 category='reading'이고 qtype='문법_XXX' 형태의 데이터를 추가하거나\n` +
+          `3. 기존 문법 문제의 qtype을 '문법_'로 시작하도록 수정`;
+      } else {
+        const missingCats = groupsInOrder.filter(g => (byGroup[g] || []).length === 0);
+        debugInfo.hint = `선택한 카테고리 중 ${missingCats.join(", ")}에 문제가 없습니다.`;
+        debugInfo.solution = "해당 카테고리의 문제를 DB에 추가해야 합니다.";
+      }
+
+      console.error("[student/random] 문제 0개 반환:", debugInfo);
+      return NextResponse.json({
+        ok: false,
+        error: "no_problems",
+        errorMessage: debugInfo.hint + "\n\n" + debugInfo.solution,
+        errorDetails: debugInfo,
+      }, { status: 200 });
+    }
+
     if (mapped.length < targetCount) {
       console.warn(`[student/random] 목표 ${targetCount}개 중 ${mapped.length}개만 반환`);
     }
 
-    return NextResponse.json({ ok: true, problems: mapped, total: mapped.length });
+    // 개발 환경에서 debug 필드 추가
+    const response: any = { ok: true, problems: mapped, total: mapped.length };
+    if (process.env.NODE_ENV === "development") {
+      response.debug = {
+        counts: debugCounts,
+        requested: { grade, subject, categories: selected, targetCount },
+      };
+    }
+
+    return NextResponse.json(response);
   } catch (e: any) {
     console.error("student/random error:", e);
     return NextResponse.json(

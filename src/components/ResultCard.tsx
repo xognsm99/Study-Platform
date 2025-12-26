@@ -347,14 +347,23 @@ export default function ResultCard({
     return `/${l}/student/${encodeURIComponent(grade)}/${subject}/${category}`;
   };
 
-  // ✅ 다시 풀기 (sessionStorage의 lastQuizHref로 이동, replay=1 추가)
+  // ✅ 다시 풀기 (현재 URL의 seed를 유지하여 동일 문제 세트 재시도)
   const onRetry = onRetryProp || (() => {
+    if (typeof window === "undefined") return;
+
     try {
+      const params = new URLSearchParams(window.location.search);
+      const seed = params.get("seed");
+
+      // seed가 있으면 그대로 유지하여 동일 문제 세트 재시도
       const lastQuizHref = sessionStorage.getItem("lastQuizHref");
       if (lastQuizHref) {
-        // 이미 쿼리 파라미터가 있으면 &replay=1, 없으면 ?replay=1
-        const separator = lastQuizHref.includes("?") ? "&" : "?";
-        router.push(`${lastQuizHref}${separator}replay=1`);
+        const url = new URL(lastQuizHref, window.location.origin);
+        if (seed) {
+          url.searchParams.set("seed", seed);
+        }
+        const newHref = `${url.pathname}${url.search}`;
+        router.push(newHref);
         return;
       }
     } catch (e) {
