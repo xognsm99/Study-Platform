@@ -2,27 +2,23 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-// ✅ 단순 클라이언트 생성 (cookieStore 에러 방지)
-const supabase = createClient(
-  process.env.NEXT_PUBLIC_SUPABASE_URL!,
-  process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!
-);
-
-// category 정규화: vocab, grammar, reading, dialogue
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    // 환경 변수 체크
-    if (
-      !process.env.NEXT_PUBLIC_SUPABASE_URL ||
-      !process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY
-    ) {
+    // env 체크
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey) {
       return NextResponse.json(
-        { ok: false, error: "Supabase 환경 변수가 설정되지 않았습니다." },
+        { ok: false, error: "Supabase env vars are missing" },
         { status: 500 }
       );
     }
+
+    // ✅ 단순 클라이언트 생성 (cookieStore 에러 방지)
+    const supabase = createClient(url, anonKey);
 
     const body = await req.json().catch(() => ({}));
 

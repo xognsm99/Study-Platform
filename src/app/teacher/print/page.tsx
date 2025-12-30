@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams } from "next/navigation";
 import { ProblemRenderer } from "@/components/teacher/ProblemRenderer";
 
@@ -57,7 +57,7 @@ type PrintData = {
   items: any[];
 };
 
-export default function TeacherPrintPage() {
+function TeacherPrintPageContent() {
   const sp = useSearchParams();
   const [printData, setPrintData] = useState<PrintData | null>(null);
   const [dataNotFound, setDataNotFound] = useState(false);
@@ -426,3 +426,10 @@ export default function TeacherPrintPage() {
   );
 }
 
+export default function TeacherPrintPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TeacherPrintPageContent />
+    </Suspense>
+  );
+}

@@ -8,12 +8,7 @@ import { consumeFreeUsage } from "@/lib/usage";
 import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
+export const dynamic = "force-dynamic";
 
 const QT = {
   VOCAB_DICT: "어휘_사전",
@@ -173,11 +168,14 @@ function inferQtypeFromCategory(category?: string | null): string | null {
 
 export async function POST(req: Request) {
   try {
-    // 환경 변수 체크
-    if (!process.env.SUPABASE_URL || !process.env.SUPABASE_SERVICE_ROLE_KEY) {
+    // env 체크
+    const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!supabaseUrl || !supabaseKey) {
       console.error("❌ [TEACHER/COMPOSE] Supabase 환경 변수 미설정");
       return NextResponse.json(
-        { 
+        {
           error: {
             message: "Supabase 환경 변수가 설정되지 않았습니다.",
             detail: "SUPABASE_URL 또는 SUPABASE_SERVICE_ROLE_KEY가 설정되지 않았습니다.",
@@ -187,6 +185,10 @@ export async function POST(req: Request) {
       );
     }
 
+    const supabase = createClient(supabaseUrl, supabaseKey, {
+      auth: { persistSession: false },
+    });
+
     // 사용자 인증 확인
     let userId: string | null = null;
     try {
@@ -195,11 +197,9 @@ export async function POST(req: Request) {
       const refreshToken = cookieStore.get("sb-refresh-token")?.value;
 
       if (accessToken && refreshToken) {
-        const authClient = createClient(
-          process.env.SUPABASE_URL!,
-          process.env.SUPABASE_SERVICE_ROLE_KEY!,
-          { auth: { persistSession: false } }
-        );
+        const authClient = createClient(supabaseUrl, supabaseKey, {
+          auth: { persistSession: false },
+        });
         await authClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
         const { data: { user } } = await authClient.auth.getUser();
         userId = user?.id ?? null;

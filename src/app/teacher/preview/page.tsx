@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useState, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 import { extractProblemText } from "@/lib/problem-text";
 
@@ -172,7 +172,7 @@ function getTeacherTranslation(item: any): string {
   return String(t ?? "").trim();
 }
 
-export default function TeacherPreviewPage() {
+function TeacherPreviewPageContent() {
   const sp = useSearchParams();
   const router = useRouter();
   const [items, setItems] = useState<any[]>([]);
@@ -451,3 +451,10 @@ export default function TeacherPreviewPage() {
   );
 }
 
+export default function TeacherPreviewPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TeacherPreviewPageContent />
+    </Suspense>
+  );
+}

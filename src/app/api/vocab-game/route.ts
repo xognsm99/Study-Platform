@@ -2,17 +2,7 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-function getSupabaseAdmin() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY;
-
-  if (!url) throw new Error("NEXT_PUBLIC_SUPABASE_URL 없음");
-  if (!serviceKey) throw new Error("SUPABASE_SERVICE_ROLE_KEY 없음 (.env.local)");
-
-  // ✅ service_role 로 서버에서만 읽기 (RLS 우회)
-  return createClient(url, serviceKey, { auth: { persistSession: false } });
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   return NextResponse.json({ ok: true, route: "/api/vocab-game" });
@@ -20,6 +10,20 @@ export async function GET() {
 
 export async function POST(req: Request) {
   try {
+    // env 체크
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const serviceKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !serviceKey) {
+      return NextResponse.json(
+        { ok: false, error: "Supabase env vars are missing" },
+        { status: 500 }
+      );
+    }
+
+    // ✅ service_role 로 서버에서만 읽기 (RLS 우회)
+    const supabase = createClient(url, serviceKey, { auth: { persistSession: false } });
+
     const { grade, subject, limit = 10 } = await req.json().catch(() => ({}));
 
     const g = String(grade ?? "").trim();
@@ -32,8 +36,6 @@ export async function POST(req: Request) {
         { status: 400 }
       );
     }
-
-    const supabase = getSupabaseAdmin();
 
     // ✅ DB에서 "퀴즈_키패드"만 뽑아오도록 고정
     const { data, error, count } = await supabase

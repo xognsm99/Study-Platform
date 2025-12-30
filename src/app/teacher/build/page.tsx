@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState } from "react";
+import { useMemo, useState, Suspense } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
 
 type Plan = {
@@ -30,7 +30,7 @@ function buildPlan(selected: Array<keyof Plan>): Plan {
   return base;
 }
 
-export default function TeacherBuildPage() {
+function TeacherBuildPageContent() {
   const router = useRouter();
   const sp = useSearchParams();
 
@@ -241,5 +241,13 @@ export default function TeacherBuildPage() {
         </div>
       </div>
     </main>
+  );
+}
+
+export default function TeacherBuildPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <TeacherBuildPageContent />
+    </Suspense>
   );
 }

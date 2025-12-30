@@ -3,21 +3,22 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-function getSupabase() {
-  const url = process.env.NEXT_PUBLIC_SUPABASE_URL;
-  const anonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
-
-  if (!url || !anonKey) {
-    throw new Error("Supabase 환경변수(NEXT_PUBLIC_SUPABASE_URL / NEXT_PUBLIC_SUPABASE_ANON_KEY)가 없습니다.");
-  }
-
-  return createClient(url, anonKey);
-}
+export const dynamic = "force-dynamic";
 
 export async function GET() {
   try {
-    const supabase = getSupabase();
+    // env 체크
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const anonKey = process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !anonKey) {
+      return NextResponse.json(
+        { ok: false, error: "Supabase env vars are missing" },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(url, anonKey);
 
     const content = {
       question: "seed-test 에서 넣은 테스트 문제입니다. 정답은 C 입니다.",

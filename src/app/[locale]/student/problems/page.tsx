@@ -1,6 +1,6 @@
 "use client";
 
-import { useMemo, useState, useEffect } from "react";
+import { useMemo, useState, useEffect, Suspense } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import QuizClient from "@/components/QuizClient";
@@ -29,7 +29,7 @@ const UNIT_OPTIONS: Array<{ value: string; label: string }> = [
   { value: "overall", label: "종합평가" },
 ];
 
-export default function StudentProblemsPage() {
+function StudentProblemsPageContent() {
   const router = useRouter();
   const pathname = usePathname();
   const searchParams = useSearchParams();
@@ -377,3 +377,10 @@ export default function StudentProblemsPage() {
   );
 }
 
+export default function StudentProblemsPage() {
+  return (
+    <Suspense fallback={<div>Loading...</div>}>
+      <StudentProblemsPageContent />
+    </Suspense>
+  );
+}

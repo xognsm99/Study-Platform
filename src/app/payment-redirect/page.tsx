@@ -1,9 +1,9 @@
 "use client";
 
-import { useEffect } from "react";
+import { useEffect, Suspense } from "react";
 import { useSearchParams, useRouter } from "next/navigation";
 
-export default function PaymentRedirectPage() {
+function PaymentRedirectContent() {
   const sp = useSearchParams();
   const router = useRouter();
 
@@ -45,4 +45,12 @@ export default function PaymentRedirectPage() {
   }, [sp, router]);
 
   return <div className="min-h-screen flex items-center justify-center">결제 처리중...</div>;
+}
+
+export default function PaymentRedirectPage() {
+  return (
+    <Suspense fallback={<div className="min-h-screen flex items-center justify-center">Loading...</div>}>
+      <PaymentRedirectContent />
+    </Suspense>
+  );
 }
