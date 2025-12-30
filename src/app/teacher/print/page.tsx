@@ -367,7 +367,7 @@ function TeacherPrintPageContent() {
         }
       `}</style>
 
-      <div className="print-root min-h-screen bg-gray-100">
+      <div className="print-root min-h-screen print:min-h-0 print:h-auto bg-gray-100 print:bg-white">
         <div className="no-print fixed top-4 right-4 z-50 flex gap-2">
           <button
             onClick={() => {
@@ -391,8 +391,8 @@ function TeacherPrintPageContent() {
           </button>
         </div>
 
-        <div className="print-container">
-          <div className="print-page">
+        <div className="print-container print:p-0 print:shadow-none">
+          <div className="print-page print:!p-6">
             {/* ===== Print Header ===== */}
             <div className="print-header">
               <h1 className="print-title">중 {printData.grade} {getSubjectLabel(printData.subject)} 시험</h1>
