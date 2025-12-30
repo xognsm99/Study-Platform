@@ -3,7 +3,7 @@
 import { useEffect, useState } from "react";
 import Link from "next/link";
 import { usePathname, useRouter } from "next/navigation";
-import { createSupabaseBrowser } from "@/lib/supabase/browser";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 export default function Header() {
   const pathname = usePathname();
@@ -14,7 +14,7 @@ export default function Header() {
   const [isLoading, setIsLoading] = useState(true);
   const [isLoggedIn, setIsLoggedIn] = useState(false);
 
-  const supabase = createSupabaseBrowser();
+  const supabase = supabaseBrowser();
 
   useEffect(() => {
     async function checkAuth() {

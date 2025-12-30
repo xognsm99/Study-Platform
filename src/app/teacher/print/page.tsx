@@ -161,6 +161,33 @@ export default function TeacherPrintPage() {
   return (
     <>
       <style jsx global>{`
+        /* 화면에서는 grid 2열 레이아웃 */
+        .print-columns {
+          max-width: 1040px;
+          margin: 0 auto;
+          padding: 0 16px;
+          column-count: unset;
+          column-gap: unset;
+          column-fill: unset;
+
+          display: grid;
+          grid-template-columns: 1fr 1fr;
+          gap: 16px 18px;
+          align-items: start;
+        }
+
+        .print-item {
+          width: 100%;
+          margin: 0;
+        }
+
+        /* 모바일에서는 1열 */
+        @media (max-width: 520px) {
+          .print-columns {
+            grid-template-columns: 1fr;
+          }
+        }
+
         .problem { margin: 14px 0; page-break-inside: avoid; }
         .no { font-weight: 700; margin: 0 0 6px; color: #000 !important; }
         .passage { background: #f6f7f9; padding: 10px; border-radius: 10px; margin-bottom: 8px; white-space: pre-wrap; color: #000 !important; }
@@ -174,7 +201,7 @@ export default function TeacherPrintPage() {
         }
         .choices { margin: 0 0 0 18px; }
         .blank-box { display:inline-block; width: 220px; height: 18px; background:#e5e7eb; border-radius:4px; vertical-align:middle; }
-        @media print { 
+        @media print {
           * {
             background: #fff !important;
             background-color: #fff !important;
@@ -182,7 +209,7 @@ export default function TeacherPrintPage() {
             -webkit-print-color-adjust: exact;
             print-color-adjust: exact;
           }
-          body { 
+          body {
             background: white !important;
             background-color: white !important;
             color: #000 !important;
@@ -204,6 +231,26 @@ export default function TeacherPrintPage() {
           }
           .print-page:last-child {
             page-break-after: auto;
+          }
+
+          /* 인쇄 시 2열 신문형 컬럼 강제 적용 */
+          .print-columns {
+            max-width: none;
+            margin: 0;
+            padding: 0;
+            display: block;
+            column-count: 2;
+            column-gap: 20px;
+            column-fill: auto;
+          }
+
+          .print-item {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            display: inline-block;
+            width: 100%;
+            margin-bottom: 14px;
           }
         }
 
@@ -360,15 +407,16 @@ export default function TeacherPrintPage() {
               )}
             </div>
 
-            {/* 문제 본문 */}
-            <div className="space-y-6">
+            {/* 문제 본문 - 2열 신문형 컬럼 */}
+            <div className="print-columns">
               {printData.items.map((item: any, idx: number) => (
-                <ProblemRenderer
-                  key={item.id ?? idx}
-                  problem={item}
-                  number={idx + 1}
-                  showAnswer={showAnswer}
-                />
+                <div key={item.id ?? idx} className="print-item">
+                  <ProblemRenderer
+                    problem={item}
+                    number={idx + 1}
+                    showAnswer={showAnswer}
+                  />
+                </div>
               ))}
             </div>
           </div>

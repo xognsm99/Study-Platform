@@ -8,12 +8,19 @@ const LOCALES = ["ko", "en"]; // 필요하면 더 추가
 export async function middleware(req: NextRequest) {
   const { pathname, search } = req.nextUrl;
 
+  // ✅ CRITICAL: /auth 경로는 절대 리다이렉트 금지 (OAuth 플로우 보호)
+  if (pathname === "/auth" || pathname.startsWith("/auth/")) {
+    return NextResponse.next();
+  }
+
   // ✅ 공개 경로는 모두 통과
   if (
-    pathname.startsWith("/auth") || // /auth, /auth/callback 포함
     pathname.startsWith("/_next") ||
     pathname.startsWith("/api") ||
     pathname === "/favicon.ico" ||
+    pathname === "/plans" || // 구독 안내 페이지는 항상 열림
+    pathname.startsWith("/ko/plans") || // /{locale}/plans 도 열림
+    pathname.startsWith("/en/plans") ||
     pathname.includes(".") // 정적 파일
   ) {
     return NextResponse.next();

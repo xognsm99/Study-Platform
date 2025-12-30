@@ -239,6 +239,17 @@ export async function fetchProblemsFromAPI(params: {
     if (process.env.NODE_ENV === "development") {
       console.error("student/random 실패:", errMsg);
     }
+
+    // 403 구독 필요 에러 처리 (needsSubscription 플래그 확인)
+    if (res.status === 403 && json?.needsSubscription) {
+      const reason = json.reason || "quiz";
+      // 에러 객체에 특수 플래그 포함하여 호출측에서 리다이렉트 처리
+      return {
+        problems: [],
+        error: `SUBSCRIPTION_REQUIRED:${reason}`
+      };
+    }
+
     return { problems: [], error: "문제를 불러오지 못했습니다." };
   }
 

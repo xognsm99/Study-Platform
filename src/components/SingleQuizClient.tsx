@@ -89,6 +89,15 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
     if (error) {
       console.error("[SingleQuizClient] fetchProblems 에러:", error);
+
+      // 403 구독 필요 에러 처리
+      if (error.startsWith("SUBSCRIPTION_REQUIRED:")) {
+        const reason = error.split(":")[1] || "quiz";
+        console.log(`[SingleQuizClient] 구독 필요, /plans?reason=${reason}로 리다이렉트`);
+        router.push(`/plans?reason=${reason}`);
+        return;
+      }
+
       setLoading(false);
       // 에러는 UI에서 처리 (문제 없음 상태로 표시)
       setProblems([]);
@@ -97,7 +106,7 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
 
     setProblems(loadedProblems);
     setLoading(false);
-  }, [grade, subject, category, categories]);
+  }, [grade, subject, category, categories, router]);
 
   // ✅ fetchProblems ref
   const fetchProblemsRef = useRef(fetchProblems);

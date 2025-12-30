@@ -1,9 +1,10 @@
+// src/lib/supabase/browser.ts
 import { createBrowserClient } from "@supabase/ssr";
 import type { SupabaseClient } from "@supabase/supabase-js";
 
 /**
  * 브라우저에서 사용하는 Supabase 클라이언트
- * - @supabase/ssr 의 createBrowserClient 사용 (PKCE/code_challenge 포함)
+ * - @supabase/ssr 의 createBrowserClient 사용 (PKCE code_verifier를 쿠키에 저장)
  * - 싱글톤으로 재사용
  */
 let browserClient: SupabaseClient | null = null;

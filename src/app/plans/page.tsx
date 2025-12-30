@@ -1,78 +1,127 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import * as PortOne from "@portone/browser-sdk/v2";
+import { useMemo, useState } from "react";
 import { useRouter } from "next/navigation";
-import { createSupabaseBrowser } from "@/lib/supabase/browser";
+import { supabaseBrowser } from "@/lib/supabase-browser";
 
 const PLAN_GATE_KEY = "hasSeenPlanGate";
 
+function makePaymentId(prefix: string) {
+  // 안전한 영숫자 ID (특수문자/길이 이슈 방지)
+  const rand = Math.random().toString(36).slice(2, 10);
+  return `${prefix}${Date.now()}${rand}`.slice(0, 40);
+}
+
 export default function PlansPage() {
   const router = useRouter();
-  const [isLoading, setIsLoading] = useState(true);
-  const supabase = createSupabaseBrowser();
+  const supabase = useMemo(() => supabaseBrowser(), []);
 
-  useEffect(() => {
-    async function checkAuth() {
-      try {
-        const {
-          data: { user },
-        } = await supabase.auth.getUser();
+  const [isPaying, setIsPaying] = useState(false);
+  const [billingCycle, setBillingCycle] = useState<"monthly" | "yearly">("monthly");
 
-        if (!user) {
-          // 로그인되지 않은 경우 로그인 페이지로 리다이렉트
-          router.push("/auth");
-          return;
-        }
+  const handleFreePlan = async () => {
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
 
-        // 이미 플랜 게이트를 본 경우 학생 설정으로 이동
-        const hasSeenPlanGate = localStorage.getItem(PLAN_GATE_KEY) === "true";
-        if (hasSeenPlanGate) {
-          router.push("/ko/student/setup");
-          return;
-        }
-
-        setIsLoading(false);
-      } catch (error) {
-        console.error("Failed to check auth", error);
-        router.push("/auth");
-      }
+    if (!user) {
+      router.push("/auth?next=/plans");
+      return;
     }
 
-    checkAuth();
-  }, [router, supabase]);
-
-  const handleFreePlan = () => {
-    // 무료 플랜 선택 시
     localStorage.setItem(PLAN_GATE_KEY, "true");
     router.push("/ko/student/setup");
   };
 
-  const handlePremiumPlan = () => {
-    // 프리미엄 플랜 선택 시
-    localStorage.setItem(PLAN_GATE_KEY, "true");
-    
-    // TODO: 결제 페이지가 준비되면 결제 페이지로 이동
-    // 임시로 학생 설정으로 이동 + 토스트
-    router.push("/ko/student/setup");
-    
-    // 토스트 메시지 표시 (간단한 alert로 대체)
-    setTimeout(() => {
-      alert("프리미엄 기능은 준비중입니다. 곧 만나보실 수 있습니다!");
-    }, 500);
-  };
+  const handlePremiumPlan = async () => {
+    if (isPaying) return;
 
-  if (isLoading) {
-    return (
-      <div className="flex min-h-screen items-center justify-center bg-slate-50">
-        <div className="text-center">
-          <div className="mb-4 text-slate-600">로딩 중...</div>
-        </div>
-      </div>
-    );
-  }
+    const {
+      data: { user },
+    } = await supabase.auth.getUser();
+
+    if (!user) {
+      router.push("/auth?next=/plans");
+      return;
+    }
+
+    const storeId = process.env.NEXT_PUBLIC_PORTONE_STORE_ID;
+    const channelKey = process.env.NEXT_PUBLIC_PORTONE_CHANNEL_KEY;
+
+    if (!storeId || !channelKey) {
+      alert("포트원 storeId/channelKey가 없습니다. .env.local 확인하세요.");
+      return;
+    }
+
+    const totalAmount = billingCycle === "yearly" ? 89000 : 9900;
+    const orderName =
+      billingCycle === "yearly" ? "스터디픽 프리미엄 연간" : "스터디픽 프리미엄 월간";
+
+    const paymentId = makePaymentId(billingCycle === "yearly" ? "spy" : "spm");
+
+    setIsPaying(true);
+
+    try {
+      // ✅ 코스페이먼트 채널은 간편결제 전용인 경우가 많아서 EASY_PAY로 요청해야 함
+      const res = await PortOne.requestPayment({
+        storeId,
+        channelKey,
+        paymentId,
+        orderName,
+        totalAmount,
+        currency: "CURRENCY_KRW",
+        payMethod: "EASY_PAY", // ⭐ 핵심 수정
+
+        // 모바일 결제 후 복귀용
+        redirectUrl: `${window.location.origin}/payment-redirect?cycle=${billingCycle}`,
+
+        customer: {
+          customerId: user.id,
+          fullName:
+            (user.user_metadata?.name as string) ||
+            (user.user_metadata?.full_name as string) ||
+            user.email ||
+            "스터디픽 사용자",
+          email: user.email ?? undefined,
+        },
+
+        // (선택) 특정 간편결제사 고정하고 싶으면 주석 해제 후 사용
+        // easyPay: { easyPayProvider: "KAKAOPAY" },
+      });
+
+      // 취소/실패
+      if ((res as any)?.code) {
+        alert((res as any)?.message || "결제 취소/실패");
+        return;
+      }
+
+      // ✅ PC 결제는 여기서 바로 검증
+      const verify = await fetch("/api/portone/complete", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ paymentId, cycle: billingCycle }),
+      });
+
+      const data = await verify.json().catch(() => ({}));
+      if (!verify.ok) {
+        alert(data?.error || "결제 검증 실패");
+        return;
+      }
+
+      // ✅ 성공일 때만 게이트 통과
+      localStorage.setItem(PLAN_GATE_KEY, "true");
+      router.push("/ko/student/setup");
+    } catch (e) {
+      console.error(e);
+      alert("결제 처리 중 오류가 발생했습니다.");
+    } finally {
+      setIsPaying(false);
+    }
+  };
 
   return (
-    <div className="min-h-screen bg-slate-50 px-4 py-12">
+    <div className="min-h-screen bg-[#F6F3FF] px-4 py-12">
       <div className="mx-auto max-w-4xl">
         {/* 헤더 */}
         <div className="mb-8 text-center">
@@ -83,93 +132,121 @@ export default function PlansPage() {
         {/* 플랜 카드 */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* 무료 플랜 */}
-          <div className="rounded-2xl border-2 border-slate-200 bg-white p-8 shadow-sm transition-all hover:border-slate-300 hover:shadow-md">
+          <div className="rounded-2xl border-2 border-purple-200 bg-white p-8 shadow-sm transition-all hover:border-purple-300 hover:shadow-md">
             <div className="mb-6">
-              <div className="mb-2 text-2xl font-bold text-slate-900">무료로 이용하기</div>
               <div className="text-3xl font-bold text-slate-900">무료</div>
             </div>
 
-            {/* 장점 리스트 */}
             <ul className="mb-8 space-y-3">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-green-600">✓</span>
-                <span className="text-slate-700">기본 문제 생성 (일일 1세트)</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="text-slate-700">문제 생성 2회 (학생 1회 + 선생님 1회)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-green-600">✓</span>
-                <span className="text-slate-700">결과 미리보기</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="text-slate-700">퀴즈 총 5회 (단어/선택 퀴즈 합산)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-green-600">✓</span>
-                <span className="text-slate-700">엄마한테 제출</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="text-slate-700">문제 생성 후 인쇄 가능 (선생님 모드)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-green-600">✓</span>
-                <span className="text-slate-700">다시 풀기 / 다른 문제 생성</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="text-slate-700">시험지/정답지 PDF 저장 2회</span>
               </li>
             </ul>
 
-            {/* 선택 버튼 */}
             <button
               onClick={handleFreePlan}
-              className="w-full rounded-lg bg-slate-900 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-slate-800 active:bg-slate-700"
+              className="w-full rounded-lg bg-purple-100 px-6 py-3 text-base font-semibold text-purple-700 transition-colors hover:bg-purple-200 active:bg-purple-300"
             >
               무료로 시작하기
             </button>
           </div>
 
           {/* 프리미엄 플랜 */}
-          <div className="rounded-2xl border-2 border-blue-500 bg-gradient-to-br from-blue-50 to-blue-100 p-8 shadow-lg transition-all hover:border-blue-600 hover:shadow-xl">
+          <div className="rounded-2xl border-2 border-purple-400 bg-gradient-to-br from-purple-50 to-purple-100 p-8 shadow-lg transition-all hover:border-purple-500 hover:shadow-xl">
             <div className="mb-6">
-              <div className="mb-2 flex items-center gap-2">
+              <div className="mb-3 flex items-center gap-2">
                 <div className="text-2xl font-bold text-slate-900">프리미엄 구독하기</div>
-                <span className="rounded-full bg-blue-600 px-2 py-0.5 text-xs font-semibold text-white">
+                <span className="rounded-full bg-purple-600 px-2 py-0.5 text-xs font-semibold text-white">
                   추천
                 </span>
               </div>
-              <div className="text-3xl font-bold text-slate-900">월 9,900원</div>
-              <div className="mt-1 text-sm text-slate-600">또는 연간 구독 시 할인</div>
+
+              {/* 결제 주기 토글 */}
+              <div className="mb-3 inline-flex rounded-lg bg-white p-1 shadow-sm">
+                <button
+                  onClick={() => setBillingCycle("monthly")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-semibold transition-colors ${
+                    billingCycle === "monthly"
+                      ? "bg-purple-600 text-white"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  월 결제
+                </button>
+                <button
+                  onClick={() => setBillingCycle("yearly")}
+                  className={`rounded-md px-4 py-1.5 text-sm font-semibold transition-colors ${
+                    billingCycle === "yearly"
+                      ? "bg-purple-600 text-white"
+                      : "text-slate-600 hover:text-slate-900"
+                  }`}
+                >
+                  연 결제
+                </button>
+              </div>
+
+              {/* 가격 */}
+              <div className="text-3xl font-bold text-slate-900">
+                {billingCycle === "monthly" ? "월 9,900원" : "연 89,000원"}
+              </div>
+              {billingCycle === "yearly" && (
+                <div className="mt-1 text-sm text-purple-700 font-medium">
+                  월 7,417원 (25% 할인)
+                </div>
+              )}
             </div>
 
-            {/* 장점 리스트 */}
+            {/* 프리미엄 혜택 (내용 다시 살림) */}
             <ul className="mb-8 space-y-3">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">무제한 세트 생성</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">문제 생성 무제한 (학생/선생님)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">나의 진행 상황 (누적 그래프)</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">단어 퀴즈 무제한 (모든 유형)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">힌트 +3 추가</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">누적 리포트 및 통계 그래프</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">타임스탑 2회 제공</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">문제 인쇄 무제한 (선생님 모드)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">주간 리포트 자동 제출</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">시험지/정답지 PDF 저장 (인쇄 모드 지원)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-blue-600">✓</span>
-                <span className="font-medium text-slate-900">모든 무료 기능 포함</span>
+                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="font-medium text-slate-900">모바일에서도 인쇄/공유로 간편 저장</span>
               </li>
             </ul>
 
-            {/* 선택 버튼 */}
             <button
               onClick={handlePremiumPlan}
-              className="w-full rounded-lg bg-blue-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-blue-700 active:bg-blue-800"
+              disabled={isPaying}
+              className="w-full rounded-lg bg-purple-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-purple-700 active:bg-purple-800 disabled:opacity-60"
             >
-              프리미엄 시작하기
+              {isPaying ? "결제 진행 중..." : "프리미엄 시작하기"}
             </button>
           </div>
         </div>
 
-        {/* 안내 문구 */}
         <div className="mt-8 text-center text-sm text-slate-500">
           언제든지 설정에서 플랜을 변경할 수 있습니다.
         </div>

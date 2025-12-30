@@ -4,6 +4,8 @@ import { type PresetKey } from "@/lib/teacher-presets";
 import { buildExamPlan } from "@/lib/teacher/buildExamPlan";
 import type { CategoryCounts } from "@/lib/teacher-presets";
 import { normalizeTeacherCategory, normalizeQtype } from "@/lib/teacher/normalize";
+import { consumeFreeUsage } from "@/lib/usage";
+import { cookies } from "next/headers";
 
 export const runtime = "nodejs";
 
@@ -185,6 +187,45 @@ export async function POST(req: Request) {
       );
     }
 
+    // 사용자 인증 확인
+    let userId: string | null = null;
+    try {
+      const cookieStore = await cookies();
+      const accessToken = cookieStore.get("sb-access-token")?.value;
+      const refreshToken = cookieStore.get("sb-refresh-token")?.value;
+
+      if (accessToken && refreshToken) {
+        const authClient = createClient(
+          process.env.SUPABASE_URL!,
+          process.env.SUPABASE_SERVICE_ROLE_KEY!,
+          { auth: { persistSession: false } }
+        );
+        await authClient.auth.setSession({ access_token: accessToken, refresh_token: refreshToken });
+        const { data: { user } } = await authClient.auth.getUser();
+        userId = user?.id ?? null;
+      }
+    } catch (authError) {
+      console.warn("[teacher/compose] 인증 확인 실패 (무료 제한 미적용):", authError);
+    }
+
+    // 무료 사용 제한 체크 (로그인 유저만)
+    if (userId) {
+      try {
+        const gate = await consumeFreeUsage(userId, "teacher_generate");
+        if (!gate.allowed) {
+          console.log(`[teacher/compose] 무료 제한 초과: userId=${userId}, remaining=${gate.remaining}`);
+          return NextResponse.json(
+            { needsSubscription: true, reason: "teacher_generate" },
+            { status: 403 }
+          );
+        }
+        console.log(`[teacher/compose] 무료 제한 통과: userId=${userId}, remaining=${gate.remaining}`);
+      } catch (usageError) {
+        console.error("[teacher/compose] consumeFreeUsage 에러:", usageError);
+        // 제한 체크 실패 시 요청 계속 진행 (에러로 차단하지 않음)
+      }
+    }
+
     // 요청 본문 파싱
     let body: any = {};
     try {
@@ -192,7 +233,7 @@ export async function POST(req: Request) {
     } catch (parseError: any) {
       console.error("❌ [TEACHER/COMPOSE] JSON 파싱 실패:", parseError);
       return NextResponse.json(
-        { 
+        {
           error: {
             message: "요청 본문 파싱 실패",
             detail: parseError?.message || "Invalid JSON",
