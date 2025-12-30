@@ -9,16 +9,8 @@ import { DIALOGUE_BLANK_QUESTION_SAMPLES } from "@/data/dialogue_blank_question_
 import { VOCAB_DEFINITION_MATCH_SAMPLES } from "@/data/vocab_definition_match_samples";
 import { READING_TITLE_DIEGO_SAMPLES } from "@/data/reading_title_diego_samples";
 
-const SUPABASE_URL = process.env.NEXT_PUBLIC_SUPABASE_URL!;
-const SERVICE_ROLE_KEY = process.env.SUPABASE_SERVICE_ROLE_KEY!;
-
-if (!SUPABASE_URL || !SERVICE_ROLE_KEY) {
-  throw new Error("Supabase env vars are missing");
-}
-
-const supabaseAdmin = createClient(SUPABASE_URL, SERVICE_ROLE_KEY, {
-  auth: { persistSession: false },
-});
+export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 function generateContentHash(sample: any): string {
   // 샘플의 id를 기반으로 unique hash 생성
@@ -32,14 +24,14 @@ function normalizeSample(sample: any) {
 
   // question_type에 따라 content.type 결정
   let contentType = sample.question_type || "unknown";
-  
+
   // content 필드 구성
   const content: any = {
     type: contentType,
     prompt: sample.prompt || "",
     question: contentObj.question || sample.prompt || "",
     choices: contentObj.choices || [],
-    answerIndex: typeof sample.answer_index === "number" 
+    answerIndex: typeof sample.answer_index === "number"
       ? sample.answer_index - 1  // 1-based → 0-based
       : (contentObj.answerIndex ?? 0),
     explanation: sample.explanation || "",
@@ -69,12 +61,27 @@ function normalizeSample(sample: any) {
     // source 컬럼이 없으므로 제거
     explanation: sample.explanation || "",
   };
-  
+
   return result;
 }
 
 export async function POST(_req: NextRequest) {
   try {
+    // env 체크
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      return NextResponse.json(
+        { ok: false, error: "Supabase env vars are missing" },
+        { status: 500 }
+      );
+    }
+
+    const supabaseAdmin = createClient(url, key, {
+      auth: { persistSession: false },
+    });
+
     // 1) teacher_sample 문제 삭제 (publisher="동아윤", grade="2", subject="english" 조건으로 삭제)
     // 또는 특정 id 패턴으로 삭제 (dlg-blankq-, vocab-def-, rd-title-diego-)
     console.log("[seed-teacher-samples] Deleting existing teacher_sample problems...");

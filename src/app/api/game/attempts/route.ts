@@ -2,15 +2,25 @@ import { NextResponse } from "next/server";
 import { createClient } from "@supabase/supabase-js";
 
 export const runtime = "nodejs";
-
-const supabase = createClient(
-  process.env.SUPABASE_URL!,
-  process.env.SUPABASE_SERVICE_ROLE_KEY!,
-  { auth: { persistSession: false } }
-);
+export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
+    // env 체크
+    const url = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const key = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    if (!url || !key) {
+      return NextResponse.json(
+        { ok: false, error: "Supabase env vars are missing" },
+        { status: 500 }
+      );
+    }
+
+    const supabase = createClient(url, key, {
+      auth: { persistSession: false },
+    });
+
     const body = await req.json();
     const { gameSetId, score, correctCount, totalCount, timeSpentSec, userId } = body;
 
@@ -64,4 +74,3 @@ export async function POST(req: Request) {
     );
   }
 }
-
