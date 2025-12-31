@@ -92,7 +92,7 @@ export default function SchoolSearch(props: {
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="h-12 w-24 shrink-0 rounded-full bg-[#6E63D5] hover:bg-[#5B52C8] text-sm max-[380px]:h-10 max-[380px]:w-20 max-[380px]:text-xs font-semibold text-white shadow-md active:scale-[0.99] transition-all"
+          className="h-12 w-24 shrink-0 rounded-full bg-[#6E63D5] hover:bg-[#5B52C8] text-lg max-[380px]:h-10 max-[380px]:w-20 max-[380px]:text-xs font-semibold text-white shadow-md active:scale-[0.99] transition-all"
         >
           {loading ? "검색중" : "검색"}
         </button>

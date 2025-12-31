@@ -28,7 +28,7 @@ export default async function HomePage({
               margin: "0 auto"
             }}>
               <h1
-                className="font-semibold tracking-tight text-xl sm:text-2xl leading-snug"
+                className="font-semibold tracking-tight text-3xl sm:text-2xl leading-snug"
                 style={{
                   color: "#24272D",
                 }}
@@ -36,7 +36,7 @@ export default async function HomePage({
                 <span className="block">PICK 하고,</span>
                 <span className="block">내신 점수 올리자</span>
               </h1>
-              <p className="mt-3 text-sm" style={{ color: "#9D9BA8" }}>
+              <p className="mt-3 text-2sm" style={{ color: "#9D9BA8" }}>
                 학교 맞춤 문제 생성 어플
               </p>
 
@@ -44,7 +44,7 @@ export default async function HomePage({
                 <Link
                   href={`/${locale}/student`}
                   style={{
-                    height: "48px",
+                    height: "60px",
                     borderRadius: "20px",
                     background: "#6A5AE0",
                     color: "#fff",
@@ -52,7 +52,7 @@ export default async function HomePage({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.125rem",
+                    fontSize: "1.625rem",
                     fontWeight: 600,
                     textDecoration: "none",
                     transition: "all 0.2s",
@@ -64,7 +64,7 @@ export default async function HomePage({
                 <Link
                   href={`/${locale}/teacher`}
                   style={{
-                    height: "48px",
+                    height: "60px",
                     borderRadius: "20px",
                     background: "#E9E6FF",
                     color: "#24272D",
@@ -72,7 +72,7 @@ export default async function HomePage({
                     display: "flex",
                     alignItems: "center",
                     justifyContent: "center",
-                    fontSize: "1.125rem",
+                    fontSize: "1.625rem",
                     fontWeight: 600,
                     textDecoration: "none",
                     transition: "all 0.2s",

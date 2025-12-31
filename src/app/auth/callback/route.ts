@@ -11,10 +11,6 @@ export async function GET(request: NextRequest) {
   console.log("[auth/callback] code:", code ? `${code.substring(0, 20)}...` : "없음");
   console.log("[auth/callback] next:", nextParam);
 
-  // 보안: 외부 URL 무시 (open redirect 방지)
-  const isRelativePath = nextParam && !nextParam.startsWith("http") && !nextParam.startsWith("//");
-  const next = isRelativePath ? nextParam : "/ko";
-
   if (!code) {
     console.error("[auth/callback] code 파라미터가 없음 - /auth로 리다이렉트");
     return NextResponse.redirect(new URL("/auth", request.url));
@@ -49,8 +45,46 @@ export async function GET(request: NextRequest) {
   }
 
   console.log("[auth/callback] ✅ 세션 교환 성공! 쿠키 설정됨");
-  console.log(`[auth/callback] ${next} 로 리다이렉트`);
 
-  // 성공 시 next 경로로 리다이렉트
-  return NextResponse.redirect(new URL(next, request.url));
+  // ✅ oauth redirectTo fixed: localStorage에서 next 경로 복원 (클라이언트 사이드)
+  // HTML 응답으로 클라이언트에서 localStorage 읽고 리다이렉트
+  const html = `
+<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>로그인 중...</title>
+</head>
+<body>
+  <div style="display: flex; align-items: center; justify-content: center; min-height: 100vh; font-family: system-ui, -apple-system, sans-serif;">
+    <div style="text-align: center;">
+      <h2>로그인 성공!</h2>
+      <p>잠시만 기다려주세요...</p>
+    </div>
+  </div>
+  <script>
+    (function() {
+      // localStorage에서 next 경로 복원
+      const savedNextPath = localStorage.getItem('oauth_next_path');
+      const nextPath = savedNextPath && savedNextPath.startsWith('/') ? savedNextPath : '/ko';
+
+      // localStorage 정리
+      localStorage.removeItem('oauth_next_path');
+
+      console.log('[auth/callback] 클라이언트 리다이렉트:', nextPath);
+
+      // 리다이렉트
+      window.location.href = nextPath;
+    })();
+  </script>
+</body>
+</html>
+  `;
+
+  return new NextResponse(html, {
+    status: 200,
+    headers: {
+      "Content-Type": "text/html; charset=utf-8",
+    },
+  });
 }

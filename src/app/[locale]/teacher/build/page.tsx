@@ -158,17 +158,22 @@ function TeacherBuildPageContent() {
         <h1 className="text-lg font-semibold text-[#6E63D5] max-[380px]:text-base mb-6">문제 구성</h1>
 
         <div className="rounded-[28px] bg-white shadow-sm p-5 max-[380px]:p-4">
-          <div className="mb-4 text-sm text-gray-600">
+          <div className="mb-4 text-base text-gray-600">
             <div>학년: <span className="font-semibold text-gray-900">{grade}</span></div>
             <div>과목: <span className="font-semibold text-gray-900">{subject}</span></div>
-            <div className="text-sm text-[#2E2A6A]">
+            <div className="text-base text-[#2E2A6A]">
               단원: <span className="font-semibold">{unitLabel}</span>
             </div>
+
+            <div className="text-xs text-[#2E2A6A]">
+             (☆프로필에서 변경 가능)
+            </div>
+
           </div>
 
           <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
             <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selVocab
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -182,13 +187,13 @@ function TeacherBuildPageContent() {
                   onChange={(e) => setSelVocab(e.target.checked)}
                 />
               </span>
-              <span className="flex-1 text-center text-sm font-semibold text-[#2E2A6A] leading-none">
+              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
                 어휘
               </span>
             </label>
 
             <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selGrammar
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -202,13 +207,13 @@ function TeacherBuildPageContent() {
                   onChange={(e) => setSelGrammar(e.target.checked)}
                 />
               </span>
-              <span className="flex-1 text-center text-sm font-semibold text-[#2E2A6A] leading-none">
+              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
                 문법
               </span>
             </label>
 
             <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selReading
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -222,13 +227,13 @@ function TeacherBuildPageContent() {
                   onChange={(e) => setSelReading(e.target.checked)}
                 />
               </span>
-              <span className="flex-1 text-center text-sm font-semibold text-[#2E2A6A] leading-none">
+              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
                 본문
               </span>
             </label>
 
             <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selDialogue
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -242,7 +247,7 @@ function TeacherBuildPageContent() {
                   onChange={(e) => setSelDialogue(e.target.checked)}
                 />
               </span>
-              <span className="flex-1 text-center text-sm font-semibold text-[#2E2A6A] leading-none">
+              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
                 대화문
               </span>
             </label>
@@ -272,12 +277,12 @@ function TeacherBuildPageContent() {
             </div>
           )}
 
-          <div className="mt-6 grid gap-3 max-[380px]:gap-2">
+          <div className="mt-6 grid gap-5 max-[380px]:gap-2">
             {/* ✅ 종합평가: 시험지 비율 고정 */}
             <button
               onClick={() => onCompose("overall")}
               disabled={loading}
-              className="w-full h-12 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-sm max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="w-full h-15 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
             >
               {loading ? "종합평가 생성 중..." : "종합평가"}
             </button>
@@ -286,7 +291,7 @@ function TeacherBuildPageContent() {
             <button
               onClick={() => onCompose("custom")}
               disabled={loading}
-              className="w-full h-12 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-sm max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="w-full h-15 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
             >
               {loading ? "문제 생성 중..." : "문제 생성"}
             </button>

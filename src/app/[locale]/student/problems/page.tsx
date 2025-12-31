@@ -325,14 +325,14 @@ function StudentProblemsPageContent() {
             {/* 문제 유형 선택 */}
             <div>
               <div>
-                <div className="text-sm font-semibold text-[#2A2457] mb-4">
+                <div className="text-lg font-semibold text-[#2A2457] mb-4">
                   문제 유형 선택
                 </div>
                 <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
                   {GROUPS.map((group) => (
                     <label
                       key={group.key}
-                      className={`flex items-center gap-2 max-[380px]:gap-1.5 rounded-2xl border bg-white px-4 py-2 max-[380px]:px-3 max-[380px]:py-1.5 cursor-pointer transition-colors ${
+                      className={`flex items-center gap-2 max-[380px]:gap-1.5 rounded-2xl border bg-white px-5 py-3 max-[380px]:px-3 max-[380px]:py-1.5 cursor-pointer transition-colors ${
                         selectedGroups.has(group.key)
                           ? "border-[#6E63D5] bg-[#F0EFFF] hover:bg-[#E6E2FF]"
                           : "border-[#E6E2FF] hover:border-[#B9B4E4] hover:bg-[#F0EFFF]"
@@ -342,9 +342,9 @@ function StudentProblemsPageContent() {
                         type="checkbox"
                         checked={selectedGroups.has(group.key)}
                         onChange={() => handleGroupToggle(group.key)}
-                        className="h-4 w-4 max-[380px]:h-3.5 max-[380px]:w-3.5 rounded border-gray-300 accent-[#B9B4E4] focus:ring-[#B9B4E4] focus:ring-2 focus:ring-offset-0"
+                        className="h-8 w-4 max-[380px]:h-3.5 max-[380px]:w-3.5 rounded border-gray-300 accent-[#B9B4E4] focus:ring-[#B9B4E4] focus:ring-2 focus:ring-offset-0"
                       />
-                      <span className="text-sm max-[380px]:text-xs font-medium text-slate-800">{group.label}</span>
+                      <span className="text-lg max-[380px]:text-xs font-medium text-slate-800">{group.label}</span>
                     </label>
                   ))}
                 </div>
@@ -356,7 +356,7 @@ function StudentProblemsPageContent() {
               <button
                 onClick={handleStart}
                 disabled={!canProceed || loading}
-                className="w-full h-12 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-sm max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+                className="w-full h-20 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-2xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
               >
                 20 문항 풀기 시작
               </button>

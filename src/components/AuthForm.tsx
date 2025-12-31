@@ -9,24 +9,29 @@ export default function AuthForm() {
   const handleOAuth = async (provider: "google" | "kakao") => {
     const supabase = supabaseBrowser();
 
+    // ✅ oauth redirectTo fixed: querystring 없이 정확히 /auth/callback만 설정
+    // (Supabase allowlist 매칭 실패 방지)
     const nextParam = searchParams?.get("next");
     const nextPath = nextParam && nextParam.startsWith("/") ? nextParam : "/ko";
 
+    // localStorage에 next 경로 저장 (callback에서 복원)
+    if (typeof window !== "undefined") {
+      localStorage.setItem("oauth_next_path", nextPath);
+    }
+
     // Supabase 대시보드 Redirect URLs에 반드시 포함되어 있어야 함:
     // http://localhost:3000/auth/callback
-    const redirectTo =
-      `${window.location.origin}/auth/callback?next=${encodeURIComponent(nextPath)}`;
+    // https://yourdomain.vercel.app/auth/callback
+    const redirectTo = `${window.location.origin}/auth/callback`;
 
     console.log("[OAuth] provider =", provider);
     console.log("[OAuth] redirectTo =", redirectTo);
+    console.log("[OAuth] next path (via localStorage) =", nextPath);
 
     const { data, error } = await supabase.auth.signInWithOAuth({
       provider,
       options: {
         redirectTo,
-        // ✅ 자동 이동이 안 먹는 경우가 있어서, url을 받아 우리가 직접 이동시킬 거다.
-        // skipBrowserRedirect 값이 어딘가에서 true로 들어가면 자동이 막힘.
-        // 여기서는 넣지 않는다(기본값).
       },
     });
 

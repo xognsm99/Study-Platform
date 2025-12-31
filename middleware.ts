@@ -6,6 +6,10 @@ const DEFAULT_LOCALE = "ko";
 const LOCALES = ["ko", "en"]; // 필요하면 더 추가
 
 export async function middleware(req: NextRequest) {
+  // ✅ local dev bypass: hostname 기준으로 localhost 여부 판단
+  const hostname = req.nextUrl.hostname;
+  const isLocalhost = hostname === "localhost" || hostname === "127.0.0.1" || hostname === "::1";
+
   const { pathname, search } = req.nextUrl;
 
   // ✅ CRITICAL: /auth 경로는 절대 리다이렉트 금지 (OAuth 플로우 보호)
@@ -78,7 +82,8 @@ export async function middleware(req: NextRequest) {
     data: { user },
   } = await supabase.auth.getUser();
 
-  if (!user) {
+  // ✅ local dev bypass: localhost에서는 로그인 없어도 통과
+  if (!user && !isLocalhost) {
     const url = req.nextUrl.clone();
     url.pathname = "/auth";
     const next = pathname + search;

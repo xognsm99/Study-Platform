@@ -217,7 +217,7 @@ export default function PlansPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-purple-600">✓</span>
-                <span className="font-medium text-slate-900">단어 퀴즈 무제한 (모든 유형)</span>
+                <span className="font-medium text-slate-900"> 무제한 (모든 유형)</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-purple-600">✓</span>

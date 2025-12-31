@@ -629,7 +629,7 @@ export default function StudentPage() {
                   type="button"
                   onClick={handleSaveProfile}
                   disabled={saving || !selectedSchool || !authReady || !user}
-                  className={`h-12 w-full rounded-full ${PRIMARY_BG} text-sm max-[380px]:h-10 max-[380px]:text-xs text-white font-semibold shadow-sm transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50`}
+                  className={`h-12 w-full rounded-full ${PRIMARY_BG} text-lg max-[380px]:h-10 max-[380px]:text-xs text-white font-semibold shadow-sm transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50`}
                 >
                   {saving ? "저장 중..." : !authReady ? "" : !user ? "로그인이 필요합니다" : "프로필 저장"}
                 </button>
@@ -639,7 +639,7 @@ export default function StudentPage() {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="h-12 w-full rounded-full border border-[#B9B4E4] bg-white text-sm max-[380px]:h-10 max-[380px]:text-xs text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all"
+                    className="h-12 w-full rounded-full border border-[#B9B4E4] bg-white text-lg max-[380px]:h-10 max-[380px]:text-xs text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all"
                   >
                     취소
                   </button>
@@ -670,14 +670,14 @@ export default function StudentPage() {
                 </div>
                 <button
                   onClick={() => setShowForm(true)}
-                  className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 max-[380px]:px-3 max-[380px]:py-1.5 text-sm max-[380px]:text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
+                  className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 max-[380px]:px-3 max-[380px]:py-1.5 text-lx max-[380px]:text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
                 >
                   프로필
                 </button>
               </div>
 
               {/* 주요 액션 버튼들 */}
-              <div className="mt-4 space-y-3 max-[380px]:mt-3 max-[380px]:space-y-2">
+              <div className="mt-8 space-y-5 max-[380px]:mt-3 max-[380px]:space-y-2">
                 <button
                   type="button"
                   onClick={() => {
@@ -687,11 +687,11 @@ export default function StudentPage() {
                       region: regionGroup,
                       sub: subRegion,
                       school: selectedSchool?.code ?? "",
-                      unit: encodeURIComponent(unitRange),
+                      unit: unitRange,
                     });
                     router.push(`/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 text-violet-800 text-sm max-[180px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                  className="w-full h-16 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-xl max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.99] transition-all"
                 >
                   단어 퀴즈 (10문제)
                 </button>
@@ -699,22 +699,17 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="w-full h-12 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 text-violet-900 text-sm max-[180px]:text-xs font-semibold shadow-sm active:scale-[0.99] transition-all"
+                  className="w-full h-16 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-xl max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.99] transition-all"
                 >
                   단어/숙어 퀴즈 (4지선다)
                 </button>
 
-                {/* ✅ A/B 본문 선택 퀴즈 */}
                 <button
                   type="button"
                   onClick={handleStartReadingAB}
-                  className={[
-                    "w-full h-12 max-[380px]:h-10 rounded-full text-sm max-[180px]:text-xs font-semibold active:scale-[0.99] transition-all",
-                    "bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0]",
-                    "disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300",
-                  ].join(" ")}
+                  className="w-full h-16 max-[380px]:h-10 rounded-full text-xl max-[380px]:text-base font-semibold active:scale-[0.99] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
                 >
-                  A/B 본문 선택 퀴즈 (O X 퀴즈)
+                  A/B 선택 퀴즈 (OX퀴즈)
                 </button>
 
                 {/* ✅ 버튼 아래 공간 (답답함 해결) */}

@@ -140,7 +140,7 @@ function SimpleSelect({
   return (
     <div ref={rootRef} className="relative">
       <label className="block">
-        <span className="mb-1 block text-xs font-semibold text-[#3C357A]">{label}</span>
+        <span className="mb-1 block text-2x font-semibold text-[#3C357A]">{label}</span>
         <button
           ref={buttonRef}
           type="button"
@@ -148,7 +148,7 @@ function SimpleSelect({
             setOpen((prev) => !prev);
             if (!open) setFocusedIndex(options.findIndex((o) => o.value === value));
           }}
-          className="w-full h-12 rounded-2xl bg-white/80 border border-[#CFCBFF] px-4 text-sm text-[#1F1B3A] focus:outline-none focus:ring-2 focus:ring-[#8A7CF0] focus:border-[#8A7CF0] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between"
+          className="w-full h-15 rounded-2xl bg-white/80 border border-[#CFCBFF] px-4 text-sm text-[#1F1B3A] focus:outline-none focus:ring-2 focus:ring-[#8A7CF0] focus:border-[#8A7CF0] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between"
         >
           <span className={selectedOption ? "text-[#1F1B3A]" : "text-gray-400"}>
             {displayText}
@@ -236,7 +236,7 @@ export default function TeacherHomePage() {
   }));
 
   return (
-    <div className="px-4 pt-6 pb-24">
+    <div className="px-6 pt-6 pb-24">
       <ScreenTitle>선생님 모드</ScreenTitle>
 
       <ScreenCard className="space-y-5">
@@ -267,7 +267,7 @@ export default function TeacherHomePage() {
           <button
             onClick={handleNext}
             disabled={!canProceed}
-            className="w-full h-12 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-sm max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+            className="w-full h-20 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
           >
             20문항 시험지 만들기
           </button>

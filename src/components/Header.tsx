@@ -70,12 +70,16 @@ export default function Header() {
     <header className="border-b bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         {/* ✅ 앱 이름 */}
-        <Link href="/" className="text-base font-semibold text-slate-900 whitespace-nowrap">
-          STUDY PICK
+        <Link
+         href="/"
+         className="text-lg md:text-2xl font-bold text-slate-900 whitespace-nowrap tracking-tight"
+         >
+         STUDY PICK
         </Link>
 
+
         {/* ✅ 우측 메뉴 */}
-        <div className="flex items-center gap-3 text-sm text-slate-600">
+        <div className="flex items-center gap-3 text-2sm text-slate-600">
           {isLoading ? (
             // 로딩 중: 텍스트 자리 비움 (레이아웃 깨지지 않게)
             <span className="invisible">로딩 중...</span>
