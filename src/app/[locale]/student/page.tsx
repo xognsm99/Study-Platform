@@ -499,7 +499,7 @@ export default function StudentPage() {
               <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
                 {/* 1) 지역 */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     지역
                   </label>
                   <PurpleSelect
@@ -519,7 +519,7 @@ export default function StudentPage() {
 
                 {/* 2) 세부지역 */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     {regionGroup === "서울"
                       ? "구"
                       : regionGroup === "경기"
@@ -543,7 +543,7 @@ export default function StudentPage() {
 
                 {/* 3) 학교(읽기 전용 표시) */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     학교
                   </label>
                   <div className={fieldClass(!!selectedSchool) + " flex items-center"}>
@@ -558,7 +558,7 @@ export default function StudentPage() {
 
                 {/* 5) 학년 */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     학년
                   </label>
                   <PurpleSelect
@@ -572,19 +572,19 @@ export default function StudentPage() {
 
                 {/* 6) 과목 */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     과목
                   </label>
-                  <input 
+                  <input
                     className={`${fieldClass(!!subject)} text-gray-900 placeholder:text-gray-400`}
-                    value={subject} 
-                    readOnly 
+                    value={subject}
+                    readOnly
                   />
                 </div>
 
                 {/* 4) 단원/시험범위 */}
                 <div className="min-w-0">
-                  <label className="mb-1 block text-xs text-gray-500">
+                  <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
                     단원
                   </label>
                   <PurpleSelect
@@ -629,7 +629,7 @@ export default function StudentPage() {
                   type="button"
                   onClick={handleSaveProfile}
                   disabled={saving || !selectedSchool || !authReady || !user}
-                  className={`h-12 w-full rounded-full ${PRIMARY_BG} text-lg max-[380px]:h-10 max-[380px]:text-xs text-white font-semibold shadow-sm transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50`}
+                  className={`h-14 w-full rounded-xl ${PRIMARY_BG} text-lg max-[380px]:h-12 max-[380px]:text-base text-white font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:active:scale-100`}
                 >
                   {saving ? "저장 중..." : !authReady ? "" : !user ? "로그인이 필요합니다" : "프로필 저장"}
                 </button>
@@ -639,7 +639,7 @@ export default function StudentPage() {
                   <button
                     type="button"
                     onClick={() => setShowForm(false)}
-                    className="h-12 w-full rounded-full border border-[#B9B4E4] bg-white text-lg max-[380px]:h-10 max-[380px]:text-xs text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] transition-all"
+                    className="h-14 w-full rounded-xl border-2 border-[#B9B4E4] bg-white text-lg max-[380px]:h-12 max-[380px]:text-base text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] hover:border-[#A89FD8] active:scale-[0.98] transition-all"
                   >
                     취소
                   </button>
@@ -677,7 +677,7 @@ export default function StudentPage() {
               </div>
 
               {/* 주요 액션 버튼들 */}
-              <div className="mt-8 space-y-5 max-[380px]:mt-3 max-[380px]:space-y-2">
+              <div className="mt-8 space-y-4 max-[380px]:mt-3 max-[380px]:space-y-3">
                 <button
                   type="button"
                   onClick={() => {
@@ -691,7 +691,7 @@ export default function StudentPage() {
                     });
                     router.push(`/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-16 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-xl max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.99] transition-all"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                 >
                   단어 퀴즈 (10문제)
                 </button>
@@ -699,7 +699,7 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="w-full h-16 max-[380px]:h-10 rounded-full bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-xl max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.99] transition-all"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                 >
                   단어/숙어 퀴즈 (4지선다)
                 </button>
@@ -707,7 +707,7 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={handleStartReadingAB}
-                  className="w-full h-16 max-[380px]:h-10 rounded-full text-xl max-[380px]:text-base font-semibold active:scale-[0.99] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
                 >
                   A/B 선택 퀴즈 (OX퀴즈)
                 </button>

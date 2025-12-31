@@ -58,7 +58,13 @@ export default function SchoolSearch(props: {
         if (!res.ok) {
           setItems([]);
           setOpen(true);
-          setMsg(data?.error || "학교 검색 API 오류");
+          // NEIS API 키 오류 메시지를 더 명확하게 표시
+          const errorMsg = data?.error || "학교 검색 API 오류";
+          if (errorMsg.includes("NEIS_API_KEY") || errorMsg.includes("환경변수")) {
+            setMsg("학교 검색 기능은 현재 준비중입니다.\n지역/필터 때문에 비어있을 수 있어요.");
+          } else {
+            setMsg(errorMsg);
+          }
           return;
         }
 
@@ -111,13 +117,8 @@ export default function SchoolSearch(props: {
           "
         >
           {msg && (
-            <div className="px-4 py-3 text-sm text-[#6E63D5]/80">
+            <div className="px-4 py-3 text-sm text-[#6E63D5]/80 whitespace-pre-line">
               {msg}
-              {region || gu ? (
-                <div className="mt-1 text-xs text-[#6E63D5]/60">
-                  지역/필터 때문에 비어있을 수 있어요.
-                </div>
-              ) : null}
             </div>
           )}
 

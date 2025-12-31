@@ -120,6 +120,14 @@ export default function Flash4Quiz({
     setHighlightedAnswerIndex(null);
   }, [payload.focusWord, payload.choices, payload.answerIndex, showCountdown]);
 
+  // showFeedback이 false로 바뀔 때 (다음 문제로 넘어갈 때) 선택 상태 리셋
+  useEffect(() => {
+    if (!showFeedback) {
+      setSelectedIndex(null);
+      setHighlightedAnswerIndex(null);
+    }
+  }, [showFeedback]);
+
   useEffect(() => {
     if (countdown === null) return;
 

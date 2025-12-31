@@ -239,7 +239,7 @@ export default function TeacherHomePage() {
     <div className="px-6 pt-6 pb-24">
       <ScreenTitle>선생님 모드</ScreenTitle>
 
-      <ScreenCard className="space-y-5">
+      <ScreenCard className="space-y-4">
           <SimpleSelect
             label="학년"
             value={grade}
@@ -264,13 +264,15 @@ export default function TeacherHomePage() {
             placeholder="단원 선택"
           />
 
-          <button
-            onClick={handleNext}
-            disabled={!canProceed}
-            className="w-full h-20 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
-          >
-            20문항 시험지 만들기
-          </button>
+          <div className="pt-2">
+            <button
+              onClick={handleNext}
+              disabled={!canProceed}
+              className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-base text-white font-semibold shadow-sm hover:shadow-md hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 disabled:active:scale-100"
+            >
+              20문항 시험지 만들기
+            </button>
+          </div>
 
       {grade !== 2 && (
             <p className="mt-2 text-xs text-[#6B6780] text-center">

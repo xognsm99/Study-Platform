@@ -31,7 +31,7 @@ export default function PlansPage() {
     }
 
     localStorage.setItem(PLAN_GATE_KEY, "true");
-    router.push("/ko/student/setup");
+    router.push("/ko/student");
   };
 
   const handlePremiumPlan = async () => {
@@ -132,44 +132,44 @@ export default function PlansPage() {
         {/* 플랜 카드 */}
         <div className="grid gap-6 md:grid-cols-2">
           {/* 무료 플랜 */}
-          <div className="rounded-2xl border-2 border-purple-200 bg-white p-8 shadow-sm transition-all hover:border-purple-300 hover:shadow-md">
+          <div className="rounded-2xl border-2 border-[#D9D5F5] bg-white p-8 shadow-sm transition-all hover:border-[#B9B4E4] hover:shadow-md">
             <div className="mb-6">
               <div className="text-3xl font-bold text-slate-900">무료</div>
             </div>
 
             <ul className="mb-8 space-y-3">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="text-slate-700">문제 생성 2회 (학생 1회 + 선생님 1회)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="text-slate-700">퀴즈 총 5회 (단어/선택 퀴즈 합산)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="text-slate-700">문제 생성 후 인쇄 가능 (선생님 모드)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="text-slate-700">시험지/정답지 PDF 저장 2회</span>
               </li>
             </ul>
 
             <button
               onClick={handleFreePlan}
-              className="w-full rounded-lg bg-purple-100 px-6 py-3 text-base font-semibold text-purple-700 transition-colors hover:bg-purple-200 active:bg-purple-300"
+              className="w-full rounded-xl h-12 bg-[#E9E6FF] px-6 py-3 text-base font-semibold text-[#6E63D5] transition-all hover:bg-[#D9D5F5] active:scale-[0.98]"
             >
               무료로 시작하기
             </button>
           </div>
 
           {/* 프리미엄 플랜 */}
-          <div className="rounded-2xl border-2 border-purple-400 bg-gradient-to-br from-purple-50 to-purple-100 p-8 shadow-lg transition-all hover:border-purple-500 hover:shadow-xl">
+          <div className="rounded-2xl border-2 border-[#8A7CF0] bg-gradient-to-br from-[#F6F5FF] to-[#E9E6FF] p-8 shadow-lg transition-all hover:border-[#6E63D5] hover:shadow-xl">
             <div className="mb-6">
               <div className="mb-3 flex items-center gap-2">
                 <div className="text-2xl font-bold text-slate-900">프리미엄 구독하기</div>
-                <span className="rounded-full bg-purple-600 px-2 py-0.5 text-xs font-semibold text-white">
+                <span className="rounded-full bg-[#6E63D5] px-2 py-0.5 text-xs font-semibold text-white">
                   추천
                 </span>
               </div>
@@ -180,7 +180,7 @@ export default function PlansPage() {
                   onClick={() => setBillingCycle("monthly")}
                   className={`rounded-md px-4 py-1.5 text-sm font-semibold transition-colors ${
                     billingCycle === "monthly"
-                      ? "bg-purple-600 text-white"
+                      ? "bg-[#6E63D5] text-white"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -190,7 +190,7 @@ export default function PlansPage() {
                   onClick={() => setBillingCycle("yearly")}
                   className={`rounded-md px-4 py-1.5 text-sm font-semibold transition-colors ${
                     billingCycle === "yearly"
-                      ? "bg-purple-600 text-white"
+                      ? "bg-[#6E63D5] text-white"
                       : "text-slate-600 hover:text-slate-900"
                   }`}
                 >
@@ -203,7 +203,7 @@ export default function PlansPage() {
                 {billingCycle === "monthly" ? "월 9,900원" : "연 89,000원"}
               </div>
               {billingCycle === "yearly" && (
-                <div className="mt-1 text-sm text-purple-700 font-medium">
+                <div className="mt-1 text-sm text-[#6E63D5] font-medium">
                   월 7,417원 (25% 할인)
                 </div>
               )}
@@ -212,27 +212,27 @@ export default function PlansPage() {
             {/* 프리미엄 혜택 (내용 다시 살림) */}
             <ul className="mb-8 space-y-3">
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="font-medium text-slate-900">문제 생성 무제한 (학생/선생님)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
-                <span className="font-medium text-slate-900"> 무제한 (모든 유형)</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
+                <span className="font-medium text-slate-900"> 퀴즈 무제한 (모든 유형)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="font-medium text-slate-900">누적 리포트 및 통계 그래프</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="font-medium text-slate-900">문제 인쇄 무제한 (선생님 모드)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="font-medium text-slate-900">시험지/정답지 PDF 저장 (인쇄 모드 지원)</span>
               </li>
               <li className="flex items-start gap-3">
-                <span className="mt-0.5 text-purple-600">✓</span>
+                <span className="mt-0.5 text-[#6E63D5]">✓</span>
                 <span className="font-medium text-slate-900">모바일에서도 인쇄/공유로 간편 저장</span>
               </li>
             </ul>
@@ -240,7 +240,7 @@ export default function PlansPage() {
             <button
               onClick={handlePremiumPlan}
               disabled={isPaying}
-              className="w-full rounded-lg bg-purple-600 px-6 py-3 text-base font-semibold text-white transition-colors hover:bg-purple-700 active:bg-purple-800 disabled:opacity-60"
+              className="w-full rounded-xl h-12 bg-[#6E63D5] px-6 py-3 text-base font-semibold text-white transition-all hover:bg-[#5B52C8] hover:shadow-md active:scale-[0.98] disabled:opacity-60"
             >
               {isPaying ? "결제 진행 중..." : "프리미엄 시작하기"}
             </button>
