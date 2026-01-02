@@ -653,7 +653,7 @@ export default function StudentPage() {
       {!showForm && profile && isProfileComplete(profile) && (
         <StudentHomeShell>
           <div className="px-1 pt-3 pb-24">
-            <ScreenTitle>U QUIZ?</ScreenTitle>
+            <ScreenTitle>퀴즈 PICK?</ScreenTitle>
 
             <ScreenCard>
               {/* 프로필 카드 */}

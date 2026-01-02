@@ -237,7 +237,7 @@ export default function TeacherHomePage() {
 
   return (
     <div className="px-6 pt-6 pb-24">
-      <ScreenTitle>선생님 모드</ScreenTitle>
+      <ScreenTitle>선생님 PICK</ScreenTitle>
 
       <ScreenCard className="space-y-4">
           <SimpleSelect
@@ -268,7 +268,7 @@ export default function TeacherHomePage() {
             <button
               onClick={handleNext}
               disabled={!canProceed}
-              className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-base text-white font-semibold shadow-sm hover:shadow-md hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 disabled:active:scale-100"
+              className="w-full h-16 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-base text-white font-semibold shadow-sm hover:shadow-md hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 disabled:active:scale-100"
             >
               20문항 시험지 만들기
             </button>
