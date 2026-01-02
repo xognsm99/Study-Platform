@@ -258,7 +258,7 @@ function TeacherPreviewPageContent() {
       ...(grade && { grade }),
       ...(subject && { subject }),
     });
-    router.push(`/teacher/print?${params.toString()}`);
+    router.push(`/ko/teacher/print?${params.toString()}`);
   };
 
   const handleGoBack = () => {
@@ -368,84 +368,76 @@ function TeacherPreviewPageContent() {
           })()}
         </div>
 
-        <div className="mt-5 space-y-4">
-            {items.map((item: any, idx: number) => {
-              const qtype = item?.qtype ?? item?.content?.raw?.qtype ?? item?.content?.qtype ?? "";
-              const passage = getTeacherPassage(item);
-              const text = getTeacherText(item);
-              const choices = getTeacherChoices(item);
-              const tr = getTeacherTranslation(item);
+        {/* 문제 목록 - 세로 리스트 */}
+        <div className="mt-6 flex flex-col gap-6">
+          {items.map((item: any, idx: number) => {
+            const qtype = item?.qtype ?? item?.content?.raw?.qtype ?? item?.content?.qtype ?? "";
+            const passage = getTeacherPassage(item);
+            const text = getTeacherText(item);
+            const choices = getTeacherChoices(item);
+            const tr = getTeacherTranslation(item);
 
-              const isVocabEngEng = qtype === "어휘_영영";
-              const isVocabDict = qtype === "어휘_사전";
-              const isGrammar = qtype.startsWith("문법_");
-              const isDialogue = qtype.startsWith("대화문_");
-              const shouldQuestionFirst = isVocabEngEng || isGrammar || isDialogue;
+            const isVocabEngEng = qtype === "어휘_영영";
+            const isVocabDict = qtype === "어휘_사전";
+            const isGrammar = qtype.startsWith("문법_");
+            const isDialogue = qtype.startsWith("대화문_");
+            const shouldQuestionFirst = isVocabEngEng || isGrammar || isDialogue;
 
-              // dev 환경에서 샘플 문제 1개만 콘솔 로그
-              if (process.env.NODE_ENV === "development" && idx === 0) {
-                console.log("[TEACHER_PREVIEW] sample problem:", item);
-              }
+            return (
+              <div
+                key={item.id ?? idx}
+                className="w-full rounded-2xl bg-white border border-[#EAE7FF] shadow-sm p-4"
+              >
+                <div className="text-sm font-bold text-[#6E63D5] mb-2">문제 {idx + 1}</div>
 
-              return (
-                <div
-                  key={item.id ?? idx}
-                  className="rounded-2xl bg-white border border-[#EAE7FF] shadow-sm p-4"
-                >
-                  <div className="text-sm font-bold text-[#6E63D5] mb-2">문제 {idx + 1}</div>
-
-                  {/* ✅ 어휘_영영/문법은 "문제 → 지문(정의/해석) → 보기" 순서 */}
-                  {shouldQuestionFirst ? (
-                    <>
-                      <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
-                        {text || "(문제 문장을 찾지 못했습니다)"}
-                      </div>
-
-                      {(passage || tr) && (
-                        <div className="mt-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
-                          {passage && <div>{passage}</div>}
-                          {tr && <div className="mt-2 text-slate-700">▶ 해석: {tr}</div>}
-                        </div>
-                      )}
-                    </>
-                  ) : (
-                    <>
-                      {/* ✅ 나머지는 "지문 → 문제" 유지 */}
-                      {passage && (
-                        <div className="mb-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
-                          {passage}
-                        </div>
-                      )}
-
-                      <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
-                        {text || "(문제 문장을 찾지 못했습니다)"}
-                      </div>
-
-                      {/* ✅ 어휘_사전은 해석이 있으면 문제 아래에 노출(teacher 미리보기용) */}
-                      {isVocabDict && tr && (
-                        <div className="mt-2 text-sm text-slate-700">▶ 해석: {tr}</div>
-                      )}
-                    </>
-                  )}
-
-                  {/* ✅ 보기 1~5 */}
-                  {choices.length > 0 ? (
-                    <ol className="mt-3 space-y-1 pl-5 text-sm list-decimal text-slate-800 leading-relaxed">
-                      {choices.map((ch, chIdx) => (
-                        <li key={chIdx} className="whitespace-pre-wrap leading-relaxed">
-                          {ch}
-                        </li>
-                      ))}
-                    </ol>
-                  ) : (
-                    <div className="mt-3 text-sm text-red-600">
-                      (보기를 찾지 못했습니다: content 구조 확인 필요)
+                {shouldQuestionFirst ? (
+                  <>
+                    <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
+                      {text || "(문제 문장을 찾지 못했습니다)"}
                     </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+
+                    {(passage || tr) && (
+                      <div className="mt-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
+                        {passage && <div>{passage}</div>}
+                        {tr && <div className="mt-2 text-slate-700">▶ 해석: {tr}</div>}
+                      </div>
+                    )}
+                  </>
+                ) : (
+                  <>
+                    {passage && (
+                      <div className="mb-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
+                        {passage}
+                      </div>
+                    )}
+
+                    <div className="font-semibold whitespace-pre-wrap leading-relaxed text-slate-800">
+                      {text || "(문제 문장을 찾지 못했습니다)"}
+                    </div>
+
+                    {isVocabDict && tr && (
+                      <div className="mt-2 text-sm text-slate-700">▶ 해석: {tr}</div>
+                    )}
+                  </>
+                )}
+
+                {choices.length > 0 ? (
+                  <ol className="mt-3 space-y-1 pl-5 text-sm list-decimal text-slate-800 leading-relaxed">
+                    {choices.map((ch, chIdx) => (
+                      <li key={chIdx} className="whitespace-pre-wrap leading-relaxed">
+                        {ch}
+                      </li>
+                    ))}
+                  </ol>
+                ) : (
+                  <div className="mt-3 text-sm text-red-600">
+                    (보기를 찾지 못했습니다: content 구조 확인 필요)
+                  </div>
+                )}
+              </div>
+            );
+          })}
+        </div>
         </div>
       </div>
   );
