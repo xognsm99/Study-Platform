@@ -205,12 +205,25 @@ function TeacherPrintPageContent() {
         .choices { margin: 0 0 0 18px; }
         .blank-box { display:inline-block; width: 220px; height: 18px; background:#e5e7eb; border-radius:4px; vertical-align:middle; }
         @media print {
+          /* 프린트에서 레이아웃/짤림 방지 */
+          html, body { height: auto !important; overflow: visible !important; }
+          /* 화면에서만 쓰는 UI 숨김(필요하면 클래스명은 존재하는 것만 적용) */
+          .no-print, header, nav, button, [data-no-print="true"] { display: none !important; }
+
+          /* ✅ 핵심: 프린트에서 본문이 안 찍히는 문제를 강제로 해결 */
+          body * { visibility: hidden !important; }
+          #print-root, #print-root * { visibility: visible !important; }
+          #print-root { position: absolute !important; left: 0 !important; top: 0 !important; width: 100% !important; }
+
+          /* transform/scale 때문에 인쇄가 빈 페이지가 되는 케이스 방지 */
+          #print-root, #print-root * { transform: none !important; filter: none !important; }
+          /* 색상 출력(선택) */
+          * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+
           * {
             background: #fff !important;
             background-color: #fff !important;
             color: #000 !important;
-            -webkit-print-color-adjust: exact;
-            print-color-adjust: exact;
           }
           body {
             background: white !important;
@@ -223,7 +236,6 @@ function TeacherPrintPageContent() {
             background-color: #fff !important;
             color: #000 !important;
           }
-          .no-print { display:none !important; }
           .print-page {
             page-break-after: always;
             page-break-inside: avoid;
@@ -370,7 +382,7 @@ function TeacherPrintPageContent() {
         }
       `}</style>
 
-      <div className="print-root min-h-screen print:min-h-0 print:h-auto bg-gray-100 print:bg-white">
+      <div id="print-root" className="print-root min-h-screen print:min-h-0 print:h-auto bg-gray-100 print:bg-white">
         <div className="no-print fixed top-4 right-4 z-50 flex gap-2">
           <button
             onClick={() => {
