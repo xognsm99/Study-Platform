@@ -246,7 +246,7 @@ function TeacherPreviewPageContent() {
       ...(grade && { grade }),
       ...(subject && { subject }),
     });
-    router.push(`/${locale}/teacher/print?${params.toString()}`);
+    router.push(`/ko/teacher/print?${params.toString()}`);
   };
 
   const handleGoBack = () => {
