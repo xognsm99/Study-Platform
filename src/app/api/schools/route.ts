@@ -2,6 +2,7 @@
 import { NextResponse } from "next/server";
 
 export const runtime = "nodejs";
+export const dynamic = "force-dynamic";
 
 type NeisSchoolRow = {
   ATPT_OFCDC_SC_CODE: string; // 교육청 코드
@@ -153,7 +154,7 @@ export async function GET(req: Request) {
     const key = process.env.NEIS_API_KEY;
     if (!key) {
       return NextResponse.json(
-        { error: "NEIS_API_KEY 환경변수가 없습니다 (.env.local 확인)" },
+        { error: "NEIS_API_KEY env is missing (Vercel Environment Variables 확인)" },
         { status: 500 }
       );
     }
