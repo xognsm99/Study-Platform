@@ -683,19 +683,6 @@ const RAW_ITEMS: GameSet["items"] = [
   },
 ];
 
-/** SSR/CSR 동일 결과를 위한 UTC 날짜 시드 */
-function getUtcDaySeed() {
-  const d = new Date();
-  const y = d.getUTCFullYear();
-  const m = String(d.getUTCMonth() + 1).padStart(2, "0");
-  const day = String(d.getUTCDate()).padStart(2, "0");
-  return `${y}-${m}-${day}`;
-}
-
-/** 오늘 UTC 날짜 기반 시드 문자열 (fallback) */
-function getTodaySeedString() {
-  return `day:${getUtcDaySeed()}`;
-}
 
 /** 시드 기반 RNG */
 function makeRng(seedStr: string) {
@@ -765,7 +752,10 @@ function shuffleChoicesIfFlash4(
 
 /** 전체 풀 셔플 → count개 선택 → 각 문제 보기 셔플 */
 function buildTodayItems(pool: GameSet["items"], count = 10, seedOverride?: string): GameSet["items"] {
-  const seedString = seedOverride ? `seed:${seedOverride}` : getTodaySeedString();
+  // ✅ seedOverride가 없으면 매번 새로운 랜덤 seed 생성 (타임스탬프 + 랜덤)
+  const seedString = seedOverride
+    ? `seed:${seedOverride}`
+    : `random:${Date.now()}-${Math.random()}`;
   const rng = makeRng(seedString);
   const picked = shuffleWithRng(pool, rng).slice(0, Math.min(count, pool.length));
   return picked.map((it) => shuffleChoicesIfFlash4(it, rng)) as GameSet["items"];

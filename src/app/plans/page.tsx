@@ -63,6 +63,9 @@ export default function PlansPage() {
     setIsPaying(true);
 
     try {
+      // ✅ 모바일 감지
+      const isMobile = /iPhone|iPad|iPod|Android/i.test(navigator.userAgent);
+
       // ✅ 코스페이먼트 채널은 간편결제 전용인 경우가 많아서 EASY_PAY로 요청해야 함
       const res = await PortOne.requestPayment({
         storeId,
@@ -72,6 +75,11 @@ export default function PlansPage() {
         totalAmount,
         currency: "CURRENCY_KRW",
         payMethod: "EASY_PAY", // ⭐ 핵심 수정
+
+        // ✅ 모바일에서는 REDIRECTION 방식 강제 (PC는 자동, 모바일은 리다이렉트)
+        windowType: isMobile
+          ? { pc: "IFRAME", mobile: "REDIRECTION" }
+          : { pc: "IFRAME", mobile: "REDIRECTION" },
 
         // 모바일 결제 후 복귀용
         redirectUrl: `${window.location.origin}/payment-redirect?cycle=${billingCycle}`,
@@ -90,13 +98,21 @@ export default function PlansPage() {
         // easyPay: { easyPayProvider: "KAKAOPAY" },
       });
 
+      // ✅ 모바일 리다이렉트 처리: 응답이 없으면 모바일에서 리다이렉트된 것으로 간주
+      // (requestPayment가 리다이렉트하면 이 코드는 실행되지 않음)
+      if (!res) {
+        // 모바일에서는 리다이렉트되므로 여기 도달 안함
+        console.log("모바일 결제 리다이렉트 대기 중...");
+        return;
+      }
+
       // 취소/실패
       if ((res as any)?.code) {
         alert((res as any)?.message || "결제 취소/실패");
         return;
       }
 
-      // ✅ PC 결제는 여기서 바로 검증
+      // ✅ PC 결제는 여기서 바로 검증 (transactionType이 PAYMENT인 경우)
       const verify = await fetch("/api/portone/complete", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
