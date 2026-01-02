@@ -173,7 +173,7 @@ function TeacherBuildPageContent() {
 
           <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
             <label
-              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selVocab
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -193,7 +193,7 @@ function TeacherBuildPageContent() {
             </label>
 
             <label
-              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selGrammar
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -213,7 +213,7 @@ function TeacherBuildPageContent() {
             </label>
 
             <label
-              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selReading
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -233,7 +233,7 @@ function TeacherBuildPageContent() {
             </label>
 
             <label
-              className={`h-14 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
                 selDialogue
                   ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
                   : "bg-white border-[#CFC8FF] text-[#2D2368]"
@@ -253,7 +253,7 @@ function TeacherBuildPageContent() {
             </label>
           </div>
 
-          <div className="mt-5 rounded-2xl bg-violet-50 px-4 py-3 text-sm">
+          <div className="mt-2 rounded-2xl bg-violet-50 px-4 py-3 text-sm">
             <div className="text-gray-600 mb-2">자동 분배(총 {total}문항)</div>
             <div className="grid grid-cols-2 gap-2 text-gray-900">
               <div>어휘: <b>{plan.vocabulary}</b></div>
@@ -282,7 +282,7 @@ function TeacherBuildPageContent() {
             <button
               onClick={() => onCompose("overall")}
               disabled={loading}
-              className="w-full h-15 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="w-full h-14 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
             >
               {loading ? "종합평가 생성 중..." : "종합평가"}
             </button>
@@ -291,7 +291,7 @@ function TeacherBuildPageContent() {
             <button
               onClick={() => onCompose("custom")}
               disabled={loading}
-              className="w-full h-15 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="w-full h-14 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
             >
               {loading ? "문제 생성 중..." : "문제 생성"}
             </button>

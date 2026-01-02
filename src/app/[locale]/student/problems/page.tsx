@@ -356,7 +356,7 @@ function StudentProblemsPageContent() {
               <button
                 onClick={handleStart}
                 disabled={!canProceed || loading}
-                className="w-full h-20 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-2xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+                className="w-full h-16 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-2xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
               >
                 20 문항 풀기 시작
               </button>

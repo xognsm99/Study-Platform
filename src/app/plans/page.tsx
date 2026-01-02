@@ -156,15 +156,15 @@ export default function PlansPage() {
             <ul className="mb-8 space-y-3">
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
-                <span className="text-slate-700">문제 생성 2회 (학생 1회 + 선생님 1회)</span>
+                <span className="text-slate-700">문제 생성 2회 (학생/선생님 각1회)</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
-                <span className="text-slate-700">퀴즈 총 5회 (단어/선택 퀴즈 합산)</span>
+                <span className="text-slate-700">퀴즈 총 5회 (모든 퀴즈 합산)</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
-                <span className="text-slate-700">문제 생성 후 인쇄 가능 (선생님 모드)</span>
+                <span className="text-slate-700">문제 생성 후 인쇄 (선생님 PICK)</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
@@ -241,7 +241,7 @@ export default function PlansPage() {
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
-                <span className="font-medium text-slate-900">문제 인쇄 무제한 (선생님 모드)</span>
+                <span className="font-medium text-slate-900">문제 인쇄 무제한 (선생님 PICK)</span>
               </li>
               <li className="flex items-start gap-3">
                 <span className="mt-0.5 text-[#6E63D5]">✓</span>
