@@ -268,10 +268,18 @@ function TeacherPrintPageContent() {
             margin-bottom: 14px;
           }
 
-          #print-root .print-grid {
-            display: grid !important;
-            grid-template-columns: 1fr 1fr !important;
-            gap: 16px !important;
+          #print-root .newspaper {
+            column-count: 2;
+            column-gap: 16px;
+          }
+
+          #print-root .newspaper > * {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            display: inline-block;
+            width: 100%;
+            margin: 0 0 16px 0;
           }
         }
 
@@ -385,14 +393,21 @@ function TeacherPrintPageContent() {
             background: white;
             box-shadow: 0 0 10px rgba(0, 0, 0, 0.1);
           }
-          #print-root .print-grid {
-            display: grid !important;
-            grid-template-columns: 1fr !important;
-            gap: 16px !important;
+          #print-root .newspaper {
+            column-count: 1;
+            column-gap: 16px;
+          }
+          #print-root .newspaper > * {
+            break-inside: avoid;
+            page-break-inside: avoid;
+            -webkit-column-break-inside: avoid;
+            display: inline-block;
+            width: 100%;
+            margin: 0 0 16px 0;
           }
           @media (min-width: 768px) {
-            #print-root .print-grid {
-              grid-template-columns: 1fr 1fr !important;
+            #print-root .newspaper {
+              column-count: 2;
             }
           }
         }
@@ -439,7 +454,7 @@ function TeacherPrintPageContent() {
             </div>
 
             {/* 문제 본문 - 2열 신문형 컬럼 */}
-            <div className="print-columns print-grid">
+            <div className="newspaper">
               {printData.items.map((item: any, idx: number) => (
                 <div key={item.id ?? idx} className="print-item">
                   <ProblemRenderer
