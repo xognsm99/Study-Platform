@@ -128,7 +128,7 @@ function TeacherBuildPageContent() {
       // setId 생성 및 저장
       const setId = crypto.randomUUID();
       sessionStorage.setItem(`examset:${setId}`, JSON.stringify(items));
-      router.push(`/teacher/preview?setId=${setId}&grade=${grade}&subject=${subject}`);
+      router.push(`/ko/teacher/preview?setId=${setId}&grade=${grade}&subject=${subject}`);
     } catch (e: any) {
       setErr(e?.message ?? String(e));
       // 에러 발생 시 sessionStorage 저장/라우팅 하지 않음

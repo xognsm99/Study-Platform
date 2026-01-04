@@ -103,7 +103,7 @@ function getResultTheme(score: number): ResultTheme {
   }
   if (score >= 40) {
     return {
-      emoji: "🧩",
+      emoji: "😵",
       title: "조금만 더!",
       desc: "틀린 것만 복습하면 바로 올라가요.",
       motion: {
@@ -115,7 +115,7 @@ function getResultTheme(score: number): ResultTheme {
   }
   if (score >= 30) {
     return {
-      emoji: "😵",
+      emoji: "😭",
       title: "헷갈렸죠?",
       desc: "정리할 타이밍. 다시 한 판!",
       motion: {
@@ -127,7 +127,7 @@ function getResultTheme(score: number): ResultTheme {
   }
   if (score >= 20) {
     return {
-      emoji: "🥶",
+      emoji: "😭",
       title: "지금부터 시작!",
       desc: "10분만 더 하면 달라집니다.",
       motion: {
@@ -332,41 +332,41 @@ export default function PlayResultPage() {
           initial={theme.motion.initial}
           animate={theme.motion.animate}
           transition={theme.motion.transition}
-          className="mb-8 text-center"
+          className="mb-4 text-center"
         >
-          <div className="text-6xl mb-4">{theme.emoji}</div>
-          <h1 className="text-4xl font-bold text-[#6E63D5]">{theme.title}</h1>
-          <p className="mt-2 text-lg text-[#2A2457]">{theme.desc}</p>
+          <div className="text-4xl mb-2">{theme.emoji}</div>
+          <h1 className="text-2xl font-bold text-[#6E63D5]">{theme.title}</h1>
+          <p className="mt-1 text-sm text-[#2A2457]">{theme.desc}</p>
         </motion.div>
 
         <div className="rounded-[24px] bg-white/70 backdrop-blur shadow-[0_24px_60px_rgba(110,99,213,0.20)] p-6">
-          <div className="text-center mb-6">
-            <h2 className="text-2xl font-bold text-[#2A2457]">결과</h2>
-            <p className="mt-2 text-[#2A2457]/70">이제 문제 풀러 GO?</p>
+          <div className="text-center mb-4">
+            <h2 className="text-xl font-bold text-[#2A2457]">결과</h2>
+            <p className="mt-1 text-sm text-[#2A2457]/70">이제 문제 풀러 GO?</p>
           </div>
-          <div className="space-y-6">
+          <div className="space-y-4">
             {/* 점수 */}
             <div className="text-center">
-              <div className="text-6xl font-bold leading-none min-h-[72px] text-[#6E63D5]">{score}</div>
-              <div className="mt-2 text-sm text-[#2A2457]">점</div>
+              <div className="text-5xl font-bold leading-none min-h-[60px] text-[#6E63D5]">{score}</div>
+              <div className="mt-1 text-sm text-[#2A2457]">점</div>
             </div>
 
             {/* 통계 */}
-            <div className="grid grid-cols-3 gap-4">
-              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
+            <div className="grid grid-cols-3 gap-3">
+              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-3 text-center hover:bg-[#B9B4E4]/25 transition-colors">
+                <div className="min-h-[28px] flex items-center justify-center text-center text-xl font-bold leading-none tabular-nums text-[#2A2457]">
                   {correctCount}
                 </div>
                 <div className="mt-1 text-xs text-[#2A2457]/70">정답</div>
               </div>
-              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
+              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-3 text-center hover:bg-[#B9B4E4]/25 transition-colors">
+                <div className="min-h-[28px] flex items-center justify-center text-center text-xl font-bold leading-none tabular-nums text-[#2A2457]">
                   {gameSet.items.length}
                 </div>
                 <div className="mt-1 text-xs text-[#2A2457]/70">전체</div>
               </div>
-              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-4 text-center hover:bg-[#B9B4E4]/25 transition-colors">
-                <div className="min-h-[32px] flex items-center justify-center text-center text-2xl font-bold leading-none tabular-nums text-[#2A2457]">
+              <div className="rounded-xl border border-[#B9B4E4]/60 bg-white p-3 text-center hover:bg-[#B9B4E4]/25 transition-colors">
+                <div className="min-h-[28px] flex items-center justify-center text-center text-xl font-bold leading-none tabular-nums text-[#2A2457]">
                   {Math.floor(result.timeSpentSec / 60)}:{(result.timeSpentSec % 60).toString().padStart(2, "0")}
                 </div>
                 <div className="mt-1 text-xs text-[#2A2457]/70">
@@ -387,7 +387,7 @@ export default function PlayResultPage() {
             )}
 
             {/* 버튼 */}
-            <div className="space-y-3 pt-4">
+            <div className="space-y-3 pt-2">
               <Button
                 onClick={() => {
                   if (typeof window !== "undefined") {
@@ -399,7 +399,7 @@ export default function PlayResultPage() {
                     router.push("/play");
                   }
                 }}
-                className="w-full bg-[#6F6AE6] text-white hover:bg-[#5F5AD8] shadow-md"
+                className="w-full bg-[#6E63D5] text-white hover:bg-[#5F5AD8] shadow-md"
               >
                 다시 하기
               </Button>

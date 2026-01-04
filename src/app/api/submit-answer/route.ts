@@ -13,7 +13,27 @@ export async function POST(req: Request) {
     console.error("[submit-answer] auth.getUser 실패:", e);
   }
 
-  const { problemId, selectedIndex } = await req.json();
+  const body = await req.json();
+  const problemId = body.problemId ?? body.problem_id ?? body.id;
+  const selectedIndex = body.selectedIndex ?? body.selected_index ?? body.selected;
+  const grade = body.grade ?? null;
+  const subject = body.subject ?? null;
+  const category = body.category ?? null;
+
+  console.log("[submit-answer] body keys:", Object.keys(body));
+  console.log("[submit-answer] parsed:", { problemId, selectedIndex, grade, subject, category, userId });
+
+  // ✅ problemId 필수 체크
+  if (!problemId) {
+    return NextResponse.json(
+      {
+        ok: false,
+        error: "missing problemId",
+        keys: Object.keys(body),
+      },
+      { status: 400 }
+    );
+  }
 
   // ✅ 문제 정보는 항상 조회 (정답 여부 계산용)
   let answerIndex = -1;
@@ -46,6 +66,25 @@ export async function POST(req: Request) {
           if (insErr) throw insErr;
         } catch (e) {
           console.error("[submit-answer] user_progress insert 실패:", e);
+        }
+
+        try {
+          // problem_attempts insert
+          const qtype = (problem.content as any)?.qtype || null;
+          const { error: attemptErr } = await supabase.from("problem_attempts").insert({
+            user_id: userId,
+            problem_id: problem.id,
+            is_correct: isCorrect,
+            selected: selectedIndex,
+            qtype,
+            grade: grade || null,
+            subject: subject || null,
+            category: category || null,
+          });
+
+          if (attemptErr) throw attemptErr;
+        } catch (e) {
+          console.error("[submit-answer] problem_attempts insert 실패:", e);
         }
 
         try {
@@ -97,5 +136,8 @@ export async function POST(req: Request) {
     isCorrect,
     answerIndex,
     skipped: userId ? undefined : "no_user",
+    debug_userId: userId,
+    debug_problemId: problemId,
+    debug_selectedIndex: selectedIndex,
   });
 }

@@ -277,8 +277,8 @@ export default function Flash4Quiz({
                 transition={{ delay: 0.15, type: "spring", stiffness: 220 }}
                 className="relative z-10"
               >
-                <div className="text-center text-sm font-medium text-[#2A2457] mb-3">
-                  다음 중 올바른 뜻을 선택하세요
+                <div className="text-center text-sm font-medium text-[#2A2457] mb-5">
+                  다음 중 올바른 뜻을 고르시오
                 </div>
 
                 <div className="grid grid-cols-2 gap-3">

@@ -57,10 +57,10 @@ export default function PlayClient({ seed }: Props) {
           </div>
 
           <h1 className="text-center text-[24px] font-extrabold tracking-tight text-[#1F1B3A]">
-            오늘의 단어 퀴즈
+            몸풀기 단어 퀴즈
           </h1>
           <p className="mt-2 text-center text-sm text-[#6B66A3]">
-            매일 퀴즈로 영어 실력을 키워보세요
+            문제 풀기전 단어 먼저 익히자
           </p>
 
           {/* 정보칩 */}
@@ -71,16 +71,16 @@ export default function PlayClient({ seed }: Props) {
             </div>
             <div className="rounded-2xl bg-[#F6F5FF] px-4 py-3 text-center">
               <div className="text-xs text-[#6B66A3]">예상 소요 시간</div>
-              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">약 2분</div>
+              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">약 1분</div>
             </div>
           </div>
 
           {/* CTA */}
           <button
             onClick={handleStart}
-            className="mt-6 w-full rounded-2xl bg-[#6E63D5] py-4 text-base font-extrabold text-white shadow-[0_14px_30px_rgba(110,99,213,0.35)] transition hover:brightness-105 active:scale-[0.99]"
+            className="mt-6 w-full rounded-2xl bg-[#6E63D5] py-4 text-xl font-extrabold text-white shadow-[0_14px_30px_rgba(110,99,213,0.35)] transition hover:brightness-105 active:scale-[0.99]"
           >
-            시작하기
+            START
           </button>
 
           <p className="mt-4 text-center text-xs text-[#6B66A3]">

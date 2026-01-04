@@ -689,7 +689,7 @@ export default function StudentPage() {
                       school: selectedSchool?.code ?? "",
                       unit: unitRange,
                     });
-                    router.push(`/student/vocab-game?${params.toString()}`);
+                    router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
                   className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                 >

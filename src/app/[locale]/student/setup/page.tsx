@@ -10,6 +10,23 @@ type LeaderRow = {
   badge?: "gold" | "silver" | "bronze";
 };
 
+type WeakQtype = {
+  qtype: string;
+  acc: number;
+  attempts: number;
+};
+
+type TodayPlanItem = {
+  title: string;
+  desc: string;
+};
+
+type LeaderboardRow = {
+  name: string;
+  points: number;
+  rank: number;
+};
+
 type ReportData = {
   userName: string;
   points: number;
@@ -19,6 +36,10 @@ type ReportData = {
   createdProblems: number;
   monthlyGoal: number;
   period: string;
+  weakQtypes?: WeakQtype[];
+  todayPlan?: TodayPlanItem[];
+  leaderboardWorld?: LeaderboardRow[];
+  leaderboardLocal?: LeaderboardRow[];
 };
 
 export default function StudentReportPage() {
@@ -26,6 +47,7 @@ export default function StudentReportPage() {
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
+  const [leaderboardMode, setLeaderboardMode] = useState<"world" | "local">("world");
 
   const userName = reportData?.userName || "학생";
   const points = reportData?.points || 0;
@@ -74,25 +96,42 @@ export default function StudentReportPage() {
     fetchReport();
   }, [period]);
 
-  const leaderboard: LeaderRow[] = useMemo(
-    () => [
+  const leaderboard: LeaderRow[] = useMemo(() => {
+    const activeLeaderboard =
+      leaderboardMode === "world" ? reportData?.leaderboardWorld : reportData?.leaderboardLocal;
+
+    if (activeLeaderboard && activeLeaderboard.length > 0) {
+      return activeLeaderboard.map((row, idx) => ({
+        rank: row.rank,
+        name: row.name,
+        points: row.points,
+        badge:
+          idx === 0 ? ("gold" as const) : idx === 1 ? ("silver" as const) : idx === 2 ? ("bronze" as const) : undefined,
+      }));
+    }
+
+    // Fallback to placeholder
+    return [
       { rank: 1, name: "Davis", points: 2569, badge: "gold" },
       { rank: 2, name: "Alena", points: 1469, badge: "silver" },
       { rank: 3, name: "Craig", points: 1053, badge: "bronze" },
       { rank: 4, name: userName, points: points },
       { rank: 5, name: "Zain", points: 448 },
-    ],
-    [userName, points]
-  );
+    ];
+  }, [reportData, leaderboardMode, userName, points]);
 
   const advice = useMemo(() => {
-    // TODO: 카테고리별 정답률/오답률 기반으로 생성
+    if (reportData?.todayPlan && reportData.todayPlan.length > 0) {
+      return reportData.todayPlan;
+    }
+
+    // Fallback
     return [
       { title: "오늘 10문항", desc: "문법(빈칸) 10문항만 풀고 마무리하세요." },
       { title: "약점 보완", desc: "최근 오답이 많은 유형: 본문 일치 → 내일 15문항 추천" },
       { title: "루틴", desc: "3일 연속 학습을 만들면 점수가 안정적으로 오릅니다." },
     ];
-  }, []);
+  }, [reportData]);
 
   // 로딩 중
   if (loading) {
@@ -166,8 +205,18 @@ export default function StudentReportPage() {
             </div>
 
             <div className="flex gap-2">
-              <StatPill label="WORLD" value="—" />
-              <StatPill label="LOCAL" value="—" />
+              <button
+                onClick={() => setLeaderboardMode("world")}
+                className={leaderboardMode === "world" ? "" : "opacity-50"}
+              >
+                <StatPill label="WORLD" value="—" />
+              </button>
+              <button
+                onClick={() => setLeaderboardMode("local")}
+                className={leaderboardMode === "local" ? "" : "opacity-50"}
+              >
+                <StatPill label="LOCAL" value="—" />
+              </button>
             </div>
           </div>
 

@@ -1,28 +1,23 @@
 import { NextResponse } from "next/server";
-import { createClient } from "@supabase/supabase-js";
+import { supabaseServer } from "@/lib/supabase/server";
 
 export const runtime = "nodejs";
 export const dynamic = "force-dynamic";
 
 export async function POST(req: Request) {
   try {
-    // env 체크
-    const supabaseUrl = process.env.SUPABASE_URL ?? process.env.NEXT_PUBLIC_SUPABASE_URL;
-    const supabaseKey = process.env.SUPABASE_SERVICE_ROLE_KEY ?? process.env.SUPABASE_ANON_KEY ?? process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+    const supabase = await supabaseServer();
 
-    if (!supabaseUrl || !supabaseKey) {
+    // ✅ 로그인 유저 확인 (body userId 절대 믿지 않음)
+    const { data: auth, error: authErr } = await supabase.auth.getUser();
+    const userId = auth?.user?.id ?? null;
+
+    if (authErr) {
       return NextResponse.json(
-        { ok: false, error: "Supabase env vars are missing" },
-        { status: 500 }
+        { ok: false, error: `auth.getUser failed: ${authErr.message}` },
+        { status: 401 }
       );
     }
-
-    const supabase = createClient(supabaseUrl, supabaseKey, {
-      auth: { persistSession: false },
-    });
-
-    const body = await req.json();
-    const { gameSetId, score, correctCount, totalCount, timeSpentSec, userId } = body;
 
     if (!userId) {
       return NextResponse.json(
@@ -31,43 +26,57 @@ export async function POST(req: Request) {
       );
     }
 
-    if (score === undefined || correctCount === undefined || totalCount === undefined || timeSpentSec === undefined) {
+    const body = await req.json();
+
+    // ✅ body 파싱 (alias 지원)
+    const gameSetId = body.gameSetId ?? body.game_set_id ?? null;
+    const score = body.score;
+    const correctCount = body.correctCount ?? body.correct_count;
+    const totalCount = body.totalCount ?? body.total_count;
+    const timeSpentSec = body.timeSpentSec ?? body.time_spent_sec;
+
+    // ✅ 필수값 체크
+    if (
+      score === undefined ||
+      correctCount === undefined ||
+      totalCount === undefined ||
+      timeSpentSec === undefined
+    ) {
       return NextResponse.json(
-        { ok: false, error: "필수 파라미터가 누락되었습니다." },
+        {
+          ok: false,
+          error: "필수 파라미터가 누락되었습니다.",
+          keys: Object.keys(body),
+        },
         { status: 400 }
       );
     }
 
-    // gameSetId는 선택적 (mock 데이터의 경우 null)
-    const insertData: any = {
+    // ✅ 실제 INSERT
+    const insertData = {
       user_id: userId,
-      score,
-      correct_count: correctCount,
-      total_count: totalCount,
-      time_spent_sec: timeSpentSec,
+      game_set_id: gameSetId,
+      score: Number(score),
+      correct_count: Number(correctCount),
+      total_count: Number(totalCount),
+      time_spent_sec: Number(timeSpentSec),
     };
-
-    if (gameSetId) {
-      insertData.game_set_id = gameSetId;
-    }
 
     const { data, error } = await supabase
       .from("game_attempts")
       .insert(insertData)
-      .select()
+      .select("*")
       .single();
 
     if (error) {
-      console.error("Game attempt save error:", error);
       return NextResponse.json(
-        { ok: false, error: error.message },
+        { ok: false, error: error.message, details: error.details, code: error.code },
         { status: 500 }
       );
     }
 
     return NextResponse.json({ ok: true, data });
   } catch (e: any) {
-    console.error("Game attempt API error:", e);
     return NextResponse.json(
       { ok: false, error: e?.message || "Unknown error" },
       { status: 500 }

@@ -246,7 +246,7 @@ function TeacherPreviewPageContent() {
       ...(grade && { grade }),
       ...(subject && { subject }),
     });
-    router.push(`/ko/teacher/print?${params.toString()}`);
+    router.push(`/${locale}/teacher/print?${params.toString()}`);
   };
 
   const handleGoBack = () => {
@@ -356,8 +356,8 @@ function TeacherPreviewPageContent() {
           })()}
         </div>
 
-        {/* 문제 목록 - 세로 리스트 */}
-        <div className="mt-6 flex flex-col gap-6 pb-4">
+        {/* 문제 목록 - 그리드 레이아웃 */}
+        <div className="mt-6 pb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
           {items.map((item: any, idx: number) => {
             const qtype = item?.qtype ?? item?.content?.raw?.qtype ?? item?.content?.qtype ?? "";
             const passage = getTeacherPassage(item);
