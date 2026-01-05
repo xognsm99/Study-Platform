@@ -1,12 +1,8 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
-
-import BlankSentence from "@/components/vocab-game/BlankSentence";
-import AlphaKeypad from "@/components/vocab-game/AlphaKeypad";
-import { useAlphaKeypadGame } from "@/components/vocab-game/useAlphaKeypadGame";
-
+import HandwritingPad from "@/components/vocab-game/HandwritingPad";
 import { VOCAB_GAME_ITEMS as VOCAB_GAME_10 } from "./questions";
 
 function shuffle<T>(arr: T[]) {
@@ -24,9 +20,8 @@ export default function VocabGamePage() {
   const locale = params?.locale || "ko";
 
   const LIMIT = 10;
-  const MAX_SCORE = 20; // 만점 (10문항 × 2점)
+  const MAX_SCORE = 20;
 
-  // ✅ SSR/첫 렌더에서는 항상 같은 값(고정)으로 보여주기
   const initialItems = useMemo(() => {
     return (VOCAB_GAME_10 ?? []).slice(0, LIMIT);
   }, []);
@@ -35,13 +30,11 @@ export default function VocabGamePage() {
   const [items, setItems] = useState(initialItems);
   const [usageChecked, setUsageChecked] = useState(false);
 
-  // ✅ mount 이후에만 랜덤 셔플 적용 (Hydration/Hook 에러 방지)
   useEffect(() => {
     setMounted(true);
     setItems(shuffle(VOCAB_GAME_10 ?? []).slice(0, LIMIT));
   }, []);
 
-  // ✅ 퀴즈 시작 시 무료 사용 제한 체크 (quiz 1회 차감)
   useEffect(() => {
     if (!mounted || usageChecked) return;
 
@@ -70,7 +63,6 @@ export default function VocabGamePage() {
         }
       } catch (err) {
         console.error("[vocab-game] 무료 사용 제한 체크 에러:", err);
-        // 에러 발생 시 계속 진행 (사용자 차단하지 않음)
       } finally {
         setUsageChecked(true);
       }
@@ -80,53 +72,65 @@ export default function VocabGamePage() {
   }, [mounted, usageChecked, router]);
 
   const [idx, setIdx] = useState(0);
-  const [score, setScore] = useState<number>(0); // 0점에서 시작, 맞추면 점수 획득
-  const [hintUsed, setHintUsed] = useState<number>(0); // 힌트 사용 횟수
-  const [revealUsed, setRevealUsed] = useState<number>(0); // 정답보기 사용 횟수
-
-  const counted = useRef(false);
+  const [score, setScore] = useState<number>(0);
+  const [hintUsed, setHintUsed] = useState<number>(0);
+  
+  const [userInput, setUserInput] = useState("");
+  const [isChecked, setIsChecked] = useState(false);
+  const [isCorrect, setIsCorrect] = useState(false);
+  const [showHint, setShowHint] = useState(false);
+  const [usedHintThisProblem, setUsedHintThisProblem] = useState(false);
 
   const cur = items[idx];
-
-  // ✅ cur 없으면(데이터 없을 때) 안전 처리
   const safeSentence = cur?.sentence ?? "문제가 없습니다.";
   const safeAnswers = cur?.answers ?? [];
-
-  const game = useAlphaKeypadGame({
-    sentence: safeSentence,
-    answers: safeAnswers,
-    onComplete: ({ correct, usedHint, usedReveal }) => {
-      if (counted.current) return;
-      counted.current = true;
-
-      // 정답인 경우에만 점수 획득
-      if (correct) {
-        let earnedPoints = 2; // 문제당 기본 2점
-
-        // 정답보기를 사용한 경우 무조건 0점
-        if (usedReveal) {
-          earnedPoints = 0;
-          setRevealUsed((prev) => prev + 1);
-        }
-        // 힌트만 사용한 경우 1점
-        else if (usedHint) {
-          earnedPoints = 1;
-          setHintUsed((prev) => prev + 1);
-        }
-
-        setScore((prev) => Math.min(MAX_SCORE, prev + earnedPoints));
-      }
-      // 오답이면 점수 변동 없음 (힌트/정답보기 사용 횟수만 카운트)
-      else {
-        if (usedHint) setHintUsed((prev) => prev + 1);
-        if (usedReveal) setRevealUsed((prev) => prev + 1);
-      }
-    },
-  });
-
+  const correctAnswer = safeAnswers[0] ?? "";
   const isLast = idx >= items.length - 1;
 
-  // mount 전에는 UI만 살짝 비워서 깜빡임 줄이기 (훅은 그대로 유지됨)
+  const handleCheck = () => {
+    if (!userInput.trim()) return;
+
+    const normalized = userInput.trim().toLowerCase();
+    const correct = safeAnswers.some((ans) => ans.toLowerCase() === normalized);
+
+    setIsChecked(true);
+    setIsCorrect(correct);
+
+    if (correct) {
+      let earnedPoints = 2;
+      if (usedHintThisProblem) {
+        earnedPoints = 1;
+      }
+      setScore((prev) => Math.min(MAX_SCORE, prev + earnedPoints));
+    }
+  };
+
+  const handleNext = () => {
+    if (isLast) {
+      const params = new URLSearchParams(window.location.search);
+      params.set("score", String(score));
+      params.set("total", String(MAX_SCORE));
+      params.set("hint", String(hintUsed));
+      params.set("reveal", "0");
+      router.push(`/${locale}/student/vocab-game/result?${params.toString()}`);
+    } else {
+      setIdx((v) => Math.min(v + 1, items.length - 1));
+      setUserInput("");
+      setIsChecked(false);
+      setIsCorrect(false);
+      setShowHint(false);
+      setUsedHintThisProblem(false);
+    }
+  };
+
+  const handleHint = () => {
+    setShowHint(true);
+    if (!usedHintThisProblem) {
+      setUsedHintThisProblem(true);
+      setHintUsed((prev) => prev + 1);
+    }
+  };
+
   if (!mounted) {
     return <div className="min-h-screen bg-[#F5F3FF]" />;
   }
@@ -135,105 +139,164 @@ export default function VocabGamePage() {
     return (
       <div className="min-h-screen bg-[#F5F3FF] p-6">
         <div className="font-semibold mb-2">문제가 없습니다.</div>
-        <div className="text-sm text-gray-600">
-          questions.ts에 VOCAB_GAME_ITEMS가 비었거나 LIMIT보다 적습니다.
-        </div>
-      </div>
-    );
-  }
-
-  if (!game.isValid) {
-    return (
-      <div className="p-6">
-        <div className="font-semibold mb-2">문제 설정 오류</div>
-        <pre className="text-xs whitespace-pre-wrap bg-white/70 p-3 rounded-xl">
-          {game.error}
-        </pre>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-[#F5F3FF]">
+    <div className="min-h-screen bg-gradient-to-br from-[#F5F3FF] via-[#FAF8FF] to-[#F0EDFF]">
       <div className="max-w-[520px] mx-auto p-2">
-        {/* 보라 헤더 바 */}
-        <div className="bg-[#6E63D5] text-white rounded-none px-3 py-3 flex items-center justify-between mb-5 w-full">
+        {/* 헤더 */}
+        <div className="bg-gradient-to-r from-[#6E63D5] to-[#8B7FE8] text-white rounded-2xl px-4 py-4 flex items-center justify-between mb-6 shadow-lg w-full">
           <button
             onClick={() => router.back()}
-            className="text-sm font-medium opacity-95"
+            className="text-sm font-semibold opacity-95 hover:opacity-100 transition-opacity"
           >
-            ← 뒤로가기
+            ← 뒤로
           </button>
 
-          <div className="text-[18px] md:text-[24px] font-semibold tracking-tight">
-            단어 게임 퀴즈
+          <div className="text-[20px] font-bold tracking-tight flex items-center gap-2">
+            <span className="text-2xl">✍️</span>
+            서술형 대비
           </div>
 
-          <div className="text-sm font-medium opacity-95">
-            점수: <span className="text-[#FFE156]">{score}</span> / {MAX_SCORE}
+          <div className="text-sm font-semibold bg-white/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+            <span className="text-[#FFE156]">{score}</span> / {MAX_SCORE}
           </div>
         </div>
 
-        <div className="text-sm text-gray-700 mb-2">
-          문제 {idx + 1} / {items.length}
+        {/* 문제 번호 */}
+        <div className="text-sm font-semibold text-[#6E63D5] mb-3 flex items-center gap-2">
+          <div className="w-8 h-8 rounded-full bg-[#6E63D5] text-white flex items-center justify-center text-xs">
+            {idx + 1}
+          </div>
+          <span>/ {items.length} 문제</span>
         </div>
 
         {/* 문장 카드 */}
-        <div className="rounded-3xl bg-white/80 p-5 border border-[#E6E3FA] mb-4">
-          <BlankSentence
-            sentence={cur.sentence}
-            userAnswers={game.userAnswers}
-            activeBlankIndex={game.activeBlankIndex}
-            answers={cur.answers}
-            revealed={game.revealed}
-            onBlankClick={(i) => game.setActiveBlankIndex(i)}
-          />
+        <div className="rounded-3xl bg-white/90 backdrop-blur-sm p-6 border-2 border-[#E6E3FA] mb-5 shadow-sm">
+          <div className="text-[17px] font-medium text-gray-800 leading-relaxed mb-3">
+            {safeSentence}
+          </div>
 
           {cur.explain && (
-            <div className="text-sm text-gray-700 mt-3">
-              {(cur.explain ?? "").replace(/^\s*해설\s*[:：]\s*/i, "")}
+            <div className="text-sm text-gray-600 mt-4 pt-4 border-t border-gray-100">
+              💡 {(cur.explain ?? "").replace(/^\s*해설\s*[:：]\s*/i, "")}
             </div>
           )}
         </div>
 
-        {/* 키패드 */}
-        <AlphaKeypad
-          letters={game.letters}
-          onKeyPress={game.onKeyPress}
-          onBackspace={game.onBackspace}
-          onHint={game.onHint}
-          onReveal={game.onReveal}
-          disabled={game.isComplete}
-        />
+        {/* 손글씨 패드 */}
+        <div className="mb-4">
+          <div className="text-sm font-semibold text-gray-700 mb-2 flex items-center gap-2">
+            <span className="text-lg">📝</span>
+            손글씨로 연습하기
+            <span className="text-xs text-gray-500">(쓰고 인식 버튼 클릭)</span>
+          </div>
+          <HandwritingPad
+            disabled={isChecked}
+            onRecognize={(text) => {
+              // 인식된 텍스트를 입력창에 자동으로 채우기
+              setUserInput(text);
+            }}
+          />
+        </div>
 
-        {/* 다음 문제 / 결과 보기 */}
-        <div className="mt-6 flex justify-end">
-          <button
-            disabled={!game.isComplete}
-            onClick={() => {
-              if (isLast) {
-                // 마지막 문제 완료 시 결과 페이지로 이동
-                const params = new URLSearchParams(window.location.search);
-                params.set("score", String(score)); // 현재 점수 (0~20)
-                params.set("total", String(MAX_SCORE)); // 만점 20
-                params.set("hint", String(hintUsed)); // 힌트 사용 횟수
-                params.set("reveal", String(revealUsed)); // 정답보기 사용 횟수
-                router.push(`/${locale}/student/vocab-game/result?${params.toString()}`);
-              } else {
-                // 다음 문제로 이동
-                counted.current = false;
-                setIdx((v) => Math.min(v + 1, items.length - 1));
+        {/* 답 입력 */}
+        <div className="rounded-3xl bg-white/90 backdrop-blur-sm p-5 border-2 border-[#E6E3FA] mb-4 shadow-sm">
+          <label className="text-sm font-semibold text-gray-700 mb-2 block">
+            정답 입력
+          </label>
+          <input
+            type="text"
+            value={userInput}
+            onChange={(e) => setUserInput(e.target.value)}
+            onKeyPress={(e) => {
+              if (e.key === "Enter" && !isChecked) {
+                handleCheck();
               }
             }}
+            disabled={isChecked}
+            placeholder="답을 입력하세요"
             className={[
-              "px-6 py-3.5 rounded-xl text-sm font-semibold transition-all",
-              !game.isComplete
-                ? "bg-[#E7E5FF] text-[#6E63D5] opacity-100"
-                : "bg-[#6E63D9] text-white shadow-sm active:scale-[0.98]",
+              "w-full px-4 py-3.5 rounded-xl border-2 text-base font-medium transition-all",
+              isChecked
+                ? isCorrect
+                  ? "border-green-400 bg-green-50 text-green-700"
+                  : "border-red-400 bg-red-50 text-red-700"
+                : "border-[#E6E3FA] bg-white focus:border-[#6E63D5] focus:outline-none focus:ring-2 focus:ring-[#6E63D5]/20",
             ].join(" ")}
-          >
-            {isLast ? "결과 보기 →" : "다음 문제 →"}
-          </button>
+          />
+
+          {/* 결과 표시 */}
+          {isChecked && (
+            <div className={[
+              "mt-3 p-3 rounded-xl text-sm font-semibold flex items-center gap-2",
+              isCorrect
+                ? "bg-green-100 text-green-700"
+                : "bg-red-100 text-red-700"
+            ].join(" ")}>
+              {isCorrect ? (
+                <>
+                  <span className="text-xl">✅</span>
+                  정답입니다! {usedHintThisProblem ? "(힌트 사용: +1점)" : "(+2점)"}
+                </>
+              ) : (
+                <>
+                  <span className="text-xl">❌</span>
+                  오답입니다. 정답: <span className="font-bold">{correctAnswer}</span>
+                </>
+              )}
+            </div>
+          )}
+        </div>
+
+        {/* 힌트 */}
+        {showHint && cur?.hint && (
+          <div className="rounded-2xl bg-[#FFF4E6] border-2 border-[#FFD699] p-4 mb-4">
+            <div className="text-sm font-semibold text-[#FF9500] mb-1">💡 힌트</div>
+            <div className="text-sm text-gray-700">{cur?.hint}</div>
+          </div>
+        )}
+
+        {/* 버튼 영역 */}
+        <div className="flex gap-2 justify-end">
+          {!isChecked && cur.hint && (
+            <button
+              onClick={handleHint}
+              disabled={showHint}
+              className={[
+                "px-5 py-3 rounded-xl text-sm font-semibold transition-all",
+                showHint
+                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
+                  : "bg-[#FFD699] text-[#FF9500] hover:bg-[#FFC266] active:scale-95 shadow-sm"
+              ].join(" ")}
+            >
+              💡 힌트 보기
+            </button>
+          )}
+
+          {!isChecked ? (
+            <button
+              onClick={handleCheck}
+              disabled={!userInput.trim()}
+              className={[
+                "px-6 py-3 rounded-xl text-sm font-semibold transition-all",
+                !userInput.trim()
+                  ? "bg-[#E7E5FF] text-[#6E63D5]/50 cursor-not-allowed"
+                  : "bg-[#6E63D9] text-white shadow-md hover:shadow-lg hover:bg-[#5D52C4] active:scale-[0.98]",
+              ].join(" ")}
+            >
+              ✓ 확인하기
+            </button>
+          ) : (
+            <button
+              onClick={handleNext}
+              className="px-6 py-3 rounded-xl text-sm font-semibold bg-[#6E63D9] text-white shadow-md hover:shadow-lg hover:bg-[#5D52C4] active:scale-[0.98] transition-all"
+            >
+              {isLast ? "📊 결과 보기" : "→ 다음 문제"}
+            </button>
+          )}
         </div>
       </div>
     </div>

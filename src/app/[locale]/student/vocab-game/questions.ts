@@ -3,6 +3,7 @@ export type VocabKeypadQ = {
   sentence: string;   // 빈칸은 반드시 "()" 토큰
   answers: string[];  // 빈칸 개수와 동일
   explain?: string;
+  hint?: string;
 };
 
 export const VOCAB_GAME_ITEMS: VocabKeypadQ[] = [
