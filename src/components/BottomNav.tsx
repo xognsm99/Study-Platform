@@ -20,52 +20,22 @@ export default function BottomNav() {
   const hrefTeacher = `${base}/teacher`;
   const hrefMy = `${base}/student/setup`;
 
-  // 활성 탭 판별 (정확한 매칭)
   const activeHome = pathname === hrefHome;
-  const activeQuiz = pathname === hrefQuiz; // exact match only
+  const activeQuiz = pathname === hrefQuiz;
   const activeProblem = pathname.startsWith(hrefProblem);
   const activeTeacher = pathname.startsWith(hrefTeacher);
   const activeMy = pathname.startsWith(hrefMy);
 
-  const ACTIVE = "text-[#6E63D5]";
-  const INACTIVE = "text-gray-400";
+  // ✅ 진한 보라 + 선택 하이라이트
+  const ACTIVE_ITEM = "text-[#4B2BBE] bg-[#4B2BBE]/10";
+  const INACTIVE_ITEM = "text-gray-400";
 
   const items = [
-    { 
-      key: "home", 
-      href: hrefHome, 
-      label: "홈", 
-      Icon: Home, 
-      active: activeHome 
-    },
-    { 
-      key: "quiz", 
-      href: hrefQuiz, 
-      label: "퀴즈", 
-      Icon: BookOpen, 
-      active: activeQuiz 
-    },
-    { 
-      key: "problem", 
-      href: hrefProblem, 
-      label: "문제", 
-      Icon: FileText, 
-      active: activeProblem 
-    },
-    { 
-      key: "teacher", 
-      href: hrefTeacher, 
-      label: "선생님", 
-      Icon: Users, 
-      active: activeTeacher 
-    },
-    { 
-      key: "my", 
-      href: hrefMy, 
-      label: "마이", 
-      Icon: Settings, 
-      active: activeMy 
-    },
+    { key: "home", href: hrefHome, label: "홈", Icon: Home, active: activeHome },
+    { key: "quiz", href: hrefQuiz, label: "퀴즈", Icon: BookOpen, active: activeQuiz },
+    { key: "problem", href: hrefProblem, label: "문제", Icon: FileText, active: activeProblem },
+    { key: "teacher", href: hrefTeacher, label: "선생님", Icon: Users, active: activeTeacher },
+    { key: "my", href: hrefMy, label: "마이", Icon: Settings, active: activeMy },
   ];
 
   return (
@@ -73,21 +43,20 @@ export default function BottomNav() {
       <div className="mx-auto flex h-16 max-w-md items-center justify-around">
         {items.map((it) => {
           const Icon = it.Icon;
+          const itemCls = it.active ? ACTIVE_ITEM : INACTIVE_ITEM;
+
           return (
             <Link
               key={it.key}
               href={it.href}
-              className="flex w-16 flex-col items-center justify-center gap-1"
+              className={[
+                "flex w-16 flex-col items-center justify-center gap-1 rounded-xl px-2 py-2 transition",
+                itemCls,
+              ].join(" ")}
               aria-current={it.active ? "page" : undefined}
             >
-              <Icon
-                className={it.active ? ACTIVE : INACTIVE}
-                strokeWidth={1.8}
-                size={22}
-              />
-              <span className={`text-[11px] ${it.active ? ACTIVE : INACTIVE}`}>
-                {it.label}
-              </span>
+              <Icon className="text-current" strokeWidth={1.8} size={22} />
+              <span className="text-[11px] font-medium">{it.label}</span>
             </Link>
           );
         })}

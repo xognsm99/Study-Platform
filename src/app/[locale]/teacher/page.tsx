@@ -156,7 +156,7 @@ function SimpleSelect({
             setOpen((prev) => !prev);
             if (!open) setFocusedIndex(options.findIndex((o) => o.value === value));
           }}
-          className="w-full h-15 rounded-2xl bg-white/80 border border-[#CFCBFF] px-4 text-sm text-[#1F1B3A] focus:outline-none focus:ring-2 focus:ring-[#8A7CF0] focus:border-[#8A7CF0] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between"
+          className="w-full h-12 rounded-2xl bg-white/80 border border-[#CFCBFF] px-4 text-sm text-[#1F1B3A] focus:outline-none focus:ring-2 focus:ring-[#8A7CF0] focus:border-[#8A7CF0] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between"
         >
           <span className={selectedOption ? "text-[#1F1B3A]" : "text-gray-400"}>
             {displayText}
