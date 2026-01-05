@@ -244,8 +244,10 @@ export default function TeacherHomePage() {
   }));
 
   return (
-    <div className="px-6 pt-6 pb-24">
-      <ScreenTitle>선생님 PICK</ScreenTitle>
+    <div className="px-1 pt-3 pb-24">
+      <div className="px-5 mb-6">
+        <ScreenTitle>선생님 PICK</ScreenTitle>
+      </div>
 
       <ScreenCard className="space-y-4">
           <SimpleSelect

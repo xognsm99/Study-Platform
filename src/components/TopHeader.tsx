@@ -7,16 +7,20 @@ export default function TopHeader() {
   const pathname = usePathname();
   const locale = pathname?.split("/")[1] || "ko";
 
-  // student 페이지에서만 보이도록
+  // student 또는 teacher 페이지에서 보이도록
   const isStudentPage = pathname?.includes("/student");
+  const isTeacherPage = pathname?.includes("/teacher");
 
-  if (!isStudentPage) return null;
+  if (!isStudentPage && !isTeacherPage) return null;
+
+  // student 페이지면 /student?edit=true, teacher 페이지면 /teacher?edit=true
+  const profileRoute = isTeacherPage ? `/${locale}/teacher?edit=true` : `/${locale}/student?edit=true`;
 
   return (
     <div className="sticky top-0 z-50 bg-violet-100/90 backdrop-blur-sm border-b border-violet-200">
       <div className="max-w-[520px] mx-auto px-4 h-14 flex items-center justify-end">
         <button
-          onClick={() => router.push(`/${locale}/student?edit=true`)}
+          onClick={() => router.push(profileRoute)}
           className="rounded-full border border-violet-300 bg-violet-100 px-4 py-1.5 text-sm font-semibold text-slate-700 hover:bg-violet-200 transition-colors"
         >
           프로필

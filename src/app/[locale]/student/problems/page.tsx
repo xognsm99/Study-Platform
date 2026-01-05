@@ -327,7 +327,9 @@ function StudentProblemsPageContent() {
   return (
     <StudentHomeShell>
       <div className="px-1 pt-3 pb-24">
-        <ScreenTitle>문제 PICK</ScreenTitle>
+        <div className="px-5 mb-6">
+          <ScreenTitle>문제 PICK</ScreenTitle>
+        </div>
 
         <ScreenCard>
             {/* 문제 유형 선택 */}
