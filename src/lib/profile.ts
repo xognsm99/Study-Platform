@@ -9,6 +9,7 @@ export type StudentProfile = {
   grade?: string | null;
   subject?: string | null;
   term?: string | null;
+  quiz_scope?: string | null; // 단어 퀴즈 출제 범위 (u1~u12, mid1, final1, mid2, final2, overall)
   updated_at?: string | null;
   created_at?: string | null;
 };
@@ -21,6 +22,7 @@ export type StudentProfileInput = {
   grade?: string | null;
   subject?: string | null;
   term?: string | null;
+  quiz_scope?: string | null; // 단어 퀴즈 출제 범위
 };
 
 /**
@@ -88,8 +90,14 @@ export async function upsertMyProfile(
     );
 
     if (error) {
-      console.error("[upsertMyProfile] error:", error);
-      return { success: false, error: error.message };
+      console.error("[upsertMyProfile] Full error object:", JSON.stringify(error, null, 2));
+      console.error("[upsertMyProfile] Error details:", {
+        message: error.message,
+        details: error.details,
+        hint: error.hint,
+        code: error.code
+      });
+      return { success: false, error: error.message || JSON.stringify(error) };
     }
 
     return { success: true };

@@ -40,7 +40,7 @@ export default function HomePage({
 
               <div className="mt-8 grid grid-cols-2 gap-3">
                 <Link
-                  href={`/${locale}/student`}
+                  href={`/${locale}/student/mode`}
                   className="group"
                   style={{
                     height: "55px",

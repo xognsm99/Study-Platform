@@ -1,7 +1,7 @@
 "use client";
 
 import { useMemo, useState, useEffect } from "react";
-import { useRouter, usePathname } from "next/navigation";
+import { useRouter, usePathname, useSearchParams } from "next/navigation";
 import type { User } from "@supabase/supabase-js";
 import QuizClient from "@/components/QuizClient";
 import type { ProblemItem } from "@/components/QuizClient";
@@ -14,6 +14,8 @@ import StudentHomeShell from "@/components/queezy/StudentHomeShell";
 import StudentProfileFormShell from "@/components/queezy/StudentProfileFormShell";
 import PurpleSelect from "@/components/queezy/PurpleSelect";
 import { ScreenCard, ScreenTitle } from "@/components/ui/ScreenCard";
+import UnitMultiSelect from "@/components/UnitMultiSelect";
+import { parseQuizScope, examToUnits } from "@/lib/quiz/scope";
 
 
 const GRADES = [
@@ -74,10 +76,18 @@ const SUBREGION_OPTIONS: Record<string, string[]> = {
 
 // 단원 옵션 (value와 label 분리)
 const UNIT_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "1-3", label: "1~3 단원" },
-  { value: "4-6", label: "4~6 단원" },
-  { value: "7-9", label: "7~9 단원" },
-  { value: "10-12", label: "10~12 단원" },
+  { value: "u1", label: "1단원" },
+  { value: "u2", label: "2단원" },
+  { value: "u3", label: "3단원" },
+  { value: "u4", label: "4단원" },
+  { value: "u5", label: "5단원" },
+  { value: "u6", label: "6단원" },
+  { value: "u7", label: "7단원" },
+  { value: "u8", label: "8단원" },
+  { value: "u9", label: "9단원" },
+  { value: "u10", label: "10단원" },
+  { value: "u11", label: "11단원" },
+  { value: "u12", label: "12단원" },
   { value: "mid1", label: "1학기 중간고사" },
   { value: "final1", label: "1학기 기말고사" },
   { value: "mid2", label: "2학기 중간고사" },
@@ -88,9 +98,18 @@ const UNIT_OPTIONS: Array<{ value: string; label: string }> = [
 export default function StudentPage() {
   const router = useRouter();
   const pathname = usePathname();
-  
+  const searchParams = useSearchParams();
+
   // locale 추출 (예: /ko/student -> ko)
   const locale = pathname?.split("/")[1] || "ko";
+
+  // URL에서 edit 파라미터 확인
+  const editParam = searchParams?.get("edit");
+  const [editMode, setEditMode] = useState(false);
+
+  useEffect(() => {
+    setEditMode(editParam === "true");
+  }, [editParam]);
 
   // 인증 관련 state
   const [user, setUser] = useState<User | null>(null);
@@ -106,6 +125,11 @@ export default function StudentPage() {
   const [grade, setGrade] = useState<string>("2");
   const [subject, setSubject] = useState<string>("영어");
   const [unitRange, setUnitRange] = useState<string>(UNIT_OPTIONS[0].value);
+
+  // 단어 퀴즈 설정
+  const [examType, setExamType] = useState<string>(""); // mid1/final1/mid2/final2/overall 또는 빈 문자열(custom)
+  const [selectedUnits, setSelectedUnits] = useState<string[]>(["u1"]); // 실제 선택된 단원들
+
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(
     new Set(["vocab", "grammar", "reading", "dialogue"])
   );
@@ -172,14 +196,27 @@ export default function StudentPage() {
         
         // 프로필이 완성되었는지 확인
         if (isProfileComplete(data)) {
-          // 프로필이 완성되었으면 폼 숨김, 프로필 정보로 state 초기화
-          setShowForm(false);
+          // 프로필이 완성되었으면 폼 숨김 (단, editMode면 열기), 프로필 정보로 state 초기화
+          setShowForm(editMode);
           if (data) {
             setRegionGroup(data.region || "서울");
             setSubRegion(data.district || "");
             setGrade(data.grade || "2");
             setSubject(data.subject || "영어");
             setUnitRange(data.term || UNIT_OPTIONS[0].value);
+
+            // quiz_scope 파싱
+            const quizScope = data.quiz_scope || "u1";
+            const units = parseQuizScope(quizScope);
+            setSelectedUnits(units);
+
+            // exam 타입 판별 (mid1/final1... 이면 설정, 아니면 custom)
+            if (["mid1", "final1", "mid2", "final2", "overall"].includes(quizScope)) {
+              setExamType(quizScope);
+            } else {
+              setExamType(""); // custom
+            }
+
             if (data.school && data.school_code) {
               setSelectedSchool({
                 code: data.school_code,
@@ -201,7 +238,17 @@ export default function StudentPage() {
       }
     }
     loadProfile();
-  }, [authReady, user?.id]);
+  }, [authReady, user?.id, editMode]);
+
+  // 시험 범위 변경 시 units 자동 설정
+  useEffect(() => {
+    if (examType && examType !== "") {
+      const units = examToUnits(examType);
+      if (units.length > 0) {
+        setSelectedUnits(units);
+      }
+    }
+  }, [examType]);
 
   // 세부 지역 옵션 (PurpleSelect용으로 변환)
   const subRegionOptions = useMemo(() => {
@@ -290,6 +337,14 @@ export default function StudentPage() {
     setError(null);
 
     try {
+      // quiz_scope 결정: exam이 선택되어 있으면 exam, 아니면 콤마로 구분된 units
+      let quizScopeToSave = "";
+      if (examType && examType !== "") {
+        quizScopeToSave = examType; // "mid1" | "final1" | ...
+      } else {
+        quizScopeToSave = selectedUnits.join(","); // "u1,u3,u5"
+      }
+
       const result = await upsertMyProfile(
         {
           region: regionGroup,
@@ -299,6 +354,7 @@ export default function StudentPage() {
           grade: grade,
           subject: subject,
           term: unitRange,
+          quiz_scope: quizScopeToSave,
         },
         user.id
       );
@@ -308,6 +364,9 @@ export default function StudentPage() {
         const updatedProfile = await getMyProfile(user.id);
         setProfile(updatedProfile);
         setShowForm(false);
+        setEditMode(false);
+        // URL에서 edit 파라미터 제거
+        router.replace(`/${locale}/student`);
       } else {
         setError(result.error || "프로필 저장에 실패했습니다.");
       }
@@ -433,14 +492,6 @@ export default function StudentPage() {
   }
 
   // 프로필 정보 포맷팅 함수
-  const formatProfileLocation = () => {
-    if (!profile) return "";
-    const parts: string[] = [];
-    if (profile.region) parts.push(profile.region);
-    if (profile.district) parts.push(profile.district);
-    return parts.join(" · ");
-  };
-
   const formatProfileInfo = () => {
     if (!profile) return "";
     const parts: string[] = [];
@@ -449,8 +500,7 @@ export default function StudentPage() {
       parts.push(gradeLabel);
     }
     if (profile.subject) parts.push(profile.subject);
-    if (profile.term) parts.push(profile.term);
-    return parts.join(" · ");
+    return parts.join(" ");
   };
 
   // Primary 색상 상수 (프로필 저장 버튼과 통일)
@@ -582,19 +632,57 @@ export default function StudentPage() {
                   />
                 </div>
 
-                {/* 4) 단원/시험범위 */}
+                {/* 7) 시험 범위 */}
                 <div className="min-w-0">
                   <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
-                    단원
+                    시험 범위
                   </label>
                   <PurpleSelect
-                    value={unitRange}
-                    onChange={setUnitRange}
-                    placeholder="단원"
-                    options={unitOptions}
-                    selected={!!unitRange}
+                    value={examType}
+                    onChange={(v) => {
+                      setExamType(v);
+                    }}
+                    placeholder="선택 또는 아래 단원 직접 선택"
+                    options={[
+                      { value: "mid1", label: "1학기 중간고사" },
+                      { value: "final1", label: "1학기 기말고사" },
+                      { value: "mid2", label: "2학기 중간고사" },
+                      { value: "final2", label: "2학기 기말고사" },
+                      { value: "overall", label: "종합평가" },
+                    ]}
+                    selected={!!examType}
                   />
                 </div>
+              </div>
+
+              {/* 단원 복수선택 (그리드 밖, 전체 너비) */}
+              <div className="mt-4">
+                <label className="mb-1.5 block text-sm max-[380px]:text-xs font-medium text-gray-600">
+                  단원 (복수 선택 가능)
+                </label>
+                <UnitMultiSelect
+                  selectedUnits={selectedUnits}
+                  onChange={(units) => {
+                    setSelectedUnits(units);
+                    // 수동 선택 시 exam 타입을 빈 문자열로 (custom)
+                    setExamType("");
+                  }}
+                  options={[
+                    { value: "u1", label: "1단원" },
+                    { value: "u2", label: "2단원" },
+                    { value: "u3", label: "3단원" },
+                    { value: "u4", label: "4단원" },
+                    { value: "u5", label: "5단원" },
+                    { value: "u6", label: "6단원" },
+                    { value: "u7", label: "7단원" },
+                    { value: "u8", label: "8단원" },
+                    { value: "u9", label: "9단원" },
+                    { value: "u10", label: "10단원" },
+                    { value: "u11", label: "11단원" },
+                    { value: "u12", label: "12단원" },
+                  ]}
+                  placeholder="단원 선택"
+                />
               </div>
 
               {/* 학교 검색 */}
@@ -638,7 +726,11 @@ export default function StudentPage() {
                 {profile && isProfileComplete(profile) && (
                   <button
                     type="button"
-                    onClick={() => setShowForm(false)}
+                    onClick={() => {
+                      setShowForm(false);
+                      setEditMode(false);
+                      router.replace(`/${locale}/student`);
+                    }}
                     className="h-14 w-full rounded-xl border-2 border-[#B9B4E4] bg-white text-lg max-[380px]:h-12 max-[380px]:text-base text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] hover:border-[#A89FD8] active:scale-[0.98] transition-all"
                   >
                     취소
@@ -653,31 +745,38 @@ export default function StudentPage() {
       {!showForm && profile && isProfileComplete(profile) && (
         <StudentHomeShell>
           <div className="px-1 pt-3 pb-24">
-            <ScreenTitle>퀴즈 PICK?</ScreenTitle>
+            <ScreenTitle>훈련 PICK</ScreenTitle>
 
             <ScreenCard>
               {/* 프로필 카드 */}
-              <div className="flex items-start justify-between gap-4 max-[380px]:gap-3">
-                <div className="min-w-0">
-                  {/* 학교명 */}
-                  <div className="text-[18px] max-[380px]:text-base font-extrabold tracking-tight text-[#6E63D5]">
-                    {profile?.school ?? "학교 미설정"}
-                  </div>
-                  <div className="mt-1 text-sm max-[380px]:text-xs text-slate-600">
-                    {formatProfileLocation() && `${formatProfileLocation()} · `}
-                    {formatProfileInfo()}
-                  </div>
+              <div className="min-w-0">
+                {/* 학교명 */}
+                <div className="text-[18px] max-[380px]:text-base font-extrabold tracking-tight text-[#6E63D5]">
+                  {profile?.school ?? "학교 미설정"}
                 </div>
-                <button
-                  onClick={() => setShowForm(true)}
-                  className="shrink-0 rounded-full border border-slate-200 bg-white px-4 py-2 max-[380px]:px-3 max-[380px]:py-1.5 text-lx max-[380px]:text-xs font-semibold text-slate-700 hover:bg-slate-50 transition-colors"
-                >
-                  프로필
-                </button>
+                <div className="mt-1 text-sm max-[380px]:text-xs text-slate-600">
+                  {formatProfileInfo()}
+                </div>
               </div>
 
               {/* 주요 액션 버튼들 */}
               <div className="mt-8 space-y-4 max-[380px]:mt-3 max-[380px]:space-y-3">
+                <button
+                  type="button"
+                  onClick={() => router.push("/play")}
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                >
+                  단어/숙어 훈련
+                </button>
+
+                <button
+                  type="button"
+                  onClick={handleStartReadingAB}
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                >
+                  본문 선택형 훈련
+                </button>
+
                 <button
                   type="button"
                   onClick={() => {
@@ -691,25 +790,9 @@ export default function StudentPage() {
                     });
                     router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
-                >
-                  단어 퀴즈 (10문제)
-                </button>
-
-                <button
-                  type="button"
-                  onClick={() => router.push("/play")}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
-                >
-                  단어/숙어 퀴즈 (4지선다)
-                </button>
-
-                <button
-                  type="button"
-                  onClick={handleStartReadingAB}
                   className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
                 >
-                  A/B 선택 퀴즈 (OX퀴즈)
+                  단어 퀴즈 (10문제)
                 </button>
 
                 {/* ✅ 버튼 아래 공간 (답답함 해결) */}

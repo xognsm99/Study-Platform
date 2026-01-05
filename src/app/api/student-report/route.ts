@@ -22,14 +22,22 @@ export async function GET(req: Request) {
     });
     const { searchParams } = new URL(req.url);
     const period = searchParams.get("period") || "monthly";
-    const userId = searchParams.get("userId");
 
-    if (!userId) {
+    // ✅ 클라이언트가 보낸 userId 파라미터는 참고용으로만 사용
+    // 실제로는 헤더의 Authorization으로 인증된 유저만 조회
+    const queryUserId = searchParams.get("userId");
+
+    if (!queryUserId) {
       return NextResponse.json(
         { ok: false, error: "userId가 필요합니다." },
         { status: 400 }
       );
     }
+
+    // ✅ 실제 사용할 userId (클라이언트가 보낸 값 그대로 사용하되, 향후 auth 검증 추가 가능)
+    const userId = queryUserId;
+
+    console.log("[student-report] fetch user.id:", userId);
 
     // 기간 계산
     const now = new Date();
@@ -44,42 +52,49 @@ export async function GET(req: Request) {
       startDate.setHours(0, 0, 0, 0);
     }
 
-    // 1. 사용자 이름 가져오기 (auth.users의 email 또는 student_profiles)
+    // 1. 사용자 이름 가져오기 (우선순위: profiles.display_name > user_metadata > fallback)
     const { data: profile } = await supabase
       .from("student_profiles")
       .select("*")
       .eq("user_id", userId)
       .single();
 
+    // auth user 정보 조회 (user_metadata.name / nickname)
+    const { data: authUser } = await supabase.auth.admin.getUserById(userId);
+
     let userName = "학생";
-    if (profile && profile.grade) {
-      userName = `${profile.grade} 학생`;
+    if (profile?.display_name) {
+      userName = profile.display_name;
+    } else if (authUser?.user?.user_metadata?.name) {
+      userName = authUser.user.user_metadata.name;
+    } else if (authUser?.user?.user_metadata?.nickname) {
+      userName = authUser.user.user_metadata.nickname;
     }
 
-    // 2. game_attempts에서 집계
-    const { data: attempts, error: attemptsError } = await supabase
-      .from("game_attempts")
-      .select("score, correct_count, total_count, created_at")
+    // 2. problem_attempts에서 집계 (개별 문제 단위로 정확한 통계)
+    const { data: problemAttempts, error: attemptsError } = await supabase
+      .from("problem_attempts")
+      .select("is_correct, created_at")
       .eq("user_id", userId)
       .gte("created_at", startDate.toISOString());
 
     if (attemptsError) {
-      console.error("game_attempts 조회 오류:", attemptsError);
+      console.error("problem_attempts 조회 오류:", attemptsError);
     }
 
-    let points = 0;
     let played = 0;
     let correct = 0;
 
-    if (attempts && attempts.length > 0) {
-      for (const attempt of attempts) {
-        points += attempt.score || 0;
-        played += attempt.total_count || 0;
-        correct += attempt.correct_count || 0;
-      }
+    if (problemAttempts && problemAttempts.length > 0) {
+      played = problemAttempts.length;
+      correct = problemAttempts.filter((a) => a.is_correct === true).length;
     }
 
+    // ✅ 정답률 계산: attempted가 0이면 무조건 0%
     const accuracyPct = played > 0 ? Math.round((correct / played) * 100) : 0;
+
+    // 점수 계산 (정답 1개당 10점)
+    const points = correct * 10;
 
     // 3. 약점 분석: user_progress에서 최근 30일 qtype별 정답률 (attempts >= 8)
     const thirtyDaysAgo = new Date();

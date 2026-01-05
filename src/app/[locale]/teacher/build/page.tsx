@@ -42,10 +42,23 @@ function TeacherBuildPageContent() {
   const unit = (sp.get("unit") ?? "") as string;
 
   const unitLabel =
-    unit === "1-3" ? "1~3 단원" :
-    unit === "4-6" ? "4~6 단원" :
-    unit === "7-9" ? "7~9 단원" :
-    unit === "10-12" ? "10~12 단원" :
+    unit === "u1" ? "1단원" :
+    unit === "u2" ? "2단원" :
+    unit === "u3" ? "3단원" :
+    unit === "u4" ? "4단원" :
+    unit === "u5" ? "5단원" :
+    unit === "u6" ? "6단원" :
+    unit === "u7" ? "7단원" :
+    unit === "u8" ? "8단원" :
+    unit === "u9" ? "9단원" :
+    unit === "u10" ? "10단원" :
+    unit === "u11" ? "11단원" :
+    unit === "u12" ? "12단원" :
+    unit === "mid1" ? "1학기 중간고사" :
+    unit === "final1" ? "1학기 기말고사" :
+    unit === "mid2" ? "2학기 중간고사" :
+    unit === "final2" ? "2학기 기말고사" :
+    unit === "overall" ? "종합평가" :
     unit ? unit : "종합평가";
 
   const [selVocab, setSelVocab] = useState(true);

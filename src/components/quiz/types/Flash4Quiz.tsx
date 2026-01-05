@@ -302,7 +302,7 @@ export default function Flash4Quiz({
                         <motion.button
                           onClick={() => handleSelect(index)}
                           disabled={showFeedback}
-                          className={`h-14 w-full rounded-2xl text-[15px] font-semibold border transition-all relative overflow-hidden ${
+                          className={`h-[80px] w-full rounded-2xl text-[15px] font-semibold border transition-all relative overflow-hidden px-5 ${
                             showResult
                               ? isCorrect
                                 ? "bg-gradient-to-br from-green-400 to-green-600 border-green-300 text-white shadow-[0_0_18px_rgba(34,197,94,0.45)]"
@@ -314,8 +314,8 @@ export default function Flash4Quiz({
                           whileHover={!showFeedback ? { scale: 1.03 } : {}}
                           whileTap={!showFeedback ? { scale: 0.97 } : {}}
                         >
-                          <div className="relative flex items-center justify-center gap-2 px-3">
-                            <span className="font-bold">{choice}</span>
+                          <div className="relative flex items-center justify-center gap-2 h-full">
+                            <span className="font-bold break-keep leading-tight">{choice}</span>
                             {showResult && (
                               <motion.span
                                 initial={{ scale: 0, rotate: -180 }}

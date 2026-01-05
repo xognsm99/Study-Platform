@@ -75,6 +75,8 @@ export default function StudentReportPage() {
           return;
         }
 
+        console.log("[setup] user.id:", user.id);
+
         const res = await fetch(`/api/student-report?userId=${user.id}&period=${period}`);
         const json = await res.json();
 
@@ -140,7 +142,7 @@ export default function StudentReportPage() {
         <div className="mx-auto w-full max-w-md">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-              학습 리포트(준비중)
+               리포트 PICK
             </h1>
           </div>
           <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
@@ -158,7 +160,7 @@ export default function StudentReportPage() {
         <div className="mx-auto w-full max-w-md">
           <div className="flex items-center justify-between">
             <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-              학습 리포트(준비중)
+              리포트 PICK
             </h1>
           </div>
           <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
@@ -181,7 +183,7 @@ export default function StudentReportPage() {
         {/* Header */}
         <div className="flex items-center justify-between">
           <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-            학습 리포트(준비중)
+            리포트 PICK
           </h1>
 
           <button

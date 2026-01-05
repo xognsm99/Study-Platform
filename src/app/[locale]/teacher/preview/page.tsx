@@ -181,10 +181,23 @@ function TeacherPreviewPageContent() {
   const subject = sp.get("subject") ?? "";
   const unitRaw = sp.get("unit") ?? "";
   const unitLabel =
-    unitRaw === "1-3" ? "1~3 단원" :
-    unitRaw === "4-6" ? "4~6 단원" :
-    unitRaw === "7-9" ? "7~9 단원" :
-    unitRaw === "10-12" ? "10~12 단원" :
+    unitRaw === "u1" ? "1단원" :
+    unitRaw === "u2" ? "2단원" :
+    unitRaw === "u3" ? "3단원" :
+    unitRaw === "u4" ? "4단원" :
+    unitRaw === "u5" ? "5단원" :
+    unitRaw === "u6" ? "6단원" :
+    unitRaw === "u7" ? "7단원" :
+    unitRaw === "u8" ? "8단원" :
+    unitRaw === "u9" ? "9단원" :
+    unitRaw === "u10" ? "10단원" :
+    unitRaw === "u11" ? "11단원" :
+    unitRaw === "u12" ? "12단원" :
+    unitRaw === "mid1" ? "1학기 중간고사" :
+    unitRaw === "final1" ? "1학기 기말고사" :
+    unitRaw === "mid2" ? "2학기 중간고사" :
+    unitRaw === "final2" ? "2학기 기말고사" :
+    unitRaw === "overall" ? "종합평가" :
     unitRaw ? unitRaw : "종합평가";
 
   useEffect(() => {

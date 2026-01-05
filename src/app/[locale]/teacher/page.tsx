@@ -16,10 +16,18 @@ const SUBJECTS = [
 ];
 
 const UNIT_OPTIONS: Array<{ value: string; label: string }> = [
-  { value: "1-3", label: "1~3 단원" },
-  { value: "4-6", label: "4~6 단원" },
-  { value: "7-9", label: "7~9 단원" },
-  { value: "10-12", label: "10~12 단원" },
+  { value: "u1", label: "1단원" },
+  { value: "u2", label: "2단원" },
+  { value: "u3", label: "3단원" },
+  { value: "u4", label: "4단원" },
+  { value: "u5", label: "5단원" },
+  { value: "u6", label: "6단원" },
+  { value: "u7", label: "7단원" },
+  { value: "u8", label: "8단원" },
+  { value: "u9", label: "9단원" },
+  { value: "u10", label: "10단원" },
+  { value: "u11", label: "11단원" },
+  { value: "u12", label: "12단원" },
   { value: "mid1", label: "1학기 중간고사" },
   { value: "final1", label: "1학기 기말고사" },
   { value: "mid2", label: "2학기 중간고사" },

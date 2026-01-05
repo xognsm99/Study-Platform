@@ -1,38 +1,77 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useMemo } from "react";
-import { buildGameSet } from "@/lib/quiz/mockGameSet";
+import { useState, useEffect } from "react";
+import { supabaseBrowser } from "@/lib/supabase-browser";
+import { getMyProfile } from "@/lib/profile";
+import { parseQuizScope } from "@/lib/quiz/scope";
 
 type Props = {
   seed?: string;
 };
 
+const TOTAL_QUESTIONS = 10;
+
 export default function PlayClient({ seed }: Props) {
   const router = useRouter();
+  const [loading, setLoading] = useState(false);
+  const [userId, setUserId] = useState<string | null>(null);
+
+  // 사용자 인증 확인
+  useEffect(() => {
+    async function checkAuth() {
+      const supabase = supabaseBrowser();
+      const { data: { user } } = await supabase.auth.getUser();
+      setUserId(user?.id ?? null);
+    }
+    checkAuth();
+  }, []);
 
   // TODO: 개발 중 검증용 - 배포 전 제거
   console.log("[PLAY seed]", seed ?? "today");
 
-  const gameSet = useMemo(() => {
-    const set = buildGameSet(seed);
-    // TODO: 개발 중 검증용 - 배포 전 제거
-    if (set.items.length > 0) {
-      const first = set.items[0];
-      if (first.type === "flash4") {
-        console.log("[PLAY first question]", first.payload.focusWord, first.payload.choices[0]);
-      }
-    }
-    return set;
-  }, [seed]);
+  const handleStart = async () => {
+    if (loading) return;
+    setLoading(true);
 
-  const handleStart = () => {
-    // 세션 시작: 게임 세트를 session storage에 저장하고 세션 페이지로 이동
-    if (typeof window !== "undefined") {
-      sessionStorage.setItem("currentGameSet", JSON.stringify(gameSet));
-      sessionStorage.setItem("gameSessionStartTime", Date.now().toString());
+    try {
+      // 프로필에서 quiz_scope 읽기
+      const profile = await getMyProfile(userId ?? undefined);
+      const quizScope = profile?.quiz_scope || "u1";
+
+      // quiz_scope 파싱 (시험범위 또는 콤마로 구분된 units)
+      const units = parseQuizScope(quizScope);
+      const unitsParam = units.join(",");
+
+      const seedKey = seed ?? "today";
+
+      const res = await fetch(
+        `/api/play/game-set?units=${encodeURIComponent(unitsParam)}&n=${TOTAL_QUESTIONS}&seed=${encodeURIComponent(seedKey)}`,
+        { cache: "no-store" }
+      );
+
+      if (!res.ok) {
+        const errorData = await res.json().catch(() => ({ error: "알 수 없는 오류" }));
+        alert(errorData.error || "게임셋 생성 실패");
+        return;
+      }
+
+      const gameSet = await res.json();
+
+      // 세션 시작: 게임 세트를 session storage에 저장하고 세션 페이지로 이동
+      if (typeof window !== "undefined") {
+        sessionStorage.removeItem("currentGameSet");
+        sessionStorage.removeItem("gameSessionStartTime");
+        sessionStorage.setItem("currentGameSet", JSON.stringify(gameSet));
+        sessionStorage.setItem("gameSessionStartTime", Date.now().toString());
+      }
+
+      router.push("/play/session");
+    } catch (e: any) {
+      alert("게임 시작 실패: " + (e?.message ?? "Unknown error"));
+    } finally {
+      setLoading(false);
     }
-    router.push("/play/session");
   };
 
   return (
@@ -52,8 +91,6 @@ export default function PlayClient({ seed }: Props) {
             >
               ← 뒤로가기
             </button>
-
-
           </div>
 
           <h1 className="text-center text-[24px] font-extrabold tracking-tight text-[#1F1B3A]">
@@ -67,7 +104,9 @@ export default function PlayClient({ seed }: Props) {
           <div className="mt-5 grid grid-cols-2 gap-1">
             <div className="rounded-2xl bg-[#F6F5FF] px-4 py-3 text-center">
               <div className="text-xs text-[#6B66A3]">총 문제</div>
-              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">{gameSet.items.length}문제</div>
+              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">
+                {TOTAL_QUESTIONS}문제
+              </div>
             </div>
             <div className="rounded-2xl bg-[#F6F5FF] px-4 py-3 text-center">
               <div className="text-xs text-[#6B66A3]">예상 소요 시간</div>
@@ -78,9 +117,10 @@ export default function PlayClient({ seed }: Props) {
           {/* CTA */}
           <button
             onClick={handleStart}
-            className="mt-6 w-full rounded-2xl bg-[#6E63D5] py-4 text-xl font-extrabold text-white shadow-[0_14px_30px_rgba(110,99,213,0.35)] transition hover:brightness-105 active:scale-[0.99]"
+            disabled={loading}
+            className="mt-6 w-full rounded-2xl bg-[#6E63D5] py-4 text-xl font-extrabold text-white shadow-[0_14px_30px_rgba(110,99,213,0.35)] transition hover:brightness-105 active:scale-[0.99] disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            START
+            {loading ? "불러오는 중..." : "START"}
           </button>
 
           <p className="mt-4 text-center text-xs text-[#6B66A3]">

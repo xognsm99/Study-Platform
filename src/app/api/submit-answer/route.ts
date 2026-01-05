@@ -50,7 +50,8 @@ export async function POST(req: Request) {
       console.error("[submit-answer] 문제 조회 실패:", pErr);
     } else {
       answerIndex = (problem.content as any).answerIndex as number;
-      isCorrect = selectedIndex === answerIndex;
+      // ✅ selectedIndex가 null/undefined면 무조건 오답 처리
+      isCorrect = selectedIndex != null && selectedIndex === answerIndex;
 
       // ✅ 로그인한 사용자에 대해서만 진행률/통계 저장
       if (userId) {
