@@ -157,7 +157,7 @@ export default function VocabGamePage() {
 
           <div className="text-[20px] font-bold tracking-tight flex items-center gap-2">
             <span className="text-2xl">✍️</span>
-            서술형 대비
+            서술형 대비 훈련
           </div>
 
           <div className="text-sm font-semibold bg-white/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
@@ -220,6 +220,8 @@ export default function VocabGamePage() {
             placeholder="답을 입력하세요"
             className={[
               "w-full px-4 py-3.5 rounded-xl border-2 text-base font-medium transition-all",
+                !isChecked ? "text-[#4B2BBE]" : "", // ✅ 입력 텍스트 찐보라
+              "placeholder:text-slate-400 placeholder:font-semibold",
               isChecked
                 ? isCorrect
                   ? "border-green-400 bg-green-50 text-green-700"

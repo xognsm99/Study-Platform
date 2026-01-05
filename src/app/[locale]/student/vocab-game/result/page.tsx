@@ -58,7 +58,7 @@ function ResultContent() {
           </button>
 
           <div className="text-[18px] md:text-[24px] font-semibold tracking-tight">
-            단어 게임 퀴즈 결과
+            서술형 훈련 결과
           </div>
 
           <div className="w-16"></div>
