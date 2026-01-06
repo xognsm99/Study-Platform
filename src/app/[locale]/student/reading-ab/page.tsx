@@ -51,7 +51,7 @@ export default function ReadingABPage() {
   const passages: QuizPassage[] = useMemo(
     () => [
       {
-        title: "본문 퀴즈 1",
+        title: "본문 선택",
         lines: [
           [t("Hello! I’m Somin.")],
           [
@@ -78,7 +78,7 @@ export default function ReadingABPage() {
         ],
       },
       {
-        title: "본문 퀴즈 2",
+        title: "본문 선택",
         lines: [
           [
             t("Hi, my name is Diego, and I live "),
@@ -136,7 +136,7 @@ export default function ReadingABPage() {
         ],
       },
       {
-        title: "본문 퀴즈 3",
+        title: "본문 선택",
         lines: [
           [
             t("Hi! My name is Tabin, and I live "),
@@ -191,7 +191,7 @@ export default function ReadingABPage() {
         ],
       },
       {
-        title: "본문 퀴즈 4",
+        title: "본문 선택",
         lines: [
           [
             t("Hi! I’m Musa, and I live "),
@@ -297,21 +297,22 @@ export default function ReadingABPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#E2E0F7] px-4 py-6">
+    <div className="min-h-screen bg-[#F5F3FF] px-4 py-6">
+
       <div className="mx-auto w-full max-w-[420px]">
         {/* 헤더 */}
-        <div className="mb-4 flex items-center justify-between text-[#2B245A]">
+        <div className="mb-4 flex items-center justify-between text-[#6E63D5]">
           <button onClick={() => router.back()} className="text-[#2B245A]/80">
             ← 뒤로가기
           </button>
-          <div className="font-bold">본문 선택 퀴즈</div>
-          <div className="w-[70px]" />
+          <div className="text-xl font-semibold">본문 선택형 훈련</div>
+          <div className="w-[80px]" />
         </div>
 
         {/* 카드(스크롤 없이 보이도록 설계: 페이지를 짧게 쪼개서 보여줌) */}
         <div className="rounded-[28px] bg-white/95 p-5 shadow-[0_18px_60px_rgba(22,16,60,0.18)]">
           <div className="mb-3 flex items-center justify-between">
-            <div className="text-[#2B245A] font-extrabold text-[16px]">{page.title}</div>
+            <div className="text-[#2B245Z] font-xs text-[14px]">{page.title}</div>
             <div className="text-xs text-slate-500">
               {pageIndex + 1} / {pages.length}
             </div>
@@ -329,7 +330,11 @@ export default function ReadingABPage() {
                       value={answers[seg.value.id]}
                       onChange={(v) => {
                         if (checked) return; // ✅ 검사 후에는 고정
-                        setAnswers((prev) => ({ ...prev, [seg.value.id]: v }));
+                        setAnswers((prev) => {
+                          const next = { ...prev };
+                          next[seg.value.id] = v;
+                          return next;
+                        });
                       }}
                       checked={checked}
                     />
@@ -356,7 +361,7 @@ export default function ReadingABPage() {
                 : "bg-[#6E63D5] text-white hover:bg-[#584FAA] active:bg-[#4D4595]",
             ].join(" ")}
           >
-            {!checked ? "검사 보기" : pageIndex === pages.length - 1 ? "완료" : "다음 단락 →"}
+            {!checked ? "정답 보기" : pageIndex === pages.length - 1 ? "완료" : "다음 단락 →"}
           </button>
 
           {!allAnswered && (
@@ -393,19 +398,19 @@ function ChoiceBlank({
       <span className="inline-flex items-center gap-1 rounded-lg border-2 border-[#D9D5F6] bg-[#F3F1FF] px-2 py-1">
         {[0, 1].map((i) => {
           const optIndex = i as 0 | 1;
-          const isSelected = selected === optIndex;
+          const isSelected = value === optIndex;
 
           return (
             <button
               key={optIndex}
               type="button"
-              onClick={() => onChange(optIndex)}
+              onClick={() => !checked && onChange(optIndex)}
               className={[
-                "inline-flex items-center gap-1 rounded-md px-2 py-[3px] text-[13px] leading-none transition-all",
+                "inline-flex items-center gap-1 rounded-md px-2 py-[3px] text-[13px] leading-none",
                 isSelected
                   ? "bg-[#6E63D5] text-white font-bold border-2 border-[#6E63D5] shadow-sm"
                   : "bg-white/60 text-[#2B245A]/70 border-2 border-transparent",
-                checked ? "cursor-default" : "hover:bg-white/80 hover:border-[#D9D5F6]",
+                checked ? "cursor-default" : "",
               ].join(" ")}
             >
               <span>{blank.options[optIndex]}</span>

@@ -93,24 +93,24 @@ export default function PlayClient({ seed }: Props) {
             </button>
           </div>
 
-          <h1 className="text-center text-[24px] font-extrabold tracking-tight text-[#1F1B3A]">
-            몸풀기 단어 퀴즈
+          <h1 className="text-center text-[24px] font-semibold tracking-tight text-[#6E63D5]">
+            단어/숙어 훈련
           </h1>
           <p className="mt-2 text-center text-sm text-[#6B66A3]">
-            문제 풀기전 단어 먼저 익히자
+            선택한 단원의 단어들만 PICK
           </p>
 
           {/* 정보칩 */}
           <div className="mt-5 grid grid-cols-2 gap-1">
             <div className="rounded-2xl bg-[#F6F5FF] px-4 py-3 text-center">
               <div className="text-xs text-[#6B66A3]">총 문제</div>
-              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">
+              <div className="mt-1 text-lg font-semibold text-[#2A2457]">
                 {TOTAL_QUESTIONS}문제
               </div>
             </div>
             <div className="rounded-2xl bg-[#F6F5FF] px-4 py-3 text-center">
               <div className="text-xs text-[#6B66A3]">예상 소요 시간</div>
-              <div className="mt-1 text-lg font-extrabold text-[#2A2457]">약 1분</div>
+              <div className="mt-1 text-lg font-semibold text-[#2A2457]">약 1분</div>
             </div>
           </div>
 
@@ -124,7 +124,7 @@ export default function PlayClient({ seed }: Props) {
           </button>
 
           <p className="mt-4 text-center text-xs text-[#6B66A3]">
-            퀴즈를 완료하면 결과를 확인 할 수 있습니다
+            완료 후 훈련 결과를 확인 할 수 있습니다
           </p>
         </div>
       </div>

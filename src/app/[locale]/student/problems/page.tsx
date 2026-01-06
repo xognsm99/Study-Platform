@@ -9,6 +9,7 @@ import { supabaseBrowser } from "@/lib/supabase-browser";
 import StudentHomeShell from "@/components/queezy/StudentHomeShell";
 import { ScreenCard, ScreenTitle } from "@/components/ui/ScreenCard";
 
+
 const GROUPS = [
   { key: "vocab", label: "어휘" },
   { key: "grammar", label: "문법" },
@@ -57,7 +58,7 @@ function StudentProblemsPageContent() {
   const [grade, setGrade] = useState<string>("2");
   const [unitRange, setUnitRange] = useState<string>(UNIT_OPTIONS[0].value);
   const [selectedGroups, setSelectedGroups] = useState<Set<string>>(
-    new Set(["vocab", "grammar", "reading", "dialogue"])
+    new Set([])
   );
   const [started, setStarted] = useState(false);
   const [loading, setLoading] = useState(false);
@@ -339,24 +340,24 @@ function StudentProblemsPageContent() {
                   문제 유형 선택
                 </div>
                 <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
-                  {GROUPS.map((group) => (
-                    <label
-                      key={group.key}
-                      className={`flex items-center gap-2 max-[380px]:gap-1.5 rounded-2xl border bg-white px-5 py-3 max-[380px]:px-3 max-[380px]:py-1.5 cursor-pointer transition-colors ${
-                        selectedGroups.has(group.key)
-                          ? "border-[#6E63D5] bg-[#F0EFFF] hover:bg-[#E6E2FF]"
-                          : "border-[#E6E2FF] hover:border-[#B9B4E4] hover:bg-[#F0EFFF]"
-                      }`}
-                    >
-                      <input
-                        type="checkbox"
-                        checked={selectedGroups.has(group.key)}
-                        onChange={() => handleGroupToggle(group.key)}
-                        className="h-8 w-4 max-[380px]:h-3.5 max-[380px]:w-3.5 rounded border-gray-300 accent-[#B9B4E4] focus:ring-[#B9B4E4] focus:ring-2 focus:ring-offset-0"
-                      />
-                      <span className="text-lg max-[380px]:text-xs font-medium text-slate-800">{group.label}</span>
-                    </label>
-                  ))}
+                  {GROUPS.map((group) => {
+                    const isSelected = selectedGroups.has(group.key);
+                    return (
+                      <button
+                        key={group.key}
+                        type="button"
+                        onClick={() => handleGroupToggle(group.key)}
+                        aria-pressed={isSelected}
+                        className={`w-full rounded-2xl border px-5 py-4 max-[380px]:px-3 max-[380px]:py-2.5 transition-all active:scale-[0.99] ${
+                          isSelected
+                            ? "border-[#6E63D5] bg-[#F0EFFF] text-[#2A2457] shadow-[0_8px_20px_rgba(110,99,213,0.18)]"
+                            : "border-[#E6E2FF] bg-white text-slate-700 hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                        }`}
+                      >
+                        <span className="text-lg max-[380px]:text-xs font-semibold">{group.label}</span>
+                      </button>
+                    );
+                  })}
                 </div>
               </div>
             </div>

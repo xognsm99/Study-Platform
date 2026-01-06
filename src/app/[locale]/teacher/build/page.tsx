@@ -184,90 +184,70 @@ function TeacherBuildPageContent() {
 
           </div>
 
-          <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
-            <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+          <div className="grid grid-cols-2 gap-2 max-[380px]:gap-2">
+            <button
+              type="button"
+              onClick={() => setSelVocab(!selVocab)}
+              aria-pressed={selVocab}
+              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selVocab
-                  ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
-                  : "bg-white border-[#CFC8FF] text-[#2D2368]"
+                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
+                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
               }`}
             >
-              <span className="w-8 flex items-center justify-start">
-                <input
-                  type="checkbox"
-                  className="h-5 w-5 accent-[#6E63D5]"
-                  checked={selVocab}
-                  onChange={(e) => setSelVocab(e.target.checked)}
-                />
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+                어 휘
               </span>
-              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
-                어휘
-              </span>
-            </label>
+            </button>
 
-            <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+            <button
+              type="button"
+              onClick={() => setSelGrammar(!selGrammar)}
+              aria-pressed={selGrammar}
+              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selGrammar
-                  ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
-                  : "bg-white border-[#CFC8FF] text-[#2D2368]"
+                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
+                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
               }`}
             >
-              <span className="w-8 flex items-center justify-start">
-                <input
-                  type="checkbox"
-                  className="h-5 w-5 accent-[#6E63D5]"
-                  checked={selGrammar}
-                  onChange={(e) => setSelGrammar(e.target.checked)}
-                />
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+                문 법
               </span>
-              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
-                문법
-              </span>
-            </label>
+            </button>
 
-            <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+            <button
+              type="button"
+              onClick={() => setSelReading(!selReading)}
+              aria-pressed={selReading}
+              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selReading
-                  ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
-                  : "bg-white border-[#CFC8FF] text-[#2D2368]"
+                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
+                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
               }`}
             >
-              <span className="w-8 flex items-center justify-start">
-                <input
-                  type="checkbox"
-                  className="h-5 w-5 accent-[#6E63D5]"
-                  checked={selReading}
-                  onChange={(e) => setSelReading(e.target.checked)}
-                />
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+                본 문
               </span>
-              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
-                본문
-              </span>
-            </label>
+            </button>
 
-            <label
-              className={`h-12 max-[380px]:h-10 rounded-2xl px-5 border-2 flex items-center gap-2 text-sm max-[380px]:text-xs font-semibold shadow-[0_10px_22px_rgba(110,99,213,0.12)] cursor-pointer select-none transition-colors ${
+            <button
+              type="button"
+              onClick={() => setSelDialogue(!selDialogue)}
+              aria-pressed={selDialogue}
+              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selDialogue
-                  ? "bg-[#F0EEFF] border-[#6E63D5] text-[#2D2368]"
-                  : "bg-white border-[#CFC8FF] text-[#2D2368]"
+                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
+                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
               }`}
             >
-              <span className="w-8 flex items-center justify-start">
-                <input
-                  type="checkbox"
-                  className="h-5 w-5 accent-[#6E63D5]"
-                  checked={selDialogue}
-                  onChange={(e) => setSelDialogue(e.target.checked)}
-                />
-              </span>
-              <span className="flex-1 text-center text-lg font-semibold text-[#2E2A6A] leading-none">
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
                 대화문
               </span>
-            </label>
+            </button>
           </div>
 
           <div className="mt-2 rounded-2xl bg-violet-50 px-4 py-3 text-sm">
-            <div className="text-gray-600 mb-2">자동 분배(총 {total}문항)</div>
+            <div className="text-gray-600 mb-2">선택 / 자동 분배(총 {total}문항)</div>
             <div className="grid grid-cols-2 gap-2 text-gray-900">
               <div>어휘: <b>{plan.vocabulary}</b></div>
               <div>문법: <b>{plan.grammar}</b></div>
@@ -290,7 +270,7 @@ function TeacherBuildPageContent() {
             </div>
           )}
 
-          <div className="mt-6 grid gap-5 max-[380px]:gap-2">
+          <div className="mt-6 grid gap-3 max-[380px]:gap-2">
             {/* ✅ 종합평가: 시험지 비율 고정 */}
             <button
               onClick={() => onCompose("overall")}

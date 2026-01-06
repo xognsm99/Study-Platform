@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter, usePathname, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import { DEFAULT_QUIZ_SIZE } from "@/lib/utils/constants";
 import ResultCard from "./ResultCard";
 import { buildExamTitle } from "@/lib/utils/exam";
@@ -550,7 +551,8 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
           {current.choices.map((c, i) => {
             const isAnswer = i === current.answerIndex;
             const isSelected = i === selected;
-            const base = "w-full rounded-xl border px-4 py-3 text-left text-sm transition";
+            const isCorrect = i === current.answerIndex;
+            const base = "w-full rounded-xl border px-4 py-3 text-left text-sm transition relative";
             const state = !submitted
               ? "hover:bg-gray-50 cursor-pointer"
               : isAnswer
@@ -569,6 +571,16 @@ export default function SingleQuizClient({ grade, subject, category, initialProb
               >
                 <span className="mr-2 inline-block w-5 text-xs text-gray-500">{i + 1}.</span>
                 {c}
+                {isSelected && submitted && (
+                  <Image
+                    src={isCorrect ? "/marks/circle.png" : "/marks/x.png"}
+                    alt=""
+                    width={260}
+                    height={180}
+                    className="pointer-events-none absolute z-20 left-1/2 top-[48%] w-[240px] -translate-x-1/2 -translate-y-[55%] rotate-[-10deg] opacity-95"
+                    priority
+                  />
+                )}
               </button>
             );
           })}
