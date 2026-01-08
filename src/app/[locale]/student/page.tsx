@@ -790,10 +790,22 @@ export default function StudentPage() {
                     });
                     router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all
+                             bg-gradient-to-r from-[#BEB7FF] to-[#D7D3FF] text-[#4E43C8]
+                             shadow-[0_10px_22px_rgba(110,99,213,0.18)]
+                             hover:from-[#B1A9FF] hover:to-[#CBC6FF] hover:shadow-[0_14px_28px_rgba(110,99,213,0.25)]
+                             disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+
                 >
-                  단어 퀴즈 (10문제)
+                  서술형 대비 훈련
                 </button>
+                <button
+                   onClick={() => router.push(`/${locale}/student/reading-ab2`)}
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+>
+                  문장 배열 훈련
+                </button>
+
 
                 {/* ✅ 버튼 아래 공간 (답답함 해결) */}
                 <div className="h-3" />

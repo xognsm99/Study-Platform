@@ -1,53 +1,51 @@
-"use client";
+type Props = {
+  answer: string;        // 정답(= correctAnswer랑 같은 값이 들어올 수도 있음)
+  value: string;         // 유저가 입력/인식한 값
+  isActive: boolean;     // 현재 선택된 blank인지
+  isRevealed: boolean;   // 채점 후 정답 공개 상태인지
+  correctAnswer: string; // 정답(최종)
+};
 
-interface UnderlineSlotsProps {
-  answer: string;
-  value: string;
-  isActive?: boolean;
-  isRevealed?: boolean;
-  correctAnswer?: string;
-}
-
-/**
- * 정답 길이만큼 슬롯을 표시하는 컴포넌트 (왼쪽 정렬)
- */
 export default function UnderlineSlots({
   answer,
   value,
-  isActive = false,
-  isRevealed = false,
+  isActive,
+  isRevealed,
   correctAnswer,
-}: UnderlineSlotsProps) {
-  const len = answer?.length ?? 0;
-  const chars = Array.from({ length: len }, (_, i) => value?.[i] ?? "");
+}: Props) {
+  const expectedRaw = (correctAnswer || answer || "").trim();
+  const expectedLen = expectedRaw.length;
+
+  // ✅ 표시용 언더바 개수: 정답 글자수 그대로 (최소2, 최대16)
+  const displayLen = Math.min(16, Math.max(2, expectedLen || 5));
+
+  // ✅ UI 폭: 너무 좁지 않게 최소 4ch
+  const widthLen = Math.max(4, displayLen);
+
+  // ✅ 표시할 값
+  const displayText = (isRevealed ? expectedRaw : value).trim();
+
+  // ✅ 빈칸이면 placeholder로 "____" 형태
+  const content = displayText || "_".repeat(displayLen);
+
+  // ✅ 스타일
+  const baseClass =
+    "inline-flex items-center justify-center gap-1 px-3 py-1 rounded-lg " +
+    "transition-all select-none font-semibold text-base";
+
+  const stateClass = isActive
+    ? "bg-[#6E63D5]/10"
+    : "";
+
+  const textClass = displayText
+    ? "text-[#2F2A57] tracking-wider"
+    : "text-[#2F2A57]/45 font-mono tracking-[0.08em]";
 
   return (
-    <div className="flex flex-wrap items-center justify-start gap-1 md:gap-2">
-      {chars.map((ch, i) => (
-        <div
-          key={i}
-          className={`
-            h-10 md:h-10 w-8 md:w-9
-            rounded-md border-2 text-center
-            text-xl md:text-2xl font-bold
-            shadow-sm backdrop-blur-sm
-            transition-all
-            ${
-              isActive
-                ? "ring-2 ring-[#B9B4E4] border-[#B9B4E4] bg-white/70"
-                : "border-[#E7E5FF] bg-white/70"
-            }
-          `}
-        >
-          <div className="leading-[2.5rem] md:leading-[3rem] text-[#2F2A57] font-mono">
-            {isRevealed && correctAnswer
-              ? (correctAnswer[i]?.toLowerCase() || "_")
-              : ch
-                ? ch.toLowerCase()
-                : "_"}
-          </div>
-        </div>
-      ))}
-    </div>
+    <span className={[baseClass, stateClass].join(" ")} style={{ minWidth: `${widthLen}ch` }}>
+      <span className="text-[#2F2A57]/60 font-normal">(</span>
+      <span className={textClass}>{content}</span>
+      <span className="text-[#2F2A57]/60 font-normal">)</span>
+    </span>
   );
 }

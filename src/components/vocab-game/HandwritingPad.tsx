@@ -1,19 +1,20 @@
 "use client";
 
 import { useRef, useEffect, useState } from "react";
-import Tesseract from "tesseract.js";
 
 interface HandwritingPadProps {
   onClear?: () => void;
   onRecognize?: (text: string) => void;
   disabled?: boolean;
+  resetKey?: string | number;
 }
 
-export default function HandwritingPad({ onClear, onRecognize, disabled = false }: HandwritingPadProps) {
+export default function HandwritingPad({ onClear, onRecognize, disabled = false, resetKey }: HandwritingPadProps) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const [isDrawing, setIsDrawing] = useState(false);
   const [isEmpty, setIsEmpty] = useState(true);
   const [isRecognizing, setIsRecognizing] = useState(false);
+  const [ocrError, setOcrError] = useState<string>("");
 
   useEffect(() => {
     const canvas = canvasRef.current;
@@ -33,10 +34,10 @@ export default function HandwritingPad({ onClear, onRecognize, disabled = false 
     ctx.fillRect(0, 0, canvas.width, canvas.height);
 
     // 그리기 스타일
-    ctx.strokeStyle = "#6E63D5";
-    ctx.lineWidth = 3;
     ctx.lineCap = "round";
     ctx.lineJoin = "round";
+    ctx.strokeStyle = "#111111"; // 거의 검정 (인식률 최고)
+    ctx.lineWidth = 6;          // 굵게
   }, []);
 
   const startDrawing = (e: React.MouseEvent<HTMLCanvasElement> | React.TouchEvent<HTMLCanvasElement>) => {
@@ -80,7 +81,7 @@ export default function HandwritingPad({ onClear, onRecognize, disabled = false 
     setIsDrawing(false);
   };
 
-  const handleClear = () => {
+  const clearCanvas = () => {
     const canvas = canvasRef.current;
     if (!canvas) return;
 
@@ -90,33 +91,81 @@ export default function HandwritingPad({ onClear, onRecognize, disabled = false 
     ctx.fillStyle = "#FFFFFF";
     ctx.fillRect(0, 0, canvas.width, canvas.height);
     setIsEmpty(true);
+  };
+
+  const handleClear = () => {
+    clearCanvas();
     onClear?.();
   };
 
+  // resetKey가 바뀌면 캔버스와 상태 초기화
+  useEffect(() => {
+    if (resetKey !== undefined) {
+      clearCanvas();
+      setIsRecognizing(false);
+      setOcrError("");
+    }
+  }, [resetKey]);
+
+  // 흰 배경 캔버스로 변환 (OCR 인식률 향상)
+  const toWhiteBgDataURL = (canvas: HTMLCanvasElement) => {
+    const out = document.createElement("canvas");
+    out.width = canvas.width;
+    out.height = canvas.height;
+
+    const octx = out.getContext("2d")!;
+    // 흰 배경 채우기
+    octx.fillStyle = "#FFFFFF";
+    octx.fillRect(0, 0, out.width, out.height);
+
+    // 원본 캔버스 덮어쓰기
+    octx.drawImage(canvas, 0, 0);
+
+    // png로 반환
+    return out.toDataURL("image/png");
+  };
+
   const handleRecognize = async () => {
+    // 중복 호출 방지
+    if (isRecognizing) return;
+
     const canvas = canvasRef.current;
     if (!canvas || isEmpty) return;
 
     setIsRecognizing(true);
+    setOcrError("");
 
     try {
-      // Canvas를 이미지로 변환
-      const imageData = canvas.toDataURL("image/png");
+      // Canvas를 흰 배경 base64 이미지로 변환
+      const imageData = toWhiteBgDataURL(canvas);
 
-      // Tesseract.js로 텍스트 인식
-      const result = await Tesseract.recognize(imageData, "eng", {
-        logger: (m) => console.log(m),
+      // "data:image/png;base64," 제거하고 순수 base64만 추출
+      const base64Image = imageData.split(",")[1];
+
+      // Google Vision API 호출
+      const response = await fetch("/api/ocr/google-vision", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ base64Image }),
       });
 
-      const recognizedText = result.data.text.trim();
+      if (!response.ok) {
+        const errorData = await response.json();
+        throw new Error(errorData.error || "OCR 인식에 실패했습니다.");
+      }
+
+      const data = await response.json();
+      const recognizedText = data.text.trim();
       console.log("Recognized text:", recognizedText);
 
       // 인식된 텍스트를 부모 컴포넌트로 전달
-      if (recognizedText && onRecognize) {
+      if (onRecognize) {
         onRecognize(recognizedText);
       }
     } catch (error) {
       console.error("OCR Error:", error);
+      const errorMessage = error instanceof Error ? error.message : "텍스트 인식에 실패했습니다.";
+      setOcrError(errorMessage);
     } finally {
       setIsRecognizing(false);
     }
@@ -165,7 +214,7 @@ export default function HandwritingPad({ onClear, onRecognize, disabled = false 
           {isRecognizing ? (
             <>
               <span className="inline-block animate-spin">⏳</span>
-              인식 중...
+              인식중...
             </>
           ) : (
             <>🔍 인식</>
@@ -186,6 +235,13 @@ export default function HandwritingPad({ onClear, onRecognize, disabled = false 
           지우기
         </button>
       </div>
+
+      {/* 에러 메시지 */}
+      {ocrError && (
+        <div className="mt-2 text-xs text-red-600 font-semibold">
+          ❌ {ocrError}
+        </div>
+      )}
     </div>
   );
 }

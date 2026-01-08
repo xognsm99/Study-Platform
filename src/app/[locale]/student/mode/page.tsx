@@ -105,12 +105,12 @@ export default function StudentModePage() {
               cursor: "pointer",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#5B4ED4";
+              e.currentTarget.style.background = "#b8acff";
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow = "0 8px 16px rgba(106, 90, 224, 0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#6A5AE0";
+              e.currentTarget.style.background = "#d4ceffff";
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "none";
             }}
@@ -147,12 +147,12 @@ export default function StudentModePage() {
               cursor: "pointer",
             }}
             onMouseEnter={(e) => {
-              e.currentTarget.style.background = "#5B4ED4";
+              e.currentTarget.style.background = "#6E63D5";
               e.currentTarget.style.transform = "translateY(-2px)";
               e.currentTarget.style.boxShadow = "0 8px 16px rgba(106, 90, 224, 0.3)";
             }}
             onMouseLeave={(e) => {
-              e.currentTarget.style.background = "#6A5AE0";
+              e.currentTarget.style.background = "#877be4ff";
               e.currentTarget.style.transform = "translateY(0)";
               e.currentTarget.style.boxShadow = "none";
             }}

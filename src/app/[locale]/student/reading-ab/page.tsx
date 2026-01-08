@@ -49,208 +49,59 @@ export default function ReadingABPage() {
 
   // ✅ PDF 본문 기반(고정 문제, 셔플 없음)
   const passages: QuizPassage[] = useMemo(
-    () => [
-      {
-        title: "본문 선택",
-        lines: [
-          [t("Hello! I’m Somin.")],
-          [
-            t("I’m 15 "),
-            b("p1_q1", ["year", "years"], 1),
-            t(" old, and I live "),
-            b("p1_q2", ["in", "at"], 0),
-            t(" Korea."),
-          ],
-          [
-            t("Please tell "),
-            b("p1_q3", ["to me", "me"], 1),
-            t(" about your favorite time "),
-            b("p1_q4", ["of", "for"], 0),
-            t(" the day."),
-          ],
-          [
-            t("You can "),
-            b("p1_q5", ["also", "too"], 0),
-            t(" show "),
-            b("p1_q6", ["me", "to me"], 0),
-            t(" some pictures."),
-          ],
-        ],
-      },
-      {
-        title: "본문 선택",
-        lines: [
-          [
-            t("Hi, my name is Diego, and I live "),
-            b("p2_q1", ["in", "at"], 0),
-            t(" "),
-            b("p2_q2", ["Seville, Spain", "Spain, Seville"], 0),
-            t("."),
-          ],
-          [
-            t("My favorite time "),
-            b("p2_q3", ["of", "for"], 0),
-            t(" the day "),
-            b("p2_q4", ["is", "are"], 0),
-            t(" lunch time."),
-          ],
-          [
-            t("My school "),
-            b("p2_q5", ["usually ends", "ends usually"], 0),
-            t(" "),
-            b("p2_q6", ["about", "around"], 1),
-            t(" 2 p.m."),
-          ],
-          [
-            b("p2_q7", ["On", "In"], 0),
-            t(" most days, my family "),
-            b("p2_q8", ["get", "gets"], 1),
-            t(" together and "),
-            b("p2_q9", ["have", "has"], 0),
-            t(" a big, long lunch."),
-          ],
-          [
-            t("We "),
-            b("p2_q10", ["usually have", "have usually"], 0),
-            t(" soup, vegetables, "),
-            b("p2_q11", ["and", "or"], 0),
-            t(" meat."),
-          ],
-          [
-            t("We "),
-            b("p2_q12", ["also", "too"], 0),
-            t(" have a dessert like churros."),
-          ],
-          [
-            t("After lunch, we "),
-            b("p2_q13", ["take usually", "usually take"], 1),
-            t(" a siesta, a short nap."),
-          ],
-          [
-            t("Both my father "),
-            b("p2_q14", ["and", "or"], 0),
-            t(" I like "),
-            b("p2_q15", ["to sleeping", "to sleep"], 1),
-            t(" under the tree in our garden."),
-          ],
-        ],
-      },
-      {
-        title: "본문 선택",
-        lines: [
-          [
-            t("Hi! My name is Tabin, and I live "),
-            b("p3_q1", ["near", "nearly"], 0),
-            t(" the Gobi Desert "),
-            b("p3_q2", ["in", "at"], 0),
-            t(" Mongolia."),
-          ],
-          [t("I’m happy "), b("p3_q3", ["when", "while"], 0), t(" I ride my horse.")],
-          [t("Horses are important "), b("p3_q4", ["in", "at"], 0), t(" our culture.")],
-          [
-            b("p3_q5", ["Almost", "Always"], 0),
-            t(" everyone can ride a horse "),
-            b("p3_q6", ["in", "at"], 0),
-            t(" Mongolia."),
-          ],
-          [
-            b("p3_q7", ["On", "In"], 1),
-            t(' fact, we say, "We ride horses before we can '),
-            b("p3_q8", ["to walk", "walk"], 1),
-            t('."'),
-          ],
-          [
-            t("I take good care "),
-            b("p3_q9", ["of", "for"], 0),
-            t(" my horse."),
-          ],
-          [
-            t("I "),
-            b("p3_q10", ["often brush", "brush often"], 0),
-            t(" him and give "),
-            b("p3_q11", ["some carrot him", "him some carrots"], 1),
-            t("."),
-          ],
-          [
-            t("I enjoy "),
-            b("p3_q12", ["to ride", "riding"], 1),
-            t(" especially "),
-            b("p3_q13", ["in", "at"], 0),
-            t(" the evening before the sunset."),
-          ],
-          [
-            b("p3_q14", ["Then", "Than"], 0),
-            t(" "),
-            b("p3_q15", ["sky", "the sky"], 1),
-            t(" is red, and everything "),
-            b("p3_q16", ["is", "are"], 0),
-            t(" "),
-            b("p3_q17", ["peace", "peaceful"], 1),
-            t("."),
-          ],
-        ],
-      },
-      {
-        title: "본문 선택",
-        lines: [
-          [
-            t("Hi! I’m Musa, and I live "),
-            b("p4_q1", ["in", "at"], 0),
-            t(" "),
-            b("p4_q2", ["Nairobi, Kenya", "Kenya Nairobi"], 0),
-            t("."),
-          ],
-          [
-            t("My favorite time "),
-            b("p4_q3", ["of", "for"], 0),
-            t(" the day is our "),
-            b("p4_q4", ["running", "runing"], 0),
-            t(" practice time."),
-          ],
-          [
-            t("My friend, Tamu, and I "),
-            b("p4_q5", ["am", "are"], 1),
-            t(" "),
-            b("p4_q6", ["in", "on"], 1),
-            t(" the school’s "),
-            b("p4_q7", ["runing", "running"], 1),
-            t(" team."),
-          ],
-          [
-            t("I’m "),
-            b("p4_q8", ["happiest", "most happy"], 0),
-            t(" when I run "),
-            b("p4_q9", ["with", "by"], 0),
-            t(" Tamu."),
-          ],
-          [
-            t("Our practice time isn’t "),
-            b("p4_q10", ["boring", "bored"], 0),
-            t(" "),
-            b("p4_q11", ["because of", "because"], 1),
-            t(" we can see many animals."),
-          ],
-          [
-            t("Many runners "),
-            b("p4_q12", ["from", "in"], 0),
-            t(" Kenya won races "),
-            b("p4_q13", ["in", "on"], 0),
-            t(" the Olympics."),
-          ],
-          [t("I’m so proud "), b("p4_q14", ["of", "with"], 0), t(" them.")],
-          [
-            b("p4_q15", ["Both", "Either"], 0),
-            t(" Tamu "),
-            b("p4_q16", ["and", "or"], 0),
-            t(" I want "),
-            b("p4_q17", ["to be", "being"], 0),
-            t(" like them."),
-          ],
-        ],
-      },
-    ],
-    []
-  );
+  () => [
+    {
+      title: "본문 선택",
+      lines: [
+        [ t("You can work with NGOs "), b("u1_b1", ["as", "for"], 0), t(" a teenager.") ],
+        [ t("It is a great way "), b("u1_b2", ["learning", "to learn"], 1), t(" about social issues and "), b("u1_b3", ["make", "making"], 0), t(" the") ],
+        [ t("world better.") ],
+        [ t("Are you "), b("u1_b4", ["interesting", "interested"], 1), t("? Then, "), b("u1_b5", ["read", "reading"], 0), t(" Inho’s blog below.") ],
+        [ t("JAN 5") ],
+        [ t("I grew "), b("u1_b6", ["out", "up"], 1), t(" in Jeju-do, so I had "), b("u1_b7", ["many", "much"], 0), t(" "), b("u1_b8", ["chance", "chances"], 1), t(" to see") ],
+        [ t("dolphins.") ],
+        [ t("Then, I learned "), b("u1_b9", ["that", "what"], 0), t(" some dolphins are "), b("u1_b10", ["with", "in"], 1), t(" danger.") ],
+        [ t("some are even "), b("u1_b11", ["endangering", "endangered"], 1), t(".") ],
+        [ t("I thought I "), b("u1_b12", ["would", "should"], 1), t(" do something.") ],
+        [ t("So, I searched the Internet and "), b("u1_b13", ["found", "founded"], 0), t(" an NGO, Dolphin Lovers.") ],
+        [ t("It "), b("u1_b14", ["does", "did"], 0), t(" "), b("u1_b15", ["various", "variety"], 0), t(" activities "), b("u1_b16", ["such as", "so as"], 0), t(" "), b("u1_b17", ["cleans", "cleaning"], 1), t(" up") ],
+        [ t("beaches and "), b("u1_b18", ["helps", "helping"], 1), t(" dolphins.") ],
+        [ t("After some thought, I joined "), b("u1_b19", ["it", "them"], 0), t(" today.") ],
+        [ t("JAN20") ],
+        [ t("Many dolphins get sick or even die "), b("u1_b20", ["because", "because of"], 0), t(" plastic waste and fishing") ],
+        [ t("nets, so "), b("u1_b21", ["clean up", "cleaning up"], 1), t(" beaches "), b("u1_b22", ["is", "are"], 0), t(" important.") ],
+        [ b("u1_b23", ["It", "There"], 1), t(" was a beach cleanup party today, and I took part in "), b("u1_b24", ["it", "them"], 0), t(".") ],
+        [ b("u1_b25", ["Clean up", "Cleaning up"], 1), t(" the beach was not easy, but I enjoyed "), b("u1_b26", ["it", "them"], 0), t(".") ],
+        [ t("Oh, I saw Aunt Sumi there. She is also "), b("u1_b27", ["a", "the"], 0), t(" member of Dolphin Lovers.") ],
+        [ b("u1_b28", ["What", "How"], 0), t(" a small world~!") ],
+        [ t("FEB 14") ],
+        [ t("This afternoon, I "), b("u1_b29", ["take", "took"], 1), t(" part in a training class for Halla and Olle, two") ],
+        [ t("dolphins in an aquarium in Jeju-do.") ],
+        [ t("The "), b("u1_b30", ["late", "latest"], 1), t(" project of Dolphin Lovers "), b("u1_b31", ["is", "are"], 0), t(" to return "), b("u1_b32", ["it", "them"], 1), t(" to the sea.") ],
+        [ t("For this, Halla and Olle first need "), b("u1_b33", ["learning", "to learn"], 1), t(" some skills.") ],
+        [ t("They will need "), b("u1_b34", ["it", "them"], 1), t(" "), b("u1_b35", ["to survive", "surviving"], 0), t(" in the wild.") ],
+        [ t("I really wanted "), b("u1_b36", ["being", "to be"], 1), t(" part of the project.") ],
+        [ b("u1_b37", ["Lucky", "Luckily"], 1), t(", I got the chance.") ],
+        [ t("I just "), b("u1_b38", ["run", "ran"], 1), t(" some "), b("u1_b39", ["errors", "errands"], 1), t(" in the training class today, but the") ],
+        [ t("experience made me so "), b("u1_b40", ["exciting", "excited"], 1), t(".") ],
+        [ t("APR22") ],
+        [ t("Today, Halla and Olle went back to the sea.") ],
+        [ b("u1_b41", ["It", "There"], 1), t(" was a small ceremony, and all the members of Dolphin Lovers were") ],
+        [ b("u1_b42", ["here", "there"], 1) ],
+        [ t("The ceremony made us quite "), b("u1_b43", ["emotion", "emotional"], 1), t(".") ],
+        [ b("u1_b44", ["In fact", "However"], 0), t(", I cried "), b("u1_b45", ["a few", "a little"], 1), t(". Now I cannot see Halla and Olle") ],
+        [ b("u1_b46", ["anymore", "no more"], 0), t("!") ],
+        [ b("u1_b47", ["However", "Therefore"], 0), t(", I was very happy "), b("u1_b48", ["for", "at"], 1), t(" the same time.") ],
+        [ t("After 10 "), b("u1_b49", ["year", "years"], 1), t(" of hard life in an aquarium, now all the sea is "), b("u1_b50", ["its", "their"], 1) ],
+        [ t("home.") ],
+        [ t("“Live "), b("u1_b51", ["free", "freely"], 1), t(" and "), b("u1_b52", ["happy", "happily"], 1), t(" ever after~!” I shouted and waved goodbye") ],
+        [ t("to "), b("u1_b53", ["it", "them"], 1), t(".") ]
+      ],
+    },
+  ],
+  []
+);
+
 
   // passages를 MAX_LINES_PER_PAGE 기준으로 분할해서 pages 생성
   const pages: QuizPage[] = useMemo(() => {
@@ -269,7 +120,8 @@ export default function ReadingABPage() {
   }, [passages, MAX_LINES_PER_PAGE]);
 
   const [pageIndex, setPageIndex] = useState(0);
-  const [checked, setChecked] = useState(false);
+  const [checkedByPage, setCheckedByPage] = useState<Record<number, boolean>>({});
+  const checked = !!checkedByPage[pageIndex];
   const [answers, setAnswers] = useState<Record<string, 0 | 1>>({});
 
   const page = pages[pageIndex];
@@ -292,8 +144,6 @@ export default function ReadingABPage() {
       return;
     }
     setPageIndex((p) => p + 1);
-    setChecked(false);
-    setAnswers({});
   };
 
   return (
@@ -348,7 +198,7 @@ export default function ReadingABPage() {
           <button
             onClick={() => {
               if (!allAnswered) return;
-              if (!checked) setChecked(true);
+              if (!checked) setCheckedByPage((prev) => ({ ...prev, [pageIndex]: true }));
               else goNext();
             }}
             disabled={!allAnswered}

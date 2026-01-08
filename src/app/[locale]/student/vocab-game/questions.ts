@@ -45,7 +45,7 @@ export const VOCAB_GAME_ITEMS: VocabKeypadQ[] = [
   },
   {
     id: "q7",
-    sentence: "I'm usually () school at two o'clock.",
+    sentence: "I'm usually (     ) school at two o'clock.",
     answers: ["outof"],
     explain: "나는 보통 두 시에 학교를 끝낸다.",
   },

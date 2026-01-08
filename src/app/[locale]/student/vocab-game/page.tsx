@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useState } from "react";
 import { useRouter, useParams } from "next/navigation";
 import HandwritingPad from "@/components/vocab-game/HandwritingPad";
+import BlankSentence from "@/components/vocab-game/BlankSentence";
 import { VOCAB_GAME_ITEMS as VOCAB_GAME_10 } from "./questions";
 
 function shuffle<T>(arr: T[]) {
@@ -82,16 +83,16 @@ export default function VocabGamePage() {
   const [usedHintThisProblem, setUsedHintThisProblem] = useState(false);
 
   const cur = items[idx];
-  const safeSentence = cur?.sentence ?? "문제가 없습니다.";
+  const sentenceText = cur?.sentence ?? "문제가 없습니다.";
   const safeAnswers = cur?.answers ?? [];
-  const correctAnswer = safeAnswers[0] ?? "";
+  const primaryAnswer = safeAnswers[0] ?? "";
   const isLast = idx >= items.length - 1;
 
   const handleCheck = () => {
     if (!userInput.trim()) return;
 
-    const normalized = userInput.trim().toLowerCase();
-    const correct = safeAnswers.some((ans) => ans.toLowerCase() === normalized);
+    const norm = (s: string) => s.trim().toLowerCase().replace(/\s+/g, "");
+    const correct = safeAnswers.some((ans) => norm(ans) === norm(userInput));
 
     setIsChecked(true);
     setIsCorrect(correct);
@@ -115,11 +116,7 @@ export default function VocabGamePage() {
       router.push(`/${locale}/student/vocab-game/result?${params.toString()}`);
     } else {
       setIdx((v) => Math.min(v + 1, items.length - 1));
-      setUserInput("");
-      setIsChecked(false);
-      setIsCorrect(false);
-      setShowHint(false);
-      setUsedHintThisProblem(false);
+      // useEffect에서 idx 변경 감지하여 상태 초기화 처리
     }
   };
 
@@ -130,6 +127,15 @@ export default function VocabGamePage() {
       setHintUsed((prev) => prev + 1);
     }
   };
+
+  // 문제 인덱스가 바뀔 때 상태 초기화
+  useEffect(() => {
+    setUserInput("");
+    setIsChecked(false);
+    setIsCorrect(false);
+    setShowHint(false);
+    setUsedHintThisProblem(false);
+  }, [idx]);
 
   if (!mounted) {
     return <div className="min-h-screen bg-[#F5F3FF]" />;
@@ -176,7 +182,18 @@ export default function VocabGamePage() {
         {/* 문장 카드 */}
         <div className="rounded-3xl bg-white/90 backdrop-blur-sm p-6 border-2 border-[#E6E3FA] mb-5 shadow-sm">
           <div className="text-[17px] font-medium text-gray-800 leading-relaxed mb-3">
-            {safeSentence}
+            <BlankSentence
+              sentence={sentenceText}
+              userAnswers={[userInput]}
+              activeBlankIndex={0}
+              answers={[primaryAnswer]}
+              revealed={[!!isChecked]}
+              onBlankClick={() => {
+                // 빈칸 누르면 입력창 포커스(입력 UX 개선)
+                const el = document.getElementById("vocab-answer-input");
+                (el as HTMLInputElement | null)?.focus?.();
+              }}
+            />
           </div>
 
           {cur.explain && (
@@ -195,6 +212,7 @@ export default function VocabGamePage() {
           </div>
           <HandwritingPad
             disabled={isChecked}
+            resetKey={idx}
             onRecognize={(text) => {
               // 인식된 텍스트를 입력창에 자동으로 채우기
               setUserInput(text);
@@ -208,6 +226,7 @@ export default function VocabGamePage() {
             정답 입력
           </label>
           <input
+            id="vocab-answer-input"
             type="text"
             value={userInput}
             onChange={(e) => setUserInput(e.target.value)}
@@ -246,7 +265,7 @@ export default function VocabGamePage() {
               ) : (
                 <>
                   <span className="text-xl">❌</span>
-                  오답입니다. 정답: <span className="font-bold">{correctAnswer}</span>
+                  오답입니다. 정답: <span className="font-bold">{primaryAnswer}</span>
                 </>
               )}
             </div>
