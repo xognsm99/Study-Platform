@@ -110,35 +110,81 @@ export function formatDialogue(text: string): string {
 }
 
 export function generateHint(problem: ProblemItem, category: string): string {
+  // 1) qtype 및 텍스트 추출
+  const c: any = (problem as any)?.content ?? {};
+  const qtype = String(c?.qtype ?? c?.raw?.qtype ?? (problem as any)?.qtype ?? "").trim().toLowerCase();
+
+  const questionText = String((problem as any)?.question ?? c?.question ?? c?.raw?.문제 ?? c?.raw?.question ?? "").trim();
+  const passageText = String(c?.stimulus ?? c?.raw?.지문 ?? c?.passage ?? "").trim();
+  const combined = `${questionText}\n${passageText}`.toLowerCase();
+
+  // 2) 부정형 문제 감지 (NOT/아닌 것/틀린 것)
+  const negativePatterns = [
+    "적절하지", "옳지", "틀린", "어색한", "부적절",
+    "not correct", "incorrect", "not appropriate", "which is not", "least appropriate"
+  ];
+  const isNegative = negativePatterns.some(pattern => combined.includes(pattern));
+
+  if (isNegative) {
+    // 부정형 문제는 절대 특정 선택지를 암시하지 않는 안전 힌트만 제공
+    const safeHints = [
+      "이 문제는 '맞는 것'이 아니라 문맥에 가장 어색한 것을 고르는 유형입니다.",
+      "보기를 하나씩 넣어 읽어보고 의미/문법/연결이 깨지는 지점을 찾으세요.",
+      "품사·시제·수일치·의미 연결(앞뒤 문장) 중 하나가 어긋나는 보기가 정답입니다."
+    ];
+    // 문제 ID 기반 결정적 선택 (랜덤처럼 보이지만 같은 문제는 항상 같은 힌트)
+    const idx = Math.abs((problem.id?.charCodeAt(0) ?? 0) % safeHints.length);
+    return safeHints[idx];
+  }
+
+  // 3) qtype 기반 힌트 (긍정형 문제만)
+  const qtypeHints: Record<string, string> = {
+    "어휘_사전": "뜻을 그대로 외우기보다, 문장 속 뉘앙스(긍/부정, 강도)를 먼저 확인하세요.",
+    "어휘_영영": "영영 정의에서 핵심동사/대상(무엇을/왜/어떻게)을 잡고 보기 의미와 매칭하세요.",
+    "어휘_문맥": "빈칸 앞뒤 연결어(so/but/because)로 방향(원인/대조/결론)을 먼저 잡으세요.",
+    "문법_어법오류": "동사 형태(시제/수동)→수일치→전치사/접속사 순으로 빠르게 점검하세요.",
+    "문법_빈칸": "시제·수일치·대명사 지시 대상부터 확인하면 정답이 빨리 좁혀집니다.",
+    "문법_배열": "대명사/지시어(this/that/it)와 접속사로 문장 연결 고리를 먼저 잡으세요.",
+    "본문_제목": "반복되는 키워드 2~3개가 주제입니다. 가장 '포괄적인' 제목을 고르세요.",
+    "본문_물음": "문제가 묻는 대상(누가/무엇/왜)을 표시하고 그 근처 문장을 먼저 찾으세요.",
+    "본문_일치": "선택지와 본문을 단어 그대로가 아니라 동의어/바꿔말하기로 비교하세요.",
+    "대화문_빈칸": "직전 발화의 감정(걱정/기쁨/요청)에 맞는 톤(격려/공감/응답)인지 보세요.",
+    "대화문_흐름": "대화 목적(부탁/제안/사과/축하)이 자연스럽게 이어지는지 확인하세요.",
+    "대화문_응답": "질문이면 답(Yes/No/정보), 부탁이면 수락/거절 구조가 맞아야 합니다."
+  };
+
+  // qtype 정확 매칭 시도
+  if (qtype && qtypeHints[qtype]) {
+    return qtypeHints[qtype];
+  }
+
+  // qtype 부분 매칭 시도
+  for (const [key, hint] of Object.entries(qtypeHints)) {
+    if (qtype.includes(key) || key.includes(qtype)) {
+      return hint;
+    }
+  }
+
+  // 4) qtype 없을 때 category 기반 fallback
   const normalizedCat = normalizeCategory(category);
-  
-  // 어휘
+
   if (normalizedCat === "vocab") {
-    return "핵심 단어의 의미와 문맥을 생각해 보세요. 유사한 뜻의 단어들을 비교해 보는 것도 도움이 됩니다.";
+    return "단어 뜻만 보지 말고 문장 속 뉘앙스와 연결을 함께 보세요.";
   }
-  
-  // 문법
+
   if (normalizedCat === "grammar") {
-    return "문장의 시제와 주어-동사 일치를 확인해 보세요. 어순도 중요한 단서가 될 수 있습니다.";
+    return "시제·수일치·품사부터 체크하면 빠릅니다.";
   }
-  
-  // 본문/대화문
-  if (normalizedCat === "body" || normalizedCat === "dialogue") {
-    // 질문에서 키워드 추출
-    const questionLower = problem.question.toLowerCase();
-    if (questionLower.includes("time") || questionLower.includes("시간")) {
-      return "시간을 묻는 문제예요. 대화나 본문에서 시간 관련 정보를 찾아보세요.";
-    }
-    if (questionLower.includes("place") || questionLower.includes("장소")) {
-      return "장소를 묻는 문제예요. 대화나 본문에서 위치나 장소를 나타내는 표현을 찾아보세요.";
-    }
-    if (questionLower.includes("why") || questionLower.includes("왜")) {
-      return "이유를 묻는 문제예요. 대화나 본문에서 원인이나 이유를 설명하는 부분을 찾아보세요.";
-    }
-    return "질문의 의도를 파악하고, 본문이나 대화에서 핵심 키워드를 찾아보세요.";
+
+  if (normalizedCat === "body") {
+    return "핵심 주제/근거 문장을 먼저 찾으세요.";
   }
-  
-  // 기본 힌트
+
+  if (normalizedCat === "dialogue") {
+    return "직전 발화의 의도(요청/걱정/사과)에 맞는 응답을 고르세요.";
+  }
+
+  // 5) 기본 힌트
   return "문제를 다시 읽어보고, 문맥과 함께 생각해 보세요.";
 }
 

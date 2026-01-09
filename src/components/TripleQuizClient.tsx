@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState, useRef } from "react";
 import { useRouter } from "next/navigation";
+import Image from "next/image";
 import { DEFAULT_QUIZ_SIZE } from "@/lib/utils/constants";
 import ResultCard from "./ResultCard";
 import type { ProblemItem } from "./QuizClient";
@@ -431,16 +432,43 @@ export default function TripleQuizClient({ grade, subject, category, categories 
   ]);
   const baseExplanation = resolvedExplanation;
   const finalExplanation = baseExplanation || "해설이 제공되지 않았습니다.";
-  
+
+  // ✅ 괄호 빈칸 렌더링 헬퍼 (UI 전용)
+  function renderWideParensBlank(text: string) {
+    const parts = String(text ?? "").split(/(\(\s*\))/g);
+
+    return parts.map((p, i) => {
+      if (/^\(\s*\)$/.test(p)) {
+        return (
+          <span key={i} className="inline-flex items-center align-middle">
+            <span>(</span>
+            <span
+              className="
+                mx-1 inline-block align-middle
+                h-[22px] rounded-full bg-[#F0EEFF]
+                w-[176px] max-w-[52vw]
+              "
+            />
+            <span>)</span>
+          </span>
+        );
+      }
+
+      // keep existing blank rendering behavior for other patterns
+      return <span key={i}>{renderWithBlanks(p)}</span>;
+    });
+  }
+
   return (
-    <div className="rounded-2xl border bg-white p-5 shadow-sm text-slate-900">
+    <div className="rounded-2xl border bg-white px-2 py-4 sm:p-5 shadow-sm text-slate-900">
+
       {/* 메타 정보 */}
       {/* 결과 보기 버튼 */}
       <div className="mb-3">
         <button
           type="button"
           onClick={handleResultPreview}
-          className="rounded-md bg-purple-600 px-3 py-1.5 text-xs text-white hover:bg-purple-700"
+          className="rounded-md bg-purple-500 px-2 py-1.5 text-xs text-white hover:bg-purple-600"
         >
           결과 보기
         </button>
@@ -464,14 +492,14 @@ export default function TripleQuizClient({ grade, subject, category, categories 
       {/* ✅ 1) 문제 */}
       <h2 className="text-xl font-bold mb-4">
         <div className="whitespace-pre-line leading-relaxed">
-          {renderWithBlanks(question || "문제가 비어 있습니다.")}
+          {renderWideParensBlank(question || "문제가 비어 있습니다.")}
         </div>
       </h2>
 
       {/* ✅ 2) 지문(영영풀이/본문/해석) - stimulus 포함 */}
       {finalPassage && (
         <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
-          {renderWithBlanks(finalPassage)}
+          {renderWideParensBlank(finalPassage)}
         </div>
       )}
 
@@ -511,28 +539,45 @@ export default function TripleQuizClient({ grade, subject, category, categories 
       {current.choices && current.choices.length > 0 ? (
         <div className="space-y-2">
           {current.choices.map((c, i) => {
-            const isAnswer = i === current.answerIndex;
+            const isCorrect = i === current.answerIndex;
             const isSelected = i === selected;
+
             const base = "w-full rounded-xl border px-4 py-3 text-left text-sm transition";
             const state = !submitted
               ? "hover:bg-gray-50 cursor-pointer"
-              : isAnswer
+              : isCorrect
               ? "border-green-400 bg-green-50"
               : isSelected
               ? "border-red-400 bg-red-50"
               : "opacity-70";
 
             return (
-              <button
-                key={i}
-                type="button"
-                className={`${base} ${state}`}
-                onClick={() => submitAnswer(i)}
-                disabled={submitted}
-              >
-                <span className="mr-2 inline-block w-5 text-xs text-gray-500">{i + 1}.</span>
-                {c}
-              </button>
+              <div key={i} className="relative">
+                <button
+                  type="button"
+                  className={`${base} ${state}`}
+                  onClick={() => submitAnswer(i)}
+                  disabled={submitted}
+                >
+                  <div className="relative z-10">
+                    <span className="mr-2 inline-block w-5 text-xs text-gray-500">{i + 1}.</span>
+                    {c}
+                  </div>
+                </button>
+
+                {submitted && isSelected && (
+                  <div className="pointer-events-none absolute inset-0 z-[9999] grid place-items-center">
+                    <Image
+                      src={isCorrect ? "/marks/circle.png" : "/marks/x.png"}
+                      alt=""
+                      width={260}
+                      height={180}
+                      className="w-[240px] rotate-[-10deg] opacity-95"
+                      priority
+                    />
+                  </div>
+                )}
+              </div>
             );
           })}
         </div>
@@ -555,7 +600,8 @@ export default function TripleQuizClient({ grade, subject, category, categories 
         <button
           onClick={next}
           disabled={!submitted}
-          className="rounded-md bg-blue-600 px-4 py-2 text-sm text-white disabled:opacity-40"
+          className="rounded-md bg-[#4B2BBE] px-4 py-2 text-sm text-white hover:bg-[#3F24A3] disabled:opacity-40 disabled:hover:bg-[#4B2BBE]"
+
         >
           다음
         </button>
