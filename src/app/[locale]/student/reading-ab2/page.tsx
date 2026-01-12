@@ -101,8 +101,8 @@ export default function ReadingAb2Page() {
             </button>
 
             <div className="text-[20px] font-bold tracking-tight flex items-center gap-2">
-            <span className="text-2xl">👇</span>
-              <span className="text-[20px] font-bold">문장 배열 훈련</span>
+            <span className="text-xl text-white">👇문장 배열 훈련</span>
+              <span className="text-[20px] font-bold"></span>
             </div>
 
             <div className="rounded-full bg-white/20 px-4 py-2 text-sm font-semibold text-white">
@@ -161,7 +161,7 @@ export default function ReadingAb2Page() {
 
             {/* 안내 문구: 버튼 아래 */}
             <div className="mt-3 text-center text-sm font-semibold text-[#4E43C8]">
-              주어진 단어를 바르게 배열하여 문장을 완성하시오.
+              단어를 바르게 배열하여 문장을 완성하시오.
             </div>
 
             {/* 결과 */}

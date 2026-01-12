@@ -137,19 +137,64 @@ export async function GET(req: Request) {
       .sort((a, b) => a.acc - b.acc)
       .slice(0, 3);
 
-    // 4. 리더보드 (TODO: 실제 리더보드 테이블이 없으므로 mock)
-    // user_stats에서 상위 5명 가져오기 (임시)
-    const { data: topUsers } = await supabase
-      .from("user_stats")
-      .select("user_id, total_solved, accuracy_rate")
-      .order("total_solved", { ascending: false })
-      .limit(5);
+    // 4. 리더보드: problem_attempts 기반으로 실제 리더보드 생성
+    // 모든 사용자의 정답 수를 집계
+    const { data: allAttempts } = await supabase
+      .from("problem_attempts")
+      .select("user_id, is_correct")
+      .eq("is_correct", true)
+      .gte("created_at", startDate.toISOString());
 
-    const leaderboardWorld = (topUsers || []).map((u, idx) => ({
-      name: `User${idx + 1}`,
-      points: u.total_solved * 10,
-      rank: idx + 1,
-    }));
+    // user_id별로 정답 수 집계
+    const userPointsMap: Record<string, number> = {};
+    (allAttempts || []).forEach((attempt) => {
+      if (!userPointsMap[attempt.user_id]) {
+        userPointsMap[attempt.user_id] = 0;
+      }
+      userPointsMap[attempt.user_id] += 10; // 정답당 10점
+    });
+
+    // 정렬하여 랭킹 생성
+    const sortedUsers = Object.entries(userPointsMap)
+      .sort(([, a], [, b]) => b - a)
+      .map(([uid, pts], idx) => ({ user_id: uid, points: pts, rank: idx + 1 }));
+
+    // 내 랭킹 찾기
+    const myRankData = sortedUsers.find((u) => u.user_id === userId);
+    const myRank = myRankData?.rank || sortedUsers.length + 1;
+
+    // TOP 5 가져오기
+    const top5 = sortedUsers.slice(0, 5);
+
+    // 각 사용자의 이름 가져오기
+    const top5UserIds = top5.map((u) => u.user_id);
+    const { data: top5Profiles } = await supabase
+      .from("student_profiles")
+      .select("user_id, display_name")
+      .in("user_id", top5UserIds);
+
+    const leaderboardWorld = await Promise.all(
+      top5.map(async (u) => {
+        const profile = (top5Profiles || []).find((p) => p.user_id === u.user_id);
+        let name = profile?.display_name;
+
+        // display_name이 없으면 auth user 정보에서 가져오기
+        if (!name) {
+          const { data: authUser } = await supabase.auth.admin.getUserById(u.user_id);
+          name =
+            authUser?.user?.user_metadata?.name ||
+            authUser?.user?.user_metadata?.nickname ||
+            authUser?.user?.email?.split("@")[0] ||
+            `User${u.rank}`;
+        }
+
+        return {
+          name,
+          points: u.points,
+          rank: u.rank,
+        };
+      })
+    );
 
     const leaderboardLocal = leaderboardWorld; // TODO: 지역 필터링
 
@@ -201,6 +246,7 @@ export async function GET(req: Request) {
         todayPlan,
         leaderboardWorld,
         leaderboardLocal,
+        myRank,
       },
     });
   } catch (e: any) {

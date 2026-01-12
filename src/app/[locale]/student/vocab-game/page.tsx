@@ -153,7 +153,7 @@ export default function VocabGamePage() {
     <div className="min-h-screen bg-gradient-to-br from-[#F5F3FF] via-[#FAF8FF] to-[#F0EDFF]">
       <div className="max-w-[520px] mx-auto p-2">
         {/* 헤더 */}
-        <div className="bg-gradient-to-r from-[#6E63D5] to-[#8B7FE8] text-white rounded-2xl px-4 py-4 flex items-center justify-between mb-6 shadow-lg w-full">
+        <div className="bg-gradient-to-r from-[#6E63D5] to-[#8B7FE8] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-lg w-full">
           <button
             onClick={() => router.back()}
             className="text-sm font-semibold opacity-95 hover:opacity-100 transition-opacity"

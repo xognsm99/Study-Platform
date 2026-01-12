@@ -7,13 +7,11 @@ type AnimationPhase = "typing" | "underline" | "s" | "circle" | "done";
 
 interface IntroSplashProps {
   nextHref?: string;
-  showOnceKey?: string;
   onDone?: () => void;
 }
 
 export default function IntroSplash({
   nextHref = "/auth",
-  showOnceKey = "studypick_intro_v1",
   onDone,
 }: IntroSplashProps) {
   const router = useRouter();
@@ -32,16 +30,7 @@ export default function IntroSplash({
       ).matches;
       setShouldAnimate(!prefersReducedMotion);
     }
-
-    // Check localStorage for show-once
-    if (typeof window !== "undefined") {
-      const hasSeenIntro = localStorage.getItem(showOnceKey);
-      if (hasSeenIntro === "1") {
-        router.replace(nextHref);
-        return;
-      }
-    }
-  }, [nextHref, showOnceKey, router]);
+  }, []);
 
   // Typewriter effect
   useEffect(() => {
@@ -97,9 +86,6 @@ export default function IntroSplash({
   };
 
   const handleStart = () => {
-    if (typeof window !== "undefined") {
-      localStorage.setItem(showOnceKey, "1");
-    }
     if (onDone) {
       onDone();
     } else {

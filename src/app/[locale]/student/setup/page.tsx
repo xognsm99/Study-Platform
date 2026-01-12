@@ -34,16 +34,17 @@ type ReportData = {
   correct: number;
   accuracyPct: number;
   createdProblems: number;
-  monthlyGoal: number;
+  goalCount: number;
   period: string;
   weakQtypes?: WeakQtype[];
   todayPlan?: TodayPlanItem[];
   leaderboardWorld?: LeaderboardRow[];
   leaderboardLocal?: LeaderboardRow[];
+  myRank?: number;
 };
 
 export default function StudentReportPage() {
-  const [period, setPeriod] = useState<"weekly" | "monthly">("monthly");
+  const [period, setPeriod] = useState<"weekly" | "monthly">("weekly");
   const [loading, setLoading] = useState(true);
   const [error, setError] = useState<string | null>(null);
   const [reportData, setReportData] = useState<ReportData | null>(null);
@@ -51,11 +52,11 @@ export default function StudentReportPage() {
 
   const userName = reportData?.userName || "학생";
   const points = reportData?.points || 0;
-  const monthlyGoal = reportData?.monthlyGoal || 50;
+  const goalCount = period === "weekly" ? 140 : 600;
   const playedThisMonth = reportData?.played || 0;
   const accuracyPct = reportData?.accuracyPct || 0;
 
-  const progressPct = Math.min(100, Math.round((playedThisMonth / monthlyGoal) * 100));
+  const progressPct = Math.min(100, Math.round((playedThisMonth / goalCount) * 100));
 
   // 데이터 로드
   useEffect(() => {
@@ -121,6 +122,11 @@ export default function StudentReportPage() {
       { rank: 5, name: "Zain", points: 448 },
     ];
   }, [reportData, leaderboardMode, userName, points]);
+
+  // 내가 TOP5 밖인지 체크
+  const myRank = reportData?.myRank || 0;
+  const isInTop5 = leaderboard.some((r) => r.name === userName);
+  const shouldShowMyRank = myRank > 5 && !isInTop5;
 
   const advice = useMemo(() => {
     if (reportData?.todayPlan && reportData.todayPlan.length > 0) {
@@ -191,7 +197,7 @@ export default function StudentReportPage() {
             className="rounded-full border border-[#D9D5F6] bg-white/70 px-3 py-1.5 text-xs text-[#2B245A]/80"
             onClick={() => setPeriod((p) => (p === "monthly" ? "weekly" : "monthly"))}
           >
-            {period === "monthly" ? "월간" : "주간"} 보기
+            {period === "weekly" ? "월간" : "주간"} 보기
           </button>
         </div>
 
@@ -229,18 +235,18 @@ export default function StudentReportPage() {
                 {period === "monthly" ? "이번 달" : "이번 주"} 진행률
               </div>
               <div className="text-xs text-gray-500">
-                목표 {monthlyGoal}문항 / 현재 {playedThisMonth}문항
+                목표 {goalCount}문항 / 현재 {playedThisMonth}문항
               </div>
             </div>
 
             <div className="mt-3 flex items-center gap-4">
-              <ProgressRing value={progressPct} label={`${playedThisMonth}/${monthlyGoal}`} />
+              <ProgressRing value={progressPct} label={`${playedThisMonth}/${goalCount}`} />
               <div className="flex-1">
                 <div className="text-sm text-gray-700">
                   현재 <span className="font-semibold text-[#6E63D5]">{progressPct}%</span> 달성
                 </div>
                 <div className="mt-1 text-xs text-gray-500">
-                  오늘 {Math.max(0, Math.ceil((monthlyGoal - playedThisMonth) / 7))}~{Math.max(1, Math.ceil((monthlyGoal - playedThisMonth) / 5))}문항씩 하면 목표 달성 가능
+                  오늘 {Math.max(0, Math.ceil((goalCount - playedThisMonth) / 7))}~{Math.max(1, Math.ceil((goalCount - playedThisMonth) / 5))}문항씩 하면 목표 달성 가능
                 </div>
 
                 <div className="mt-3 h-2 w-full rounded-full bg-white">
@@ -295,14 +301,50 @@ export default function StudentReportPage() {
                 <div className="text-sm font-semibold text-[#6E63D5]">{r.points.toLocaleString()}P</div>
               </div>
             ))}
+
+            {/* 내가 TOP5 밖이면 별도 행으로 표시 */}
+            {shouldShowMyRank && (
+              <>
+                <div className="py-2 text-center">
+                  <div className="inline-block text-xs text-gray-400">...</div>
+                </div>
+                <div className="flex items-center justify-between rounded-2xl border border-[#6E63D5] bg-[#F3F1FF] p-3 ring-2 ring-[#6E63D5]/20">
+                  <div className="flex items-center gap-3">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#6E63D5] text-xs font-semibold text-white">
+                      {myRank}
+                    </div>
+                    <div className="text-sm font-semibold text-[#6E63D5]">{userName} (나)</div>
+                  </div>
+                  <div className="text-sm font-semibold text-[#6E63D5]">{points.toLocaleString()}P</div>
+                </div>
+              </>
+            )}
           </div>
 
+          {/* 약점 분석 버튼: 10문제 이상 풀면 활성화 */}
           <button
             type="button"
-            className="mt-3 w-full rounded-full bg-[#6E63D5] py-3 text-sm font-semibold text-white hover:bg-[#584FAA] active:bg-[#4D4595] max-[380px]:py-2.5 max-[380px]:text-xs"
+            disabled={playedThisMonth < 10}
+            onClick={() => {
+              if (playedThisMonth >= 10) {
+                window.location.href = "/ko/student/weakness";
+              }
+            }}
+            className={`mt-3 w-full rounded-full py-3 text-sm font-semibold max-[380px]:py-2.5 max-[380px]:text-xs ${
+              playedThisMonth >= 10
+                ? "bg-[#6E63D5] text-white hover:bg-[#584FAA] active:bg-[#4D4595]"
+                : "bg-gray-200 text-gray-400 cursor-not-allowed"
+            }`}
           >
             내 약점 분석 보기
           </button>
+
+          {/* 10문제 미만일 때 안내문 */}
+          {playedThisMonth < 10 && (
+            <div className="mt-2 text-center text-xs text-gray-500">
+              약점 분석을 보려면 최소 10문제를 풀어야 합니다. (현재 {playedThisMonth}문제)
+            </div>
+          )}
         </div>
       </div>
     </div>
