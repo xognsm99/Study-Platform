@@ -147,7 +147,7 @@ export default function ReadingABPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F3FF] px-4 py-6">
+    <div className="min-h-screen bg-sky-50 dark:bg-sky-50 px-4 py-6">
 
       <div className="mx-auto w-full max-w-[420px]">
         {/* 헤더 */}

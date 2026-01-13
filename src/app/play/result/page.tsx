@@ -313,7 +313,7 @@ export default function PlayResultPage() {
 
   if (!gameSet || !result) {
     return (
-      <div className="flex min-h-screen items-center justify-center bg-[#F6F5FF]">
+      <div className="flex min-h-screen items-center justify-center bg-sky-50 dark:bg-sky-50">
         <div className="text-[#2A2457]">로딩 중...</div>
       </div>
     );
@@ -323,7 +323,7 @@ export default function PlayResultPage() {
 
   return (
     <div
-      className="min-h-screen bg-[#F6F5FF]"
+      className="min-h-screen bg-sky-50 dark:bg-sky-50"
       onClick={handleUserInteraction}
       onTouchStart={handleUserInteraction}
     >

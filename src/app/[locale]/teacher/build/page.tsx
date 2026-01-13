@@ -191,11 +191,11 @@ function TeacherBuildPageContent() {
               aria-pressed={selVocab}
               className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selVocab
-                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
-                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                  ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
+                  : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
                 어 휘
               </span>
             </button>
@@ -206,11 +206,11 @@ function TeacherBuildPageContent() {
               aria-pressed={selGrammar}
               className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selGrammar
-                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
-                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                  ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
+                  : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
                 문 법
               </span>
             </button>
@@ -221,11 +221,11 @@ function TeacherBuildPageContent() {
               aria-pressed={selReading}
               className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selReading
-                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
-                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                  ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
+                  : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
                 본 문
               </span>
             </button>
@@ -236,11 +236,11 @@ function TeacherBuildPageContent() {
               aria-pressed={selDialogue}
               className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selDialogue
-                  ? "border-[#6E63D5] bg-[#F0EFFF] shadow-[0_8px_20px_rgba(110,99,213,0.18)] hover:bg-[#E6E2FF]"
-                  : "border-[#E6E2FF] bg-white hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                  ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
+                  : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#2A2457]">
+              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
                 대화문
               </span>
             </button>

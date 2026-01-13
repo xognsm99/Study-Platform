@@ -138,19 +138,19 @@ export default function VocabGamePage() {
   }, [idx]);
 
   if (!mounted) {
-    return <div className="min-h-screen bg-[#F5F3FF]" />;
+    return <div className="min-h-screen bg-sky-50 dark:bg-sky-50" />;
   }
 
   if (!cur) {
     return (
-      <div className="min-h-screen bg-[#F5F3FF] p-6">
+      <div className="min-h-screen bg-sky-50 dark:bg-sky-50 p-6">
         <div className="font-semibold mb-2">문제가 없습니다.</div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-[#F5F3FF] via-[#FAF8FF] to-[#F0EDFF]">
+    <div className="min-h-screen bg-sky-50 dark:bg-sky-50">
       <div className="max-w-[520px] mx-auto p-2">
         {/* 헤더 */}
         <div className="bg-gradient-to-r from-[#6E63D5] to-[#8B7FE8] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-lg w-full">

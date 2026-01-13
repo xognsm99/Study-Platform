@@ -12,9 +12,9 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="ko">
+    <html lang="ko" className="bg-sky-50">
       {/* ✅ 모바일에서 BottomNav가 가리는 문제 해결: body에 하단 공간 예약 */}
-      <body className="min-h-screen bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100">
+      <body className="min-h-screen bg-sky-50 dark:bg-sky-50 text-gray-900">
   <div className="min-h-screen flex flex-col">
     <Header />
 

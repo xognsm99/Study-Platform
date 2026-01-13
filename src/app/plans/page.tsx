@@ -137,7 +137,7 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F6F3FF] px-4 py-12">
+    <div className="min-h-screen bg-sky-50 dark:bg-sky-50 px-4 py-12">
       <div className="mx-auto max-w-4xl">
         {/* 헤더 */}
         <div className="mb-8 text-center">

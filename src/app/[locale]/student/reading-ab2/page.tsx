@@ -78,7 +78,7 @@ export default function ReadingAb2Page() {
 
   if (!q) {
     return (
-      <div className="min-h-screen bg-[#F6F3FF] p-6">
+      <div className="min-h-screen bg-sky-50 p-6">
         <div className="mx-auto max-w-[520px] rounded-[28px] bg-white/90 p-6 shadow">
           문항이 없습니다.
         </div>
@@ -87,10 +87,10 @@ export default function ReadingAb2Page() {
   }
 
   return (
-    <div className="min-h-screen bg-[#F6F3FF] p-5">
+    <div className="min-h-screen bg-sky-50 p-5">
       <div className="mx-auto w-full max-w-[560px] space-y-4">
-        {/* 상단 바: 서술형 대비 훈련과 동일 톤 */}
-        <div className="rounded-[18px] bg-[#6E63D5] px-2 py-3 shadow-sm">
+        {/* 상단 바: 블루 톤 */}
+        <div className="rounded-[18px] bg-gradient-to-r from-[#1e40af] to-[#2563eb] px-2 py-3 shadow-sm">
           <div className="flex items-center justify-between gap-3">
             <button
               onClick={() => router.back()}

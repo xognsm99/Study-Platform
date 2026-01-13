@@ -503,9 +503,9 @@ export default function StudentPage() {
     return parts.join(" ");
   };
 
-  // Primary 색상 상수 (프로필 저장 버튼과 통일)
-  const PRIMARY_BG = "bg-[#6E63D5] hover:bg-[#5B52C8]";
-  const PRIMARY_TEXT = "text-[#6E63D5]";
+  // Primary 색상 상수 (블루 계열로 통일)
+  const PRIMARY_BG = "bg-gradient-to-r from-[#1e40af] to-[#2563eb] hover:from-[#1e3a8a] hover:to-[#1e40af]";
+  const PRIMARY_TEXT = "text-[#2563eb]";
 
   // 공통 입력 필드 스타일 함수
   function fieldClass(selected: boolean) {
@@ -731,7 +731,7 @@ export default function StudentPage() {
                       setEditMode(false);
                       router.replace(`/${locale}/student`);
                     }}
-                    className="h-14 w-full rounded-xl border-2 border-[#B9B4E4] bg-white text-lg max-[380px]:h-12 max-[380px]:text-base text-[#6E63D5] font-semibold hover:bg-[#F6F5FF] hover:border-[#A89FD8] active:scale-[0.98] transition-all"
+                    className="h-14 w-full rounded-xl border-2 border-blue-300 bg-white text-lg max-[380px]:h-12 max-[380px]:text-base text-[#2563eb] font-semibold hover:bg-blue-50 hover:border-blue-400 active:scale-[0.98] transition-all"
                   >
                     취소
                   </button>
@@ -751,7 +751,7 @@ export default function StudentPage() {
               {/* 프로필 카드 */}
               <div className="min-w-0">
                 {/* 학교명 */}
-                <div className="text-[18px] max-[380px]:text-base font-extrabold tracking-tight text-[#6E63D5]">
+                <div className="text-[18px] max-[380px]:text-base font-extrabold tracking-tight text-[#2563eb]">
                   {profile?.school ?? "학교 미설정"}
                 </div>
                 <div className="mt-1 text-sm max-[380px]:text-xs text-slate-600">
@@ -764,7 +764,7 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-100 to-violet-200 hover:from-violet-200 hover:to-violet-300 text-violet-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 text-blue-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                 >
                   단어/숙어 훈련
                 </button>
@@ -772,7 +772,7 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={handleStartReadingAB}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-violet-200 to-violet-300 hover:from-violet-300 hover:to-violet-400 text-violet-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400 text-blue-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
                 >
                   본문 선택형 훈련
                 </button>
@@ -791,9 +791,9 @@ export default function StudentPage() {
                     router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
                   className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all
-                             bg-gradient-to-r from-[#BEB7FF] to-[#D7D3FF] text-[#4E43C8]
-                             shadow-[0_10px_22px_rgba(110,99,213,0.18)]
-                             hover:from-[#B1A9FF] hover:to-[#CBC6FF] hover:shadow-[0_14px_28px_rgba(110,99,213,0.25)]
+                             bg-gradient-to-r from-[#93C5FD] to-[#BFDBFE] text-[#1e40af]
+                             shadow-[0_10px_22px_rgba(37,99,235,0.18)]
+                             hover:from-[#7DB6FC] hover:to-[#A5CFFD] hover:shadow-[0_14px_28px_rgba(37,99,235,0.25)]
                              disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
 
                 >
@@ -801,7 +801,7 @@ export default function StudentPage() {
                 </button>
                 <button
                    onClick={() => router.push(`/${locale}/student/reading-ab2`)}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] hover:shadow-[0_16px_32px_rgba(110,99,213,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
+                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#1e40af] to-[#2563eb] text-white shadow-[0_12px_26px_rgba(30,64,175,0.35)] hover:from-[#1e3a8a] hover:to-[#1e40af] hover:shadow-[0_16px_32px_rgba(30,64,175,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
 >
                   문장 배열 훈련
                 </button>

@@ -8,7 +8,7 @@ export default function ParentPage() {
   const locale = (params?.locale as string) || "ko";
 
   return (
-    <div className="min-h-screen bg-slate-50 p-4 sm:p-8">
+    <div className="min-h-screen bg-sky-50 dark:bg-sky-50 p-4 sm:p-8">
       <div className="mx-auto max-w-3xl">
         <div className="rounded-2xl border-2 border-slate-200 bg-white p-8 shadow-md">
           <h1 className="text-2xl font-bold text-slate-900 mb-4">학부모 모드</h1>

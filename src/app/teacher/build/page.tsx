@@ -143,7 +143,7 @@ function TeacherBuildPageContent() {
   };
 
   return (
-    <main className="min-h-screen bg-white">
+    <main className="min-h-screen bg-sky-50 dark:bg-sky-50">
       <div className="mx-auto max-w-3xl px-5 py-10">
         <h1 className="text-2xl font-bold mb-6">문제 구성</h1>
 

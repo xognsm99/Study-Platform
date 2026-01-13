@@ -272,9 +272,9 @@ function StudentProblemsPageContent() {
   // ✅ 로딩 중일 때 전체 화면 오버레이 표시
   if (loading) {
     return (
-      <div className="fixed inset-0 z-50 flex items-center justify-center bg-violet-100/80 backdrop-blur-sm">
+      <div className="fixed inset-0 z-50 flex items-center justify-center bg-sky-100/80 backdrop-blur-sm">
         <div className="flex flex-col items-center gap-4">
-          <div className="h-12 w-12 animate-spin rounded-full border-4 border-violet-200 border-t-violet-600"></div>
+          <div className="h-12 w-12 animate-spin rounded-full border-4 border-sky-200 border-t-sky-600"></div>
         </div>
       </div>
     );
@@ -350,8 +350,8 @@ function StudentProblemsPageContent() {
                         aria-pressed={isSelected}
                         className={`w-full rounded-2xl border px-5 py-4 max-[380px]:px-3 max-[380px]:py-2.5 transition-all active:scale-[0.99] ${
                           isSelected
-                            ? "border-[#6E63D5] bg-[#F0EFFF] text-[#2A2457] shadow-[0_8px_20px_rgba(110,99,213,0.18)]"
-                            : "border-[#E6E2FF] bg-white text-slate-700 hover:border-[#B9B4E4] hover:bg-[#F6F3FF]"
+                            ? "border-[#2563eb] bg-[#EFF6FF] text-[#1e40af] shadow-[0_8px_20px_rgba(37,99,235,0.18)]"
+                            : "border-[#DBEAFE] bg-white text-slate-700 hover:border-[#93C5FD] hover:bg-sky-50"
                         }`}
                       >
                         <span className="text-lg max-[380px]:text-xs font-semibold">{group.label}</span>

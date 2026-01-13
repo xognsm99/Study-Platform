@@ -46,7 +46,7 @@ function ResultContent() {
   };
 
   return (
-    <div className="min-h-screen bg-[#F5F3FF]">
+    <div className="min-h-screen bg-sky-50 dark:bg-sky-50">
       <div className="max-w-[520px] mx-auto p-2">
         {/* 보라 헤더 바 */}
         <div className="bg-[#6E63D5] text-white rounded-none px-3 py-3 flex items-center justify-between mb-5 w-full">
@@ -122,7 +122,7 @@ function ResultContent() {
 export default function VocabGameResultPage() {
   return (
     <Suspense fallback={
-      <div className="min-h-screen bg-[#F5F3FF] flex items-center justify-center">
+      <div className="min-h-screen bg-sky-50 dark:bg-sky-50 flex items-center justify-center">
         <div className="text-[#6E63D5] font-semibold">결과 로딩 중...</div>
       </div>
     }>

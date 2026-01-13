@@ -26,8 +26,8 @@ export default function BottomNav() {
   const activeTeacher = pathname.startsWith(hrefTeacher);
   const activeMy = pathname.startsWith(hrefMy);
 
-  // ✅ 진한 보라 + 선택 하이라이트
-  const ACTIVE_ITEM = "text-[#4B2BBE] bg-[#4B2BBE]/10";
+  // ✅ 학생 버튼 블루 그라데이션 + 3D 효과
+  const ACTIVE_ITEM = "text-white bg-gradient-to-br from-[#1e40af] via-[#2563eb] to-[#3b82f6] shadow-[0_2px_8px_rgba(30,64,175,0.3)]";
   const INACTIVE_ITEM = "text-gray-400";
 
   const items = [

@@ -127,7 +127,7 @@ function TeacherPrintPageContent() {
 
   if (dataNotFound || !printData) {
     return (
-      <div className="min-h-screen bg-gray-50 flex items-center justify-center p-10">
+      <div className="min-h-screen bg-sky-50 dark:bg-sky-50 flex items-center justify-center p-10">
         <div className="max-w-md w-full rounded-2xl bg-white p-8 shadow-sm ring-1 ring-gray-100 text-center">
           <div className="mb-4">
             <svg
