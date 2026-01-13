@@ -405,6 +405,25 @@ export default function TripleQuizClient({ grade, subject, category, categories 
   // ✅ 문제 텍스트 추출
   const { passage, question } = pickText(current);
 
+  // ✅ 현재 문제의 카테고리/qtype 라벨 (SingleQuizClient와 동일)
+  const leftLabel = (() => {
+    // 1) current의 qtype 우선
+    const qtype = String(current?.content?.qtype ?? current?.content?.raw?.qtype ?? "");
+    if (qtype) return qtype;
+
+    // 2) current.qtype 컬럼(테이블 qtype)
+    const qtype2 = String((current as any)?.qtype ?? "");
+    if (qtype2) return qtype2;
+
+    // 3) current.category mapping
+    const cat = String((current as any)?.category ?? "").toLowerCase();
+    if (!cat) return "";
+    if (cat.includes("reading") || cat.includes("본문")) return "본문";
+    return cat;
+  })();
+
+  const isReading = !!leftLabel && (leftLabel.includes("본문") || leftLabel.startsWith("본문_"));
+
   // ✅ 지문(영영풀이/해석) 최종 값: content.stimulus 우선
   const c: any = current?.content ?? {};
   const finalPassage = String(
@@ -489,15 +508,22 @@ export default function TripleQuizClient({ grade, subject, category, categories 
         </div>
       )}
 
-      {/* ✅ 1) 문제 */}
-      <h2 className="text-xl font-bold mb-4">
+      {/* ✅ 1) 지문(본문) 먼저 - reading/본문 전용 */}
+      {finalPassage && isReading && (
+        <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
+          {renderWideParensBlank(finalPassage)}
+        </div>
+      )}
+
+      {/* ✅ 2) 문제 */}
+      <h2 className="text-xl font-bold mb-4 px-4">
         <div className="whitespace-pre-line leading-relaxed">
           {renderWideParensBlank(question || "문제가 비어 있습니다.")}
         </div>
       </h2>
 
-      {/* ✅ 2) 지문(영영풀이/본문/해석) - stimulus 포함 */}
-      {finalPassage && (
+      {/* ✅ 3) 지문(영영풀이/해석) - 본문 이외 */}
+      {finalPassage && !isReading && (
         <div className="mb-4 mt-3 rounded-xl border p-4 whitespace-pre-line leading-relaxed">
           {renderWideParensBlank(finalPassage)}
         </div>
