@@ -8,11 +8,13 @@ type AnimationPhase = "typing" | "underline" | "s" | "circle" | "done";
 interface IntroSplashProps {
   nextHref?: string;
   onDone?: () => void;
+  showOnceKey?: string; // ✅ 추가: 한 번만 보기 키
 }
 
 export default function IntroSplash({
   nextHref = "/auth",
   onDone,
+  showOnceKey,
 }: IntroSplashProps) {
   const router = useRouter();
   const [phase, setPhase] = useState<AnimationPhase>("typing");
@@ -21,6 +23,21 @@ export default function IntroSplash({
 
   const fullText =
     "The teacher as well as the students ( is / are ) preparing for the test.";
+
+  // ✅ (옵션) showOnceKey가 있으면, 이미 봤던 경우 바로 스킵
+  useEffect(() => {
+    if (!showOnceKey) return;
+
+    try {
+      const seen = localStorage.getItem(showOnceKey);
+      if (seen === "1") {
+        if (onDone) onDone();
+        else router.push(nextHref);
+      }
+    } catch {
+      // localStorage 접근 실패해도 그냥 진행
+    }
+  }, [showOnceKey, onDone, router, nextHref]);
 
   useEffect(() => {
     // Check prefers-reduced-motion
@@ -39,10 +56,9 @@ export default function IntroSplash({
     if (typed.length < fullText.length) {
       const timer = setTimeout(() => {
         setTyped(fullText.substring(0, typed.length + 1));
-      }, 50); // 50ms per character
+      }, 50);
       return () => clearTimeout(timer);
     } else {
-      // Typing complete, move to underline after 300ms
       const timer = setTimeout(() => {
         setPhase("underline");
       }, 300);
@@ -61,36 +77,41 @@ export default function IntroSplash({
     if (phase === "underline") {
       const timer = setTimeout(() => {
         setPhase("s");
-      }, 1500); // Underline animation duration
+      }, 1500);
       return () => clearTimeout(timer);
     }
 
     if (phase === "s") {
       const timer = setTimeout(() => {
         setPhase("circle");
-      }, 800); // S popup delay
+      }, 800);
       return () => clearTimeout(timer);
     }
 
     if (phase === "circle") {
       const timer = setTimeout(() => {
         setPhase("done");
-      }, 1500); // Circle animation duration
+      }, 1500);
       return () => clearTimeout(timer);
     }
   }, [phase, shouldAnimate, fullText]);
 
+  const markSeen = () => {
+    try {
+      if (showOnceKey) localStorage.setItem(showOnceKey, "1");
+    } catch {}
+  };
+
   const handleSkip = () => {
+    markSeen();
     setTyped(fullText);
     setPhase("done");
   };
 
   const handleStart = () => {
-    if (onDone) {
-      onDone();
-    } else {
-      router.push(nextHref);
-    }
+    markSeen();
+    if (onDone) onDone();
+    else router.push(nextHref);
   };
 
   // Fixed text segments (no duplication)
@@ -116,13 +137,10 @@ export default function IntroSplash({
         <div className="text-center">
           <p className="text-[28px] md:text-[32px] font-medium text-white/90 leading-relaxed">
             {phase === "typing" ? (
-              // Typing phase: show only typed string without any overlays
               <span>{typed}</span>
             ) : (
-              // After typing: render segments with overlays
               <>
                 <span className="relative inline-block">
-                  {/* S Popup - positioned above "The teacher" */}
                   {(phase === "s" || phase === "circle" || phase === "done") && (
                     <span
                       className="absolute left-1/2 -translate-x-1/2 text-[28px] md:text-[32px] font-bold text-[#A78BFA] animate-s-popup"
@@ -135,7 +153,7 @@ export default function IntroSplash({
                     </span>
                   )}
                   <span>{segmentA}</span>
-                  {/* Underline SVG */}
+
                   {(phase === "underline" ||
                     phase === "s" ||
                     phase === "circle" ||
@@ -155,23 +173,19 @@ export default function IntroSplash({
                         className={phase === "underline" ? "animate-draw-underline" : ""}
                         style={
                           phase === "underline"
-                            ? {
-                                strokeDasharray: "300",
-                                strokeDashoffset: "300",
-                              }
-                            : {
-                                strokeDasharray: "300",
-                                strokeDashoffset: "0",
-                              }
+                            ? { strokeDasharray: "300", strokeDashoffset: "300" }
+                            : { strokeDasharray: "300", strokeDashoffset: "0" }
                         }
                       />
                     </svg>
                   )}
                 </span>
+
                 <span>{segmentB}</span>
+
                 <span className="relative inline-block">
                   <span>{segmentC}</span>
-                  {/* Circle around "is" */}
+
                   {(phase === "circle" || phase === "done") && (
                     <svg
                       className="absolute"
@@ -196,19 +210,14 @@ export default function IntroSplash({
                         className={phase === "circle" ? "animate-draw-circle" : ""}
                         style={
                           phase === "circle"
-                            ? {
-                                strokeDasharray: "94",
-                                strokeDashoffset: "94",
-                              }
-                            : {
-                                strokeDasharray: "94",
-                                strokeDashoffset: "0",
-                              }
+                            ? { strokeDasharray: "94", strokeDashoffset: "94" }
+                            : { strokeDasharray: "94", strokeDashoffset: "0" }
                         }
                       />
                     </svg>
                   )}
                 </span>
+
                 <span>{segmentD}</span>
               </>
             )}
@@ -241,19 +250,16 @@ export default function IntroSplash({
             transform: translateY(0);
           }
         }
-
         @keyframes draw-underline {
           to {
             stroke-dashoffset: 0;
           }
         }
-
         @keyframes draw-circle {
           to {
             stroke-dashoffset: 0;
           }
         }
-
         @keyframes fade-in {
           from {
             opacity: 0;
@@ -264,23 +270,18 @@ export default function IntroSplash({
             transform: translateY(0);
           }
         }
-
         .animate-s-popup {
           animation: s-popup 0.6s ease-out forwards;
         }
-
         .animate-draw-underline {
           animation: draw-underline 1.2s ease-out forwards;
         }
-
         .animate-draw-circle {
           animation: draw-circle 1.2s ease-out forwards;
         }
-
         .animate-fade-in {
           animation: fade-in 0.5s ease-out forwards;
         }
-
         @media (prefers-reduced-motion: reduce) {
           .animate-s-popup,
           .animate-draw-underline,
