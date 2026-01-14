@@ -745,7 +745,9 @@ export default function StudentPage() {
       {!showForm && profile && isProfileComplete(profile) && (
         <StudentHomeShell>
           <div className="px-1 pt-3 pb-24">
-            <ScreenTitle>훈련 PICK</ScreenTitle>
+            <div className="px-5 mb-6">
+              <ScreenTitle>훈련 PICK</ScreenTitle>
+            </div>
 
             <ScreenCard>
               {/* 프로필 카드 */}
@@ -759,24 +761,73 @@ export default function StudentPage() {
                 </div>
               </div>
 
-              {/* 주요 액션 버튼들 */}
-              <div className="mt-8 space-y-4 max-[380px]:mt-3 max-[380px]:space-y-3">
+              {/* 주요 액션 버튼들 - 애플 글래스모피즘 스타일 */}
+              <div className="mt-8 space-y-3.5 max-[380px]:mt-3 max-[380px]:space-y-3">
+                {/* 1. 단어/숙어 훈련 - 라이트 블루 */}
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-blue-100 to-blue-200 hover:from-blue-200 hover:to-blue-300 text-blue-800 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  style={{
+                    background: "linear-gradient(145deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%)",
+                    boxShadow: "0 6px 20px -4px rgba(59,130,246,0.25), 0 0 0 1px rgba(255,255,255,0.6) inset",
+                    color: "#1e40af",
+                  }}
                 >
-                  단어/숙어 훈련
+                  {/* 호버 시 밝아지는 오버레이 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-white/0 to-blue-200/0 group-hover:from-white/40 group-hover:to-blue-200/20 transition-all duration-500 pointer-events-none" />
+
+                  {/* 상단 글로우 */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[50%] opacity-60 group-hover:opacity-80 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.7), transparent)" }}
+                  />
+
+                  {/* 호버 시 외곽 글로우 */}
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(147,197,253,0.5), rgba(191,219,254,0.3))",
+                      filter: "blur(2px)",
+                    }}
+                  />
+
+                  <span className="relative z-10">단어/숙어 훈련</span>
                 </button>
 
+                {/* 2. 본문 선택형 훈련 - 미디엄 블루 */}
                 <button
                   type="button"
                   onClick={handleStartReadingAB}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-blue-200 to-blue-300 hover:from-blue-300 hover:to-blue-400 text-blue-900 text-lg max-[380px]:text-base font-semibold shadow-sm hover:shadow-md active:scale-[0.98] transition-all"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  style={{
+                    background: "linear-gradient(145deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%)",
+                    boxShadow: "0 8px 24px -4px rgba(59,130,246,0.35), 0 0 0 1px rgba(255,255,255,0.3) inset",
+                    color: "#1e3a8a",
+                  }}
                 >
-                  본문 선택형 훈련
+                  {/* 호버 시 밝아지는 오버레이 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-300/0 to-blue-500/0 group-hover:from-blue-300/25 group-hover:to-blue-500/15 transition-all duration-500 pointer-events-none" />
+
+                  {/* 상단 글로우 */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[50%] opacity-50 group-hover:opacity-70 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)" }}
+                  />
+
+                  {/* 호버 시 외곽 글로우 */}
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(2px)",
+                    }}
+                  />
+
+                  <span className="relative z-10">본문 선택형 훈련</span>
                 </button>
 
+                {/* 3. 서술형 대비 훈련 - 딥 블루 */}
                 <button
                   type="button"
                   onClick={() => {
@@ -790,22 +841,87 @@ export default function StudentPage() {
                     });
                     router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all
-                             bg-gradient-to-r from-[#93C5FD] to-[#BFDBFE] text-[#1e40af]
-                             shadow-[0_10px_22px_rgba(37,99,235,0.18)]
-                             hover:from-[#7DB6FC] hover:to-[#A5CFFD] hover:shadow-[0_14px_28px_rgba(37,99,235,0.25)]
-                             disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
-
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  style={{
+                    background: "linear-gradient(145deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)",
+                    boxShadow: "0 8px 28px -4px rgba(37,99,235,0.4), 0 0 0 1px rgba(255,255,255,0.2) inset",
+                    color: "white",
+                  }}
                 >
-                  서술형 대비 훈련
-                </button>
-                <button
-                   onClick={() => router.push(`/${locale}/student/reading-ab2`)}
-                  className="w-full h-14 max-[380px]:h-12 rounded-xl text-lg max-[380px]:text-base font-semibold active:scale-[0.98] transition-all bg-gradient-to-r from-[#1e40af] to-[#2563eb] text-white shadow-[0_12px_26px_rgba(30,64,175,0.35)] hover:from-[#1e3a8a] hover:to-[#1e40af] hover:shadow-[0_16px_32px_rgba(30,64,175,0.45)] disabled:bg-gray-300 disabled:text-gray-500 disabled:opacity-100 disabled:cursor-not-allowed disabled:from-gray-300 disabled:to-gray-300"
->
-                  문장 배열 훈련
+                  {/* 호버 시 밝아지는 오버레이 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+
+                  {/* 상단 글로우 */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)" }}
+                  />
+
+                  {/* 호버 시 외곽 글로우 */}
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+
+                  {/* 미세한 반짝임 */}
+                  <div
+                    className="absolute inset-0 opacity-[0.1] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 20% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 80% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px)
+                      `,
+                    }}
+                  />
+
+                  <span className="relative z-10 drop-shadow-[0_2px_4px_rgba(0,0,0,0.2)]">서술형 대비 훈련</span>
                 </button>
 
+                {/* 4. 문장 배열 훈련 - 다크 블루 (가장 진함) */}
+                <button
+                  onClick={() => router.push(`/${locale}/student/reading-ab2`)}
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  style={{
+                    background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                    boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                    color: "white",
+                  }}
+                >
+                  {/* 호버 시 밝아지는 오버레이 */}
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+
+                  {/* 상단 글로우 */}
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                  />
+
+                  {/* 호버 시 외곽 글로우 */}
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+
+                  {/* 미세한 반짝임 */}
+                  <div
+                    className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+
+                  <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">문장 배열 훈련</span>
+                </button>
 
                 {/* ✅ 버튼 아래 공간 (답답함 해결) */}
                 <div className="h-3" />

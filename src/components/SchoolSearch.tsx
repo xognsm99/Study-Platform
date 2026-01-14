@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useMemo, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 
 type SchoolItem = {
   name: string;
@@ -14,7 +14,7 @@ type SchoolItem = {
 
 export default function SchoolSearch(props: {
   region: string; // 예: "경기", "서울", "전라", "경상" ...
-  gu: string;     // 예: "인천", "강남구", "경상북도", "전체" ...
+  gu: string; // 예: "인천", "강남구", "경상북도", "전체" ...
   onSelect: (school: { name: string; schoolCode: string; officeCode: string }) => void;
 }) {
   const { region, gu, onSelect } = props;
@@ -58,7 +58,7 @@ export default function SchoolSearch(props: {
         if (!res.ok) {
           setItems([]);
           setOpen(true);
-          // NEIS API 키 오류 메시지를 더 명확하게 표시
+
           const errorMsg = data?.error || "학교 검색 API 오류";
           if (errorMsg.includes("NEIS_API_KEY") || errorMsg.includes("환경변수")) {
             setMsg("학교 검색 기능은 현재 준비중입니다.\n지역/필터 때문에 비어있을 수 있어요.");
@@ -93,31 +93,43 @@ export default function SchoolSearch(props: {
           value={q}
           onChange={(e) => setQ(e.target.value)}
           placeholder="학교 검색 2글자 이상"
-          className="h-12 w-full min-w-0 rounded-full border border-[#E7E5FF] bg-white px-4 text-sm max-[380px]:h-10 max-[380px]:text-xs text-slate-900 outline-none transition focus:border-[#B9B4E4] focus:ring-2 focus:ring-[#B9B4E4]/30 placeholder:text-[#C9C6F2]"
+          className={[
+            "h-12 w-full min-w-0 rounded-2xl bg-white/80 px-4 text-sm",
+            "border border-[#93c5fd] text-[#1e3a8a] outline-none transition-all",
+            "focus:border-[#3b82f6] focus:ring-2 focus:ring-[#3b82f6] focus:ring-opacity-30",
+            "placeholder:text-slate-400",
+            "max-[380px]:h-10 max-[380px]:text-xs",
+          ].join(" ")}
         />
+
         <button
           type="button"
           onClick={() => setOpen(true)}
-          className="h-12 w-24 shrink-0 rounded-full bg-[#6E63D5] hover:bg-[#5B52C8] text-lg max-[380px]:h-10 max-[380px]:w-20 max-[380px]:text-xs font-semibold text-white shadow-md active:scale-[0.99] transition-all"
+          className={[
+            "h-12 w-24 shrink-0 rounded-2xl text-lg font-semibold text-white",
+            "shadow-md active:scale-[0.99] transition-all",
+            "bg-gradient-to-r from-[#1e40af] via-[#1e3a8a] to-[#172554]",
+            "hover:brightness-110",
+            "max-[380px]:h-10 max-[380px]:w-20 max-[380px]:text-xs",
+          ].join(" ")}
         >
           {loading ? "검색중" : "검색"}
         </button>
       </div>
 
-      <p className="mt-2 text-xs text-gray-400 max-[380px]:text-[11px]">
+      <p className="mt-2 text-xs text-slate-400 max-[380px]:text-[11px]">
         검색 결과에서 선택하면 위 &quot;학교&quot; 칸에 적용됩니다.
       </p>
 
       {open && (items.length > 0 || msg) && (
         <div
-          className="
-            mt-3 overflow-hidden rounded-2xl
-            bg-[#F6F5FF] border border-[#E6E2FF]
-            shadow-[0_18px_60px_rgba(110,99,213,0.18)]
-          "
+          className={[
+            "mt-3 overflow-hidden rounded-2xl bg-white border border-[#93c5fd]",
+            "shadow-[0_18px_60px_rgba(30,64,175,0.18)]",
+          ].join(" ")}
         >
           {msg && (
-            <div className="px-4 py-3 text-sm text-[#6E63D5]/80 whitespace-pre-line">
+            <div className="px-4 py-3 text-sm text-[#1e3a8a]/80 whitespace-pre-line">
               {msg}
             </div>
           )}
@@ -130,16 +142,13 @@ export default function SchoolSearch(props: {
                 onSelect({ name: it.name, schoolCode: it.schoolCode, officeCode: it.officeCode });
                 setOpen(false);
               }}
-              className="
-                w-full text-left px-4 py-3
-                hover:bg-[#EEEAFE] active:bg-[#E6E2FF]
-                transition
-              "
+              className={[
+                "w-full text-left px-4 py-3 transition",
+                "hover:bg-[#eff6ff] active:bg-[#dbeafe]",
+              ].join(" ")}
             >
-              <div className="text-[#2B235A] font-semibold">
-                {it.name}
-              </div>
-              <div className="text-[#6E63D5]/80 text-xs mt-1">
+              <div className="text-[#0f172a] font-semibold">{it.name}</div>
+              <div className="text-[#1e3a8a]/70 text-xs mt-1">
                 {it.location} · {it.kind} · {it.officeName}
               </div>
             </button>

@@ -92,60 +92,104 @@ export default function StudentModePage() {
               )}
             </div>
 
-            {/* 모드 선택 버튼 - 세로 배치 */}
-            <div className="flex flex-col gap-3">
-              {/* 훈련 모드 - 학생 버튼 블루 그라데이션 */}
+            {/* 모드 선택 버튼 - 애플 스타일 글래스모피즘 */}
+            <div className="flex flex-col gap-4">
+              {/* 훈련 모드 - 딥 블루 글래스 */}
               <button
                 onClick={handleTrainingMode}
-                className="group relative overflow-hidden h-24 rounded-[20px] w-full flex items-center justify-start px-6 gap-4 text-white border-none cursor-pointer transition-all duration-300 ease-out select-none bg-gradient-to-br from-[#1e40af] via-[#2563eb] to-[#3b82f6] shadow-[0_6px_20px_rgba(30,64,175,0.35),0_3px_10px_rgba(37,99,235,0.25)] hover:shadow-[0_10px_30px_rgba(30,64,175,0.45),0_5px_15px_rgba(37,99,235,0.35)] hover:-translate-y-1 hover:scale-[1.01] active:scale-[0.98]"
+                className="group relative overflow-hidden h-28 rounded-[26px] w-full flex items-center justify-start px-7 gap-5 text-white border-none cursor-pointer transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                  boxShadow: "0 10px 40px -6px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                }}
               >
-                {/* 별빛 반짝 오버레이 */}
+                {/* 호버 시 밝아지는 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+
+                {/* 상단 글로우 효과 */}
                 <div
-                  className="absolute inset-0 opacity-[0.18] pointer-events-none"
+                  className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[26px]"
                   style={{
-                    backgroundImage: `
-                      radial-gradient(circle at 20% 25%, rgba(255,255,255,0.8) 0, transparent 3px),
-                      radial-gradient(circle at 75% 20%, rgba(255,255,255,0.6) 0, transparent 2.5px),
-                      radial-gradient(circle at 85% 75%, rgba(255,255,255,0.7) 0, transparent 3px),
-                      radial-gradient(circle at 30% 80%, rgba(255,255,255,0.5) 0, transparent 2px),
-                      radial-gradient(circle at 60% 50%, rgba(255,255,255,0.45) 0, transparent 1.5px)
+                    background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)",
+                  }}
+                />
+
+                {/* 호버 시 외곽 글로우 */}
+                <div
+                  className="absolute -inset-[2px] rounded-[26px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                    filter: "blur(4px)",
+                  }}
+                />
+
+                {/* 미세한 반짝임 */}
+                <div
+                  className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                  style={{
+                    background: `
+                      radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                      radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                      radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
                     `,
                   }}
                 />
-                {/* 상단 하이라이트 */}
-                <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/25 to-transparent pointer-events-none" />
-                {/* 하단 그림자 */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/12 to-transparent pointer-events-none" />
 
-                <div className="relative z-10 text-[3rem] drop-shadow-lg">🎯</div>
-                <div className="relative z-10 text-xl font-bold tracking-tight drop-shadow-md">훈련 모드</div>
+                <div className="relative z-10 text-[3.5rem] transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                  🎯
+                </div>
+                <div className="relative z-10 text-[1.45rem] font-bold tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] group-hover:drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-500">
+                  훈련 모드
+                </div>
               </button>
 
-              {/* 실전 모드 - 빨간색 그라데이션 */}
+              {/* 실전 모드 - 파이어 레드 글래스 */}
               <button
                 onClick={handleRealMode}
-                className="group relative overflow-hidden h-24 rounded-[20px] w-full flex items-center justify-start px-6 gap-4 text-white border-none cursor-pointer transition-all duration-300 ease-out select-none bg-gradient-to-br from-[#dc2626] via-[#ef4444] to-[#f87171] shadow-[0_6px_20px_rgba(220,38,38,0.35),0_3px_10px_rgba(239,68,68,0.25)] hover:shadow-[0_10px_30px_rgba(220,38,38,0.45),0_5px_15px_rgba(239,68,68,0.35)] hover:-translate-y-1 hover:scale-[1.01] active:scale-[0.98]"
+                className="group relative overflow-hidden h-28 rounded-[26px] w-full flex items-center justify-start px-7 gap-5 text-white border-none cursor-pointer transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                style={{
+                  background: "linear-gradient(145deg, #dc2626 0%, #b91c1c 50%, #991b1b 100%)",
+                  boxShadow: "0 10px 40px -6px rgba(220,38,38,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                }}
               >
-                {/* 별빛 반짝 오버레이 */}
+                {/* 호버 시 밝아지는 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-br from-red-400/0 to-red-600/0 group-hover:from-red-400/20 group-hover:to-red-600/10 transition-all duration-500 pointer-events-none" />
+
+                {/* 상단 글로우 효과 */}
                 <div
-                  className="absolute inset-0 opacity-[0.18] pointer-events-none"
+                  className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[26px]"
                   style={{
-                    backgroundImage: `
-                      radial-gradient(circle at 20% 25%, rgba(255,255,255,0.8) 0, transparent 3px),
-                      radial-gradient(circle at 75% 20%, rgba(255,255,255,0.6) 0, transparent 2.5px),
-                      radial-gradient(circle at 85% 75%, rgba(255,255,255,0.7) 0, transparent 3px),
-                      radial-gradient(circle at 30% 80%, rgba(255,255,255,0.5) 0, transparent 2px),
-                      radial-gradient(circle at 60% 50%, rgba(255,255,255,0.45) 0, transparent 1.5px)
+                    background: "linear-gradient(to bottom, rgba(255,255,255,0.3), transparent)",
+                  }}
+                />
+
+                {/* 호버 시 외곽 글로우 */}
+                <div
+                  className="absolute -inset-[2px] rounded-[26px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                  style={{
+                    background: "linear-gradient(145deg, rgba(248,113,113,0.6), rgba(239,68,68,0.4))",
+                    filter: "blur(4px)",
+                  }}
+                />
+
+                {/* 미세한 반짝임 */}
+                <div
+                  className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                  style={{
+                    background: `
+                      radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                      radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                      radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
                     `,
                   }}
                 />
-                {/* 상단 하이라이트 */}
-                <div className="absolute top-0 left-0 right-0 h-12 bg-gradient-to-b from-white/25 to-transparent pointer-events-none" />
-                {/* 하단 그림자 */}
-                <div className="absolute bottom-0 left-0 right-0 h-16 bg-gradient-to-t from-black/12 to-transparent pointer-events-none" />
 
-                <div className="relative z-10 text-[3rem] drop-shadow-lg">🔥</div>
-                <div className="relative z-10 text-xl font-bold tracking-tight drop-shadow-md">실전 모드</div>
+                <div className="relative z-10 text-[3.5rem] transition-all duration-500 group-hover:scale-110 group-hover:rotate-6 filter drop-shadow-[0_4px_12px_rgba(0,0,0,0.3)]">
+                  🔥
+                </div>
+                <div className="relative z-10 text-[1.45rem] font-bold tracking-tight drop-shadow-[0_2px_8px_rgba(0,0,0,0.4)] group-hover:drop-shadow-[0_4px_12px_rgba(0,0,0,0.5)] transition-all duration-500">
+                  실전 모드
+                </div>
               </button>
             </div>
           </div>

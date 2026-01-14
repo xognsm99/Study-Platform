@@ -148,7 +148,7 @@ function SimpleSelect({
   return (
     <div ref={rootRef} className="relative">
       <label className="block">
-        <span className="mb-1 block text-2x font-semibold text-[#3C357A]">{label}</span>
+        <span className="mb-1 block text-2x font-semibold text-[#1e40af]">{label}</span>
         <button
           ref={buttonRef}
           type="button"
@@ -156,9 +156,9 @@ function SimpleSelect({
             setOpen((prev) => !prev);
             if (!open) setFocusedIndex(options.findIndex((o) => o.value === value));
           }}
-          className="w-full h-12 rounded-2xl bg-white/80 border border-[#CFCBFF] px-4 text-sm text-[#1F1B3A] focus:outline-none focus:ring-2 focus:ring-[#8A7CF0] focus:border-[#8A7CF0] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between"
+          className="w-full h-12 rounded-2xl bg-white/80 border border-[#93c5fd] px-4 text-sm text-[#1e3a8a] focus:outline-none focus:ring-2 focus:ring-[#3b82f6] focus:border-[#3b82f6] max-[380px]:h-10 max-[380px]:text-xs text-left flex items-center justify-between transition-all"
         >
-          <span className={selectedOption ? "text-[#1F1B3A]" : "text-gray-400"}>
+          <span className={selectedOption ? "text-[#1e3a8a]" : "text-gray-400"}>
             {displayText}
           </span>
           <svg
@@ -181,7 +181,7 @@ function SimpleSelect({
       </label>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-[#CFCBFF] bg-white shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-[#93c5fd] bg-white shadow-lg overflow-hidden">
           <div ref={listRef} className="max-h-60 overflow-auto">
             {options.map((option, index) => {
               const isSelected = option.value === value;
@@ -192,12 +192,12 @@ function SimpleSelect({
                   type="button"
                   onClick={() => handleSelect(option.value)}
                   onMouseEnter={() => setFocusedIndex(index)}
-                  className={`w-full px-4 py-3 text-sm text-[#1F1B3A] text-left transition ${
+                  className={`w-full px-4 py-3 text-sm text-[#1e3a8a] text-left transition ${
                     isSelected
-                      ? "bg-[#E9E6FF] font-semibold"
+                      ? "bg-[#dbeafe] font-semibold"
                       : isFocused
-                      ? "bg-[#E9E6FF]"
-                      : "hover:bg-[#E9E6FF]"
+                      ? "bg-[#eff6ff]"
+                      : "hover:bg-[#eff6ff]"
                   }`}
                 >
                   {option.label}
@@ -278,9 +278,50 @@ export default function TeacherHomePage() {
             <button
               onClick={handleNext}
               disabled={!canProceed}
-              className="w-full h-16 max-[380px]:h-12 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-base text-white font-semibold shadow-sm hover:shadow-md hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300 disabled:active:scale-100"
+              className="group relative overflow-hidden w-full h-16 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              style={
+                !canProceed
+                  ? {
+                      background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                      boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                      color: "#6b7280",
+                    }
+                  : {
+                      background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                      boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                      color: "white",
+                    }
+              }
             >
-              20문항 시험지 만들기
+              {canProceed && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                  />
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+                </>
+              )}
+              <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                20문항 시험지 만들기
+              </span>
             </button>
           </div>
 

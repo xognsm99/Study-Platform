@@ -1,100 +1,125 @@
-export type VocabKeypadQ = {
+export type VocabKeypadItem = {
   id: string;
-  sentence: string;   // 빈칸은 반드시 "()" 토큰
-  answers: string[];  // 빈칸 개수와 동일
-  explain?: string;
-  hint?: string;
+  sentence: string;   // () 포함
+  answers: string[];  // 빈칸 정답들 (순서대로)
+  explain: string;    // 한글 해설/뜻
 };
 
-export const VOCAB_GAME_ITEMS: VocabKeypadQ[] = [
+export const VOCAB_GAME_ITEMS: VocabKeypadItem[] = [
   {
-    id: "q1",
-    sentence: "Hello! () Somin.",
-    answers: ["Iam"],
-    explain: "안녕! 나는 소민이야.",
+    id: "dl_01",
+    sentence: "I grew up in (), so I had many chances to see dolphins.",
+    answers: ["Jeju-do"],
+    explain: "나는 제주도에서 자라서 돌고래를 볼 기회가 많았다.",
   },
   {
-    id: "q2",
-    sentence: "I'm 15 () old, and I live in Korea",
-    answers: ["years"],
-    explain: "나는 15살이고 한국에 살아.",
+    id: "dl_02",
+    sentence: "Then, I learned that some dolphins are in ().",
+    answers: ["danger"],
+    explain: "그러던 중 나는 일부 돌고래들이 위험에 처해 있다는 것을 알게 되었다.",
   },
   {
-    id: "q3",
-    sentence: "I'm 15 years old, and I () Korea",
-    answers: ["livein"],
-    explain: "나는 15살이고 한국에 살아.",
+    id: "dl_03",
+    sentence: "Some are even ().",
+    answers: ["endangered"],
+    explain: "그중 일부는 심지어 멸종 위기에 처해 있다.",
   },
   {
-    id: "q4",
-    sentence: "Please tell me () your favorite time of the day.",
-    answers: ["about"],
-    explain: "너희들이 하루 중 가장 좋아하는 시간에 대해 내게 말해 줘.",
+    id: "dl_04",
+    sentence: "So, I searched the Internet and found an (), Dolphin Lovers.",
+    answers: ["NGO"],
+    explain: "그래서 인터넷을 검색하다가 NGO ‘돌핀 러버스’를 찾게 되었다.",
   },
   {
-    id: "q5",
-    sentence: "Please tell me about your favorite time () the day.",
-    answers: ["of"],
-    explain: "너희들이 하루 중 가장 좋아하는 시간에 대해 내게 말해 줘.",
+    id: "dl_05",
+    sentence: "It does () activities such as cleaning up beaches and helping dolphins.",
+    answers: ["various"],
+    explain: "그 단체는 해변 청소나 돌고래를 돕는 등 다양한 활동을 한다.",
   },
   {
-    id: "q6",
-    sentence: "My favorite time of the day is () the afternoon.",
-    answers: ["in"],
-    explain: "하루 중 내가 가장 좋아하는 시간은 오후이다.",
+    id: "dl_06",
+    sentence: "After some (), I joined it today.",
+    answers: ["thought"],
+    explain: "고민 끝에 나는 오늘 그 단체에 가입했다.",
   },
   {
-    id: "q7",
-    sentence: "I'm usually (     ) school at two o'clock.",
-    answers: ["outof"],
-    explain: "나는 보통 두 시에 학교를 끝낸다.",
+  id: "dl_07",
+  sentence:
+    "Many dolphins get sick or even die because of () waste, so cleaning up beaches is important.",
+  answers: ["plastic"],
+  explain: "플라스틱 쓰레기 때문에 돌고래들이 아프거나 죽기도 해서 해변 청소는 중요하다.",
+},
+    {
+    id: "dl_08",
+    sentence: "There was a beach cleanup party today, and I took part in ().",
+    answers: ["it"],
+    explain: "오늘 해변 정화 활동이 있었고, 나는 그 활동에 참여했다.",
   },
   {
-    id: "q8",
-    sentence: "I then come back () my house.",
-    answers: ["to"],
-    explain: "나는 그 후 집으로 돌아온다.",
+    id: "dl_09",
+    sentence: "Cleaning up the beach was not easy, but I () it.",
+    answers: ["enjoyed"],
+    explain: "해변을 청소하는 일은 쉽지 않았지만 나는 그것을 즐겼다.",
   },
   {
-    id: "q9",
-    sentence: "My mom is already () home.",
-    answers: ["at"],
-    explain: "엄마는 이미 집에 계신다.",
+    id: "dl_10",
+    sentence: "This afternoon, I took part in a () class for Halla and Olle.",
+    answers: ["training"],
+    explain: "오늘 오후 나는 한라와 올레를 위한 훈련 수업에 참여했다.",
   },
   {
-    id: "q10",
-    sentence: "She () me with a smile.",
-    answers: ["greets"],
-    explain: "엄마는 미소로 나를 맞이하신다.",
+    id: "dl_11",
+    sentence: "The latest project of Dolphin Lovers is to () them to the sea.",
+    answers: ["return"],
+    explain: "돌핀 러버스의 최신 프로젝트는 그들을 바다로 돌려보내는 것이다.",
   },
   {
-    id: "q11",
-    sentence: "Then I take a () in my room.",
-    answers: ["rest"],
-    explain: "그 다음 나는 방에서 휴식을 취한다.",
+    id: "dl_12",
+    sentence: "For this, they first need to learn some ().",
+    answers: ["skills"],
+    explain: "이를 위해 그들은 먼저 몇 가지 기술을 배워야 한다.",
   },
   {
-    id: "q12",
-    sentence: "A little later, I listen () music.",
-    answers: ["to"],
-    explain: "조금 뒤에 나는 음악을 듣는다.",
+    id: "dl_13",
+    sentence: "They will need them to () in the wild.",
+    answers: ["survive"],
+    explain: "그 기술들은 야생에서 살아남기 위해 필요하다.",
   },
   {
-    id: "q13",
-    sentence: "I often talk to my best friend () the phone, too.",
-    answers: ["on"],
-    explain: "또 나는 전화로 가장 친한 친구와 자주 이야기한다.",
+    id: "dl_14",
+    sentence: "Luckily, I got the ().",
+    answers: ["chance"],
+    explain: "운 좋게도 나는 그 기회를 얻었다.",
   },
   {
-    id: "q14",
-    sentence: "We talk about our day () make each other laugh.",
-    answers: ["and"],
-    explain: "우리는 하루에 대해 이야기하고 서로 웃게 만든다.",
+    id: "dl_15",
+    sentence: "I just ran some () today, but the experience made me so excited.",
+    answers: ["errands"],
+    explain: "오늘은 허드렛일만 했지만 그 경험은 나를 매우 설레게 했다.",
   },
   {
-    id: "q15",
-    sentence: "After that, I do my homework () my desk.",
-    answers: ["at"],
-    explain: "그 후 나는 책상에서 숙제를 한다.",
+    id: "dl_16",
+    sentence: "The ceremony made us quite (). In fact, I cried a little.",
+    answers: ["emotional"],
+    explain: "그 기념식은 우리를 매우 감정적으로 만들었고, 사실 나는 조금 울었다.",
   },
+  {
+    id: "dl_17",
+    sentence: "After 10 years of hard life in an (), now all the sea is their home.",
+    answers: ["aquarium"],
+    explain: "수족관에서의 힘든 10년 후, 이제 바다 전체가 그들의 집이 되었다.",
+  },
+  {
+    id: "dl_18",
+    sentence: "I shouted and () goodbye to them.",
+    answers: ["waved"],
+    explain: "나는 외치며 그들에게 손을 흔들어 작별 인사를 했다.",
+  },
+  {
+  id: "dl_19",
+  sentence:
+    "Many dolphins get sick or even die because of fishing (), so cleaning up beaches is important.",
+  answers: ["nets"],
+  explain: "어망 때문에 돌고래들이 아프거나 죽기도 해서 해변 청소는 중요하다.",
+}
 ];

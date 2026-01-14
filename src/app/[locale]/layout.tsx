@@ -1,12 +1,10 @@
 import AppBackground from "@/components/AppBackground";
 import BottomNav from "@/components/BottomNav";
-import TopHeader from "@/components/TopHeader";
 
 export default function LocaleLayout({ children }: { children: React.ReactNode }) {
   return (
     <AppBackground>
       <div className="min-h-dvh bg-sky-50 dark:bg-sky-50">
-        <TopHeader />
         <main className="pb-20 bg-sky-50 dark:bg-sky-50">{children}</main>
         <BottomNav />
       </div>

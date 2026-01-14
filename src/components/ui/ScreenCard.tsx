@@ -31,9 +31,9 @@ export function ScreenTitle({
   return (
     <div
       className={
-        "w-full max-w-[520px] mx-auto mb-3 " +
+        "w-full max-w-[520px] mx-auto " +
         "text-left font-extrabold tracking-tight " +
-        "text-[18px] text-[#6E63D5] " +
+        "text-[18px] text-[#1e40af] " +
         className
       }
     >

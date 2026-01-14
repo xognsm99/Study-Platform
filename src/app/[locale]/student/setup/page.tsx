@@ -2,6 +2,7 @@
 
 import React, { useEffect, useMemo, useState } from "react";
 import { supabaseBrowser } from "@/lib/supabase-browser";
+import { ScreenCard, ScreenTitle } from "@/components/ui/ScreenCard";
 
 type LeaderRow = {
   rank: number;
@@ -144,17 +145,13 @@ export default function StudentReportPage() {
   // 로딩 중
   if (loading) {
     return (
-      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
-        <div className="mx-auto w-full max-w-md">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-               리포트 PICK
-            </h1>
-          </div>
-          <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
-            <div className="text-sm text-gray-500">데이터를 불러오는 중...</div>
-          </div>
+      <div className="px-1 pt-3 pb-24">
+        <div className="px-5 mb-6">
+          <ScreenTitle>리포트 PICK</ScreenTitle>
         </div>
+        <ScreenCard>
+          <div className="text-center text-sm text-gray-500">데이터를 불러오는 중...</div>
+        </ScreenCard>
       </div>
     );
   }
@@ -162,53 +159,49 @@ export default function StudentReportPage() {
   // 에러 발생
   if (error) {
     return (
-      <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
-        <div className="mx-auto w-full max-w-md">
-          <div className="flex items-center justify-between">
-            <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-              리포트 PICK
-            </h1>
-          </div>
-          <div className="mt-6 rounded-2xl bg-white p-8 shadow-[0_2px_8px_rgba(0,0,0,0.06)] text-center">
+      <div className="px-1 pt-3 pb-24">
+        <div className="px-5 mb-6">
+          <ScreenTitle>리포트 PICK</ScreenTitle>
+        </div>
+        <ScreenCard>
+          <div className="text-center">
             <div className="text-sm text-red-600 mb-4">{error}</div>
             <button
               onClick={() => window.location.reload()}
-              className="rounded-full bg-[#6E63D5] px-4 py-2 text-sm text-white hover:bg-[#584FAA]"
+              className="rounded-full bg-[#3b82f6] px-4 py-2 text-sm text-white hover:bg-[#2563eb]"
             >
               다시 시도
             </button>
           </div>
-        </div>
+        </ScreenCard>
       </div>
     );
   }
 
   return (
-    <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
-      <div className="mx-auto w-full max-w-md">
-        {/* Header */}
-        <div className="flex items-center justify-between">
-          <h1 className="text-lg font-semibold text-[#2B245A] max-[380px]:text-base">
-            리포트 PICK
-          </h1>
+    <div className="px-1 pt-3 pb-24">
+      <div className="px-5 mb-6">
+        <ScreenTitle>리포트 PICK</ScreenTitle>
+      </div>
 
+      <ScreenCard>
+        {/* 주간/월간 전환 버튼 */}
+        <div className="flex items-center justify-end mb-4">
           <button
             type="button"
-            className="rounded-full border border-[#D9D5F6] bg-white/70 px-3 py-1.5 text-xs text-[#2B245A]/80"
+            className="rounded-full border border-[#93c5fd] bg-white/70 px-3 py-1.5 text-xs text-[#1e3a8a]/80"
             onClick={() => setPeriod((p) => (p === "monthly" ? "weekly" : "monthly"))}
           >
             {period === "weekly" ? "월간" : "주간"} 보기
           </button>
         </div>
 
-        {/* Profile summary card */}
-        <div className="mt-3 rounded-2xl bg-white p-6 pt-7 pb-7 shadow-[0_2px_8px_rgba(0,0,0,0.06)] max-[380px]:p-5">
           <div className="flex items-center justify-between">
             <div>
               <div className="text-sm font-semibold text-gray-900">{userName}</div>
               <div className="mt-1 text-xs text-gray-500">
                 {period === "monthly" ? "이번 달" : "이번 주"} {points.toLocaleString()} 점
-                {accuracyPct > 0 && <span className="ml-2 text-[#6E63D5]">· 정답률 {accuracyPct}%</span>}
+                {accuracyPct > 0 && <span className="ml-2 text-[#3b82f6]">· 정답률 {accuracyPct}%</span>}
               </div>
             </div>
 
@@ -229,9 +222,9 @@ export default function StudentReportPage() {
           </div>
 
           {/* Progress */}
-          <div className="mt-4 rounded-2xl bg-[#F3F1FF] p-4">
+          <div className="mt-4 rounded-2xl bg-[#dbeafe] p-4">
             <div className="flex items-center justify-between">
-              <div className="text-sm font-semibold text-[#2B245A]">
+              <div className="text-sm font-semibold text-[#1e3a8a]">
                 {period === "monthly" ? "이번 달" : "이번 주"} 진행률
               </div>
               <div className="text-xs text-gray-500">
@@ -243,7 +236,7 @@ export default function StudentReportPage() {
               <ProgressRing value={progressPct} label={`${playedThisMonth}/${goalCount}`} />
               <div className="flex-1">
                 <div className="text-sm text-gray-700">
-                  현재 <span className="font-semibold text-[#6E63D5]">{progressPct}%</span> 달성
+                  현재 <span className="font-semibold text-[#3b82f6]">{progressPct}%</span> 달성
                 </div>
                 <div className="mt-1 text-xs text-gray-500">
                   오늘 {Math.max(0, Math.ceil((goalCount - playedThisMonth) / 7))}~{Math.max(1, Math.ceil((goalCount - playedThisMonth) / 5))}문항씩 하면 목표 달성 가능
@@ -251,7 +244,7 @@ export default function StudentReportPage() {
 
                 <div className="mt-3 h-2 w-full rounded-full bg-white">
                   <div
-                    className="h-2 rounded-full bg-[#6E63D5]"
+                    className="h-2 rounded-full bg-[#3b82f6]"
                     style={{ width: `${progressPct}%` }}
                   />
                 </div>
@@ -264,17 +257,17 @@ export default function StudentReportPage() {
             <div className="mb-2 text-sm font-semibold text-gray-900">추천 학습</div>
             <div className="grid gap-2">
               {advice.map((a) => (
-                <div key={a.title} className="rounded-2xl border border-[#D9D5F6] bg-white p-3">
-                  <div className="text-sm font-semibold text-[#6E63D5]">{a.title}</div>
+                <div key={a.title} className="rounded-2xl border border-[#93c5fd] bg-white p-3">
+                  <div className="text-sm font-semibold text-[#3b82f6]">{a.title}</div>
                   <div className="mt-1 text-xs text-gray-600">{a.desc}</div>
                 </div>
               ))}
             </div>
           </div>
-        </div>
+        </ScreenCard>
 
         {/* Leaderboard */}
-        <div className="mt-4 rounded-2xl bg-white p-6 pt-7 pb-7 shadow-[0_2px_8px_rgba(0,0,0,0.06)] max-[380px]:p-5">
+        <ScreenCard className="mt-4">
           <div className="flex items-center justify-between">
             <div className="text-sm font-semibold text-gray-900">리더보드</div>
             <div className="text-xs text-gray-500">{period === "monthly" ? "월간" : "주간"}</div>
@@ -286,7 +279,7 @@ export default function StudentReportPage() {
                 key={`${r.rank}-${r.name}`}
                 className={`flex items-center justify-between rounded-2xl border p-3 ${
                   r.name === userName
-                    ? "border-[#D9D5F6] bg-[#F3F1FF]"
+                    ? "border-[#93c5fd] bg-[#dbeafe]"
                     : "border-gray-100 bg-white"
                 }`}
               >
@@ -298,7 +291,7 @@ export default function StudentReportPage() {
                   {r.badge && <BadgeDot type={r.badge} />}
                 </div>
 
-                <div className="text-sm font-semibold text-[#6E63D5]">{r.points.toLocaleString()}P</div>
+                <div className="text-sm font-semibold text-[#3b82f6]">{r.points.toLocaleString()}P</div>
               </div>
             ))}
 
@@ -308,36 +301,131 @@ export default function StudentReportPage() {
                 <div className="py-2 text-center">
                   <div className="inline-block text-xs text-gray-400">...</div>
                 </div>
-                <div className="flex items-center justify-between rounded-2xl border border-[#6E63D5] bg-[#F3F1FF] p-3 ring-2 ring-[#6E63D5]/20">
+                <div className="flex items-center justify-between rounded-2xl border border-[#3b82f6] bg-[#dbeafe] p-3 ring-2 ring-[#3b82f6]/20">
                   <div className="flex items-center gap-3">
-                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#6E63D5] text-xs font-semibold text-white">
+                    <div className="flex h-7 w-7 items-center justify-center rounded-full bg-[#3b82f6] text-xs font-semibold text-white">
                       {myRank}
                     </div>
-                    <div className="text-sm font-semibold text-[#6E63D5]">{userName} (나)</div>
+                    <div className="text-sm font-semibold text-[#3b82f6]">{userName} (나)</div>
                   </div>
-                  <div className="text-sm font-semibold text-[#6E63D5]">{points.toLocaleString()}P</div>
+                  <div className="text-sm font-semibold text-[#3b82f6]">{points.toLocaleString()}P</div>
                 </div>
               </>
             )}
           </div>
 
           {/* 약점 분석 버튼: 10문제 이상 풀면 활성화 */}
-          <button
-            type="button"
-            disabled={playedThisMonth < 10}
-            onClick={() => {
-              if (playedThisMonth >= 10) {
-                window.location.href = "/ko/student/weakness";
+          <div className="mt-3 flex gap-2">
+            <button
+              type="button"
+              disabled={playedThisMonth < 10}
+              onClick={() => {
+                if (playedThisMonth >= 10) {
+                  window.location.href = "/ko/student/weakness";
+                }
+              }}
+              className="group relative overflow-hidden flex-1 h-12 max-[380px]:h-10 rounded-[20px] text-sm max-[380px]:text-xs font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              style={
+                playedThisMonth < 10
+                  ? {
+                      background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                      boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                      color: "#6b7280",
+                    }
+                  : {
+                      background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                      boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                      color: "white",
+                    }
               }
-            }}
-            className={`mt-3 w-full rounded-full py-3 text-sm font-semibold max-[380px]:py-2.5 max-[380px]:text-xs ${
-              playedThisMonth >= 10
-                ? "bg-[#6E63D5] text-white hover:bg-[#584FAA] active:bg-[#4D4595]"
-                : "bg-gray-200 text-gray-400 cursor-not-allowed"
-            }`}
-          >
-            내 약점 분석 보기
-          </button>
+            >
+              {playedThisMonth >= 10 && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                  />
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+                </>
+              )}
+              <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                내 약점 분석 보기
+              </span>
+            </button>
+
+            {/* 카톡으로 보내기 버튼 */}
+            <button
+              type="button"
+              disabled={playedThisMonth < 10}
+              onClick={() => {
+                if (playedThisMonth >= 10) {
+                  // 카카오톡 공유 로직 추가 예정
+                  alert("카카오톡 공유 기능은 준비 중입니다.");
+                }
+              }}
+              className="group relative overflow-hidden flex-1 h-12 max-[380px]:h-10 rounded-[20px] text-sm max-[380px]:text-xs font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              style={
+                playedThisMonth < 10
+                  ? {
+                      background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                      boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                      color: "#6b7280",
+                    }
+                  : {
+                      background: "linear-gradient(145deg, #FEE500 0%, #FAD100 50%, #F7C600 100%)",
+                      boxShadow: "0 10px 32px -4px rgba(254,229,0,0.5), 0 0 0 1px rgba(255,255,255,0.2) inset",
+                      color: "#3c1e1e",
+                    }
+              }
+            >
+              {playedThisMonth >= 10 && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-yellow-300/0 to-yellow-600/0 group-hover:from-yellow-300/20 group-hover:to-yellow-600/10 transition-all duration-500 pointer-events-none" />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-50 group-hover:opacity-70 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)" }}
+                  />
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(254,229,0,0.6), rgba(247,198,0,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-[0.1] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.7) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.6) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.65) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+                </>
+              )}
+              <span className="relative z-10 drop-shadow-[0_2px_6px_rgba(0,0,0,0.2)]">
+                카톡으로 보내기
+              </span>
+            </button>
+          </div>
 
           {/* 10문제 미만일 때 안내문 */}
           {playedThisMonth < 10 && (
@@ -345,15 +433,14 @@ export default function StudentReportPage() {
               약점 분석을 보려면 최소 10문제를 풀어야 합니다. (현재 {playedThisMonth}문제)
             </div>
           )}
-        </div>
-      </div>
+        </ScreenCard>
     </div>
   );
 }
 
 function StatPill({ label, value }: { label: string; value: string }) {
   return (
-    <div className="rounded-full bg-[#6E63D5] px-3 py-2 text-center max-[380px]:px-2.5 max-[380px]:py-1.5">
+    <div className="rounded-full bg-[#3b82f6] px-3 py-2 text-center max-[380px]:px-2.5 max-[380px]:py-1.5">
       <div className="text-[10px] font-medium text-white/80">{label}</div>
       <div className="text-xs font-semibold text-white">{value}</div>
     </div>
@@ -397,12 +484,12 @@ function ProgressRing({ value, label }: { value: number; label: string }) {
           strokeDasharray={c}
           strokeDashoffset={offset}
           strokeLinecap="round"
-          className="fill-none stroke-[#6E63D5]"
+          className="fill-none stroke-[#3b82f6]"
           transform={`rotate(-90 ${size / 2} ${size / 2})`}
         />
       </svg>
       <div className="absolute text-center">
-        <div className="text-lg font-extrabold text-[#6E63D5]">{value}%</div>
+        <div className="text-lg font-extrabold text-[#3b82f6]">{value}%</div>
         <div className="text-[11px] text-gray-500">{label}</div>
       </div>
     </div>

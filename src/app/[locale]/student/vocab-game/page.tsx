@@ -150,34 +150,35 @@ export default function VocabGamePage() {
   }
 
   return (
-    <div className="min-h-screen bg-sky-50 dark:bg-sky-50">
-      <div className="max-w-[520px] mx-auto p-2">
-        {/* 헤더 */}
-        <div className="bg-gradient-to-r from-[#6E63D5] to-[#8B7FE8] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-lg w-full">
-          <button
-            onClick={() => router.back()}
-            className="text-sm font-semibold opacity-95 hover:opacity-100 transition-opacity"
-          >
-            ← 뒤로
-          </button>
+      <div className="min-h-screen bg-sky-50 dark:bg-sky-50">
+  <div className="max-w-[520px] mx-auto p-2">
+    {/* 헤더 */}
+    <div className="bg-gradient-to-r from-[#1e40af] via-[#1e3a8a] to-[#172554] text-white rounded-xl px-4 py-3 flex items-center justify-between mb-6 shadow-lg w-full">
+      <button
+        onClick={() => router.back()}
+        className="text-sm font-semibold opacity-95 hover:opacity-100 transition-opacity"
+      >
+        ← 뒤로
+      </button>
 
-          <div className="text-[20px] font-bold tracking-tight flex items-center gap-2">
-            <span className="text-2xl">✍️</span>
-            서술형 대비 훈련
-          </div>
+      <div className="text-[20px] font-bold tracking-tight flex items-center gap-2">
+        <span className="text-2xl">✍️</span>
+        서술형 대비 훈련
+      </div>
 
-          <div className="text-sm font-semibold bg-white/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
-            <span className="text-[#FFE156]">{score}</span> / {MAX_SCORE}
-          </div>
-        </div>
+      <div className="text-sm font-semibold bg-white/20 px-3 py-1.5 rounded-lg backdrop-blur-sm">
+        <span className="text-[#93c5fd]">{score}</span> / {MAX_SCORE}
+      </div>
+    </div>
 
         {/* 문제 번호 */}
-        <div className="text-sm font-semibold text-[#6E63D5] mb-3 flex items-center gap-2">
-          <div className="w-8 h-8 rounded-full bg-[#6E63D5] text-white flex items-center justify-center text-xs">
-            {idx + 1}
-          </div>
-          <span>/ {items.length} 문제</span>
-        </div>
+<div className="text-sm font-semibold text-[#1e3a8a] mb-3 flex items-center gap-2">
+  <div className="w-8 h-8 rounded-full bg-[#1e40af] text-white flex items-center justify-center text-xs shadow-sm">
+    {idx + 1}
+  </div>
+  <span className="text-[#1e3a8a]">/ {items.length} 문제</span>
+</div>
+
 
         {/* 문장 카드 */}
         <div className="rounded-3xl bg-white/90 backdrop-blur-sm p-6 border-2 border-[#E6E3FA] mb-5 shadow-sm">
@@ -272,52 +273,33 @@ export default function VocabGamePage() {
           )}
         </div>
 
-        {/* 힌트 */}
-        {showHint && cur?.hint && (
-          <div className="rounded-2xl bg-[#FFF4E6] border-2 border-[#FFD699] p-4 mb-4">
-            <div className="text-sm font-semibold text-[#FF9500] mb-1">💡 힌트</div>
-            <div className="text-sm text-gray-700">{cur?.hint}</div>
-          </div>
-        )}
-
-        {/* 버튼 영역 */}
+        
+          {/* 버튼 영역 */}
         <div className="flex gap-2 justify-end">
-          {!isChecked && cur.hint && (
-            <button
-              onClick={handleHint}
-              disabled={showHint}
-              className={[
-                "px-5 py-3 rounded-xl text-sm font-semibold transition-all",
-                showHint
-                  ? "bg-gray-200 text-gray-400 cursor-not-allowed"
-                  : "bg-[#FFD699] text-[#FF9500] hover:bg-[#FFC266] active:scale-95 shadow-sm"
-              ].join(" ")}
-            >
-              💡 힌트 보기
-            </button>
-          )}
+          
 
           {!isChecked ? (
-            <button
-              onClick={handleCheck}
-              disabled={!userInput.trim()}
-              className={[
-                "px-6 py-3 rounded-xl text-sm font-semibold transition-all",
-                !userInput.trim()
-                  ? "bg-[#E7E5FF] text-[#6E63D5]/50 cursor-not-allowed"
-                  : "bg-[#6E63D9] text-white shadow-md hover:shadow-lg hover:bg-[#5D52C4] active:scale-[0.98]",
-              ].join(" ")}
-            >
-              ✓ 확인하기
-            </button>
-          ) : (
-            <button
-              onClick={handleNext}
-              className="px-6 py-3 rounded-xl text-sm font-semibold bg-[#6E63D9] text-white shadow-md hover:shadow-lg hover:bg-[#5D52C4] active:scale-[0.98] transition-all"
-            >
-              {isLast ? "📊 결과 보기" : "→ 다음 문제"}
-            </button>
-          )}
+  <button
+    onClick={handleCheck}
+    disabled={!userInput.trim()}
+    className={[
+      "px-6 py-3 rounded-xl text-sm font-semibold transition-all",
+      !userInput.trim()
+        ? "bg-[#dbeafe] text-[#1e40af]/50 cursor-not-allowed" // ✅ 연한 블루(비활성)
+        : "text-white shadow-md hover:shadow-lg active:scale-[0.98] bg-gradient-to-r from-[#1e40af] via-[#1e3a8a] to-[#172554] hover:brightness-110", // ✅ 고급 블루(활성)
+    ].join(" ")}
+  >
+    ✓ 확인하기
+  </button>
+) : (
+  <button
+    onClick={handleNext}
+    className="px-6 py-3 rounded-xl text-sm font-semibold text-white shadow-md hover:shadow-lg active:scale-[0.98] transition-all bg-gradient-to-r from-[#1e40af] via-[#1e3a8a] to-[#172554] hover:brightness-110"
+  >
+    {isLast ? "📊 결과 보기" : "→ 다음 문제"}
+  </button>
+)}
+
         </div>
       </div>
     </div>

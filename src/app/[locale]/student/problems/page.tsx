@@ -336,10 +336,10 @@ function StudentProblemsPageContent() {
             {/* 문제 유형 선택 */}
             <div>
               <div>
-                <div className="text-lg font-semibold text-[#2A2457] mb-4">
+                <div className="text-lg font-semibold text-[#2A2457] mb-6">
                   문제 유형 선택
                 </div>
-                <div className="grid grid-cols-2 gap-3 max-[380px]:gap-2">
+                <div className="grid grid-cols-2 gap-4 max-[380px]:gap-3">
                   {GROUPS.map((group) => {
                     const isSelected = selectedGroups.has(group.key);
                     return (
@@ -348,13 +348,13 @@ function StudentProblemsPageContent() {
                         type="button"
                         onClick={() => handleGroupToggle(group.key)}
                         aria-pressed={isSelected}
-                        className={`w-full rounded-2xl border px-5 py-4 max-[380px]:px-3 max-[380px]:py-2.5 transition-all active:scale-[0.99] ${
+                        className={`w-full rounded-2xl border px-6 py-8 max-[380px]:px-4 max-[380px]:py-6 transition-all active:scale-[0.99] ${
                           isSelected
-                            ? "border-[#2563eb] bg-[#EFF6FF] text-[#1e40af] shadow-[0_8px_20px_rgba(37,99,235,0.18)]"
-                            : "border-[#DBEAFE] bg-white text-slate-700 hover:border-[#93C5FD] hover:bg-sky-50"
+                            ? "border-[#60a5fa] bg-[#dbeafe] text-[#1e40af] shadow-[0_8px_20px_rgba(96,165,250,0.3)]"
+                            : "border-[#e5e7eb] bg-white text-slate-700 hover:border-[#93c5fd] hover:bg-[#eff6ff]"
                         }`}
                       >
-                        <span className="text-lg max-[380px]:text-xs font-semibold">{group.label}</span>
+                        <span className="text-2xl max-[380px]:text-lg font-semibold">{group.label}</span>
                       </button>
                     );
                   })}
@@ -362,14 +362,63 @@ function StudentProblemsPageContent() {
               </div>
             </div>
 
-            {/* 20문항 풀기 시작 버튼 */}
-            <div className="mt-5 max-[380px]:mt-4">
+            {/* 20문항 풀기 시작 버튼 - 애플 글래스모피즘 스타일 */}
+            <div className="mt-8 max-[380px]:mt-6">
               <button
                 onClick={handleStart}
                 disabled={!canProceed || loading}
-                className="w-full h-16 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-xl max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+                className="group relative overflow-hidden w-full h-32 max-[380px]:h-24 rounded-[20px] text-3xl max-[380px]:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+                style={
+                  !canProceed || loading
+                    ? {
+                        background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                        boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                        color: "#6b7280",
+                      }
+                    : {
+                        background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                        boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                        color: "white",
+                      }
+                }
               >
-                20 문항 풀기 시작
+                {!loading && !(!canProceed) && (
+                  <>
+                    {/* 호버 시 밝아지는 오버레이 */}
+                    <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+
+                    {/* 상단 글로우 */}
+                    <div
+                      className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                      style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                    />
+
+                    {/* 호버 시 외곽 글로우 */}
+                    <div
+                      className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                      style={{
+                        background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                        filter: "blur(3px)",
+                      }}
+                    />
+
+                    {/* 미세한 반짝임 */}
+                    <div
+                      className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                      style={{
+                        background: `
+                          radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                          radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                          radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                        `,
+                      }}
+                    />
+                  </>
+                )}
+
+                <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                  20 문항 풀기 시작
+                </span>
               </button>
               {grade !== "2" && (
                 <p className="mt-2 max-[380px]:mt-1.5 text-xs max-[380px]:text-[10px] text-slate-500 text-center">

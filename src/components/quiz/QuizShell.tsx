@@ -38,13 +38,14 @@ export default function QuizShell({
   return (
     <div className="min-h-screen bg-[#F6F5FF]">
       {/* 상단 헤더 */}
-      <div className="sticky top-0 z-10 border-b border-[#E7E5FF] bg-white/70 backdrop-blur-sm">
+      <div className="sticky top-0 z-10 border-b border-blue-200/60 bg-white/70 backdrop-blur-sm">
         <div className="mx-auto max-w-2xl px-4 py-3">
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-4">
               <button
                 onClick={onBack || (() => router.back())}
-                className="flex items-center text-sm text-[#2F2A57] hover:text-[#6E63D5]"
+                className="flex items-center text-sm text-[#1e3a8a] hover:text-[#1e40af]"
+
               >
                 ← 뒤로
               </button>

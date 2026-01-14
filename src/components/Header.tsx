@@ -67,7 +67,7 @@ export default function Header() {
   };
 
   return (
-    <header className="border-b bg-white">
+    <header className="sticky top-0 z-50 border-b bg-white">
       <div className="mx-auto flex max-w-5xl items-center justify-between px-6 py-3">
         {/* ✅ 앱 이름 */}
         <Link
@@ -79,7 +79,7 @@ export default function Header() {
 
 
         {/* ✅ 우측 메뉴 */}
-        <div className="flex items-center gap-3 text-2sm text-slate-600">
+        <div className="flex items-center gap-3 text-sm text-slate-600">
           {isLoading ? (
             // 로딩 중: 텍스트 자리 비움 (레이아웃 깨지지 않게)
             <span className="invisible">로딩 중...</span>
@@ -89,13 +89,37 @@ export default function Header() {
               로그인
             </Link>
           ) : (
-            // 로그인 됨: 로그아웃만 표시
-            <button
-              onClick={handleLogout}
-              className="hover:text-slate-900 text-slate-600"
-            >
-              로그아웃
-            </button>
+            // 로그인 됨: 프로필 + 로그아웃
+            <>
+              <Link
+                href={`/${locale}/student?edit=true`}
+                className="group relative overflow-hidden px-4 py-2 rounded-[14px] text-sm font-semibold no-underline transition-all duration-300 ease-out select-none active:scale-[0.95]"
+                style={{
+                  background: "linear-gradient(145deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%)",
+                  boxShadow: "0 4px 12px -2px rgba(59,130,246,0.3), 0 0 0 1px rgba(255,255,255,0.2) inset",
+                  color: "white",
+                }}
+              >
+                {/* 호버 시 밝아지는 오버레이 */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-300/0 to-blue-500/0 group-hover:from-blue-300/25 group-hover:to-blue-500/15 transition-all duration-300 pointer-events-none" />
+
+                {/* 상단 글로우 */}
+                <div
+                  className="absolute top-0 left-0 right-0 h-[45%] opacity-50 group-hover:opacity-70 transition-opacity duration-300 pointer-events-none rounded-t-[14px]"
+                  style={{
+                    background: "linear-gradient(to bottom, rgba(255,255,255,0.4), transparent)",
+                  }}
+                />
+
+                <span className="relative z-10">프로필</span>
+              </Link>
+              <button
+                onClick={handleLogout}
+                className="hover:text-slate-900 text-slate-600 transition-colors"
+              >
+                로그아웃
+              </button>
+            </>
           )}
         </div>
       </div>
