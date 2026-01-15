@@ -514,10 +514,10 @@ export default function StudentPage() {
       "max-[380px]:h-10 max-[380px]:text-xs";
 
     const normal =
-      "bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-200 focus:ring-2 focus:ring-violet-200";
+      "bg-white border-gray-200 hover:bg-sky-50 hover:border-sky-200 focus:ring-2 focus:ring-sky-200";
 
     const picked =
-      "bg-violet-50 border-violet-300 ring-1 ring-violet-200";
+      "bg-sky-50 border-sky-300 ring-1 ring-sky-200";
 
     return `${base} ${selected ? picked : normal}`;
   }

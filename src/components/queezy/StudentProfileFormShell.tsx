@@ -18,7 +18,7 @@ export default function StudentProfileFormShell({
       <div className="mx-auto w-full max-w-md">
         {/* 헤더(타이틀 영역) */}
         <div className="px-1 pt-3 max-[380px]:pt-2">
-          <h1 className="text-lg font-semibold text-[#6E63D5] max-[380px]:text-base">
+          <h1 className="text-lg font-semibold text-[#2563eb] max-[380px]:text-base">
             {title}
           </h1>
         </div>

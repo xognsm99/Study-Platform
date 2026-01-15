@@ -268,7 +268,7 @@ function TeacherPreviewPageContent() {
 
   if (loading) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
+      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
         <div className="text-center text-slate-600 text-sm">로딩 중...</div>
       </div>
     );
@@ -276,11 +276,11 @@ function TeacherPreviewPageContent() {
 
   if (dataNotFound || items.length === 0) {
     return (
-      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
-        <div className="mx-auto w-full max-w-[420px] rounded-[28px] bg-white p-6 shadow-sm border border-[#E6E3FF] text-center">
+      <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white flex items-center justify-center px-4 py-6 max-[380px]:px-3">
+        <div className="mx-auto w-full max-w-[420px] rounded-[28px] bg-white/80 backdrop-blur-xl p-6 shadow-sm border border-[#c7d8e8] text-center">
           <div className="mb-4">
             <svg
-              className="mx-auto h-10 w-10 text-[#6E63D5]"
+              className="mx-auto h-10 w-10 text-[#1e40af]"
               fill="none"
               viewBox="0 0 24 24"
               stroke="currentColor"
@@ -293,7 +293,7 @@ function TeacherPreviewPageContent() {
               />
             </svg>
           </div>
-          <h2 className="text-[15px] font-semibold text-[#6E63D5] mb-2">
+          <h2 className="text-[15px] font-semibold text-[#1e40af] mb-2">
             세트 데이터를 찾지 못했습니다
           </h2>
           <p className="text-sm text-slate-600 mb-5">
@@ -301,7 +301,11 @@ function TeacherPreviewPageContent() {
           </p>
           <button
             onClick={handleGoBack}
-            className="w-full h-11 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-sm font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all"
+            className="w-full h-11 rounded-2xl text-white text-sm font-semibold transition-all active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+              boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+            }}
           >
             다시 생성하기
           </button>
@@ -311,24 +315,24 @@ function TeacherPreviewPageContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#E9E7FF] via-white to-white px-4 py-6 pb-24 max-[380px]:px-3">
+    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white px-4 py-6 pb-24 max-[380px]:px-3">
       <div className="mx-auto w-full max-w-[420px]">
-        <h1 className="text-[18px] font-semibold text-[#6E63D5]">미리보기</h1>
+        <h1 className="text-[18px] font-semibold text-[#1e40af]">미리보기</h1>
 
-        <div className="mt-4 rounded-[28px] bg-white shadow-sm border border-[#E6E3FF] p-5">
+        <div className="mt-4 rounded-[28px] bg-white/80 backdrop-blur-xl shadow-sm border border-[#c7d8e8] p-5">
           <div className="mb-4 space-y-2">
             <div className="flex flex-wrap gap-2 text-xs">
-              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+              <span className="rounded-full bg-[#dbeafe] px-3 py-1 text-[#1e40af] font-semibold">
                 학년 {grade || "-"}
               </span>
-              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+              <span className="rounded-full bg-[#dbeafe] px-3 py-1 text-[#1e40af] font-semibold">
                 과목 {subject || "-"}
               </span>
-              <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-[#6E63D5] font-semibold">
+              <span className="rounded-full bg-[#dbeafe] px-3 py-1 text-[#1e40af] font-semibold">
                 단원 {unitLabel}
               </span>
               {items.length > 0 && (
-                <span className="rounded-full bg-[#F1EFFF] px-3 py-1 text-slate-600 font-semibold">
+                <span className="rounded-full bg-[#e0e7f0] px-3 py-1 text-slate-600 font-semibold">
                   총 {items.length}문항
                 </span>
               )}
@@ -337,18 +341,26 @@ function TeacherPreviewPageContent() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-semibold text-[#5B52C8]">문제 목록</h2>
+              <h2 className="text-[15px] font-semibold text-[#1e3a8a]">문제 목록</h2>
             </div>
             <div className="grid grid-cols-2 gap-2 ml-4">
               <button
                 onClick={() => handlePrint("question")}
-                className="h-9 px-3 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-xs font-semibold shadow-[0_8px_18px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all whitespace-nowrap"
+                className="h-9 px-3 rounded-xl text-white text-xs font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
+                style={{
+                  background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                  boxShadow: "0 8px 18px -4px rgba(30,64,175,0.4)",
+                }}
               >
                 문제 인쇄
               </button>
               <button
                 onClick={() => handlePrint("answer")}
-                className="h-9 px-3 rounded-xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white text-xs font-semibold shadow-[0_8px_18px_rgba(110,99,213,0.25)] hover:from-[#5B52C8] hover:to-[#7A6FE0] active:scale-[0.98] transition-all whitespace-nowrap"
+                className="h-9 px-3 rounded-xl text-white text-xs font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
+                style={{
+                  background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                  boxShadow: "0 8px 18px -4px rgba(30,64,175,0.4)",
+                }}
               >
                 정답 인쇄
               </button>
@@ -362,7 +374,7 @@ function TeacherPreviewPageContent() {
             const read = counts?.reading ?? 0;
             const summary = `어휘 ${vocab} · 문법 ${gram} · 대화문 ${dial} · 본문 ${read}`;
             return (
-              <div className="mt-2 text-[13px] text-[#2E2A6A]/70">
+              <div className="mt-2 text-[13px] text-[#1e3a8a]/70">
                 {summary}
               </div>
             );
@@ -387,9 +399,9 @@ function TeacherPreviewPageContent() {
             return (
               <div
                 key={item.id ?? idx}
-                className="w-full rounded-2xl bg-white border border-[#EAE7FF] shadow-sm p-4"
+                className="w-full rounded-2xl bg-white/80 backdrop-blur-sm border border-[#c7d8e8] shadow-sm p-4"
               >
-                <div className="text-sm font-bold text-[#6E63D5] mb-2">문제 {idx + 1}</div>
+                <div className="text-sm font-bold text-[#1e40af] mb-2">문제 {idx + 1}</div>
 
                 {shouldQuestionFirst ? (
                   <>
@@ -398,7 +410,7 @@ function TeacherPreviewPageContent() {
                     </div>
 
                     {(passage || tr) && (
-                      <div className="mt-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
+                      <div className="mt-3 rounded-xl bg-[#e8f0f8] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
                         {passage && <div>{passage}</div>}
                         {tr && <div className="mt-2 text-slate-700">▶ 해석: {tr}</div>}
                       </div>
@@ -407,7 +419,7 @@ function TeacherPreviewPageContent() {
                 ) : (
                   <>
                     {passage && (
-                      <div className="mb-3 rounded-xl bg-[#F6F4FF] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
+                      <div className="mb-3 rounded-xl bg-[#e8f0f8] px-4 py-3 text-sm whitespace-pre-wrap leading-relaxed text-slate-800">
                         {passage}
                       </div>
                     )}

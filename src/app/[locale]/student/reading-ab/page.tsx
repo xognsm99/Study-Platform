@@ -147,20 +147,20 @@ export default function ReadingABPage() {
   };
 
   return (
-    <div className="min-h-screen bg-sky-50 dark:bg-sky-50 px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 px-4 py-6">
 
       <div className="mx-auto w-full max-w-[420px]">
         {/* 헤더 */}
-        <div className="mb-4 flex items-center justify-between text-[#6E63D5]">
-          <button onClick={() => router.back()} className="text-[#2B245A]/80">
+        <div className="mb-4 flex items-center justify-between text-sky-700">
+          <button onClick={() => router.back()} className="text-slate-600 hover:text-sky-600 transition">
             ← 뒤로가기
           </button>
-          <div className="text-xl font-semibold">본문 선택형 훈련</div>
+          <div className="text-xl font-semibold text-slate-800">본문 선택형 훈련</div>
           <div className="w-[80px]" />
         </div>
 
-        {/* 카드(스크롤 없이 보이도록 설계: 페이지를 짧게 쪼개서 보여줌) */}
-        <div className="rounded-[28px] bg-white/95 p-5 shadow-[0_18px_60px_rgba(22,16,60,0.18)]">
+        {/* 글래스모피즘 카드 */}
+        <div className="rounded-[28px] bg-white/60 backdrop-blur-xl border border-white/40 p-5 shadow-[0_8px_32px_rgba(0,100,200,0.12)]">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-[#2B245Z] font-xs text-[14px]">{page.title}</div>
             <div className="text-xs text-slate-500">
@@ -194,7 +194,7 @@ export default function ReadingABPage() {
             ))}
           </div>
 
-          {/* 하단 버튼: “전부 선택 끝나야” 검사 가능, 검사 후 다음 */}
+          {/* 하단 버튼: "전부 선택 끝나야" 검사 가능, 검사 후 다음 */}
           <button
             onClick={() => {
               if (!allAnswered) return;
@@ -203,12 +203,12 @@ export default function ReadingABPage() {
             }}
             disabled={!allAnswered}
             className={[
-              "mt-6 w-full rounded-full py-4 font-semibold transition",
+              "mt-6 w-full rounded-full py-4 font-semibold transition-all duration-200",
               !allAnswered
-                ? "bg-[#B9B4E4] text-[#2B245A]/50 cursor-not-allowed"
+                ? "bg-sky-200/60 text-sky-400 cursor-not-allowed"
                 : checked
-                ? "bg-[#6E63D5] text-white hover:bg-[#584FAA] active:bg-[#4D4595]"
-                : "bg-[#6E63D5] text-white hover:bg-[#584FAA] active:bg-[#4D4595]",
+                ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-600 hover:to-blue-700 active:scale-[0.98] shadow-lg shadow-sky-500/30"
+                : "bg-gradient-to-r from-sky-500 to-blue-600 text-white hover:from-sky-600 hover:to-blue-700 active:scale-[0.98] shadow-lg shadow-sky-500/30",
             ].join(" ")}
           >
             {!checked ? "정답 보기" : pageIndex === pages.length - 1 ? "완료" : "다음 단락 →"}
@@ -245,7 +245,7 @@ function ChoiceBlank({
 
   return (
     <span className="inline-flex items-center mx-1">
-      <span className="inline-flex items-center gap-1 rounded-lg border-2 border-[#D9D5F6] bg-[#F3F1FF] px-2 py-1">
+      <span className="inline-flex items-center gap-1 rounded-xl border border-sky-200/60 bg-sky-50/80 backdrop-blur-sm px-2 py-1">
         {[0, 1].map((i) => {
           const optIndex = i as 0 | 1;
           const isSelected = value === optIndex;
@@ -256,10 +256,10 @@ function ChoiceBlank({
               type="button"
               onClick={() => !checked && onChange(optIndex)}
               className={[
-                "inline-flex items-center gap-1 rounded-md px-2 py-[3px] text-[13px] leading-none",
+                "inline-flex items-center gap-1 rounded-lg px-2 py-[3px] text-[13px] leading-none transition-all duration-150",
                 isSelected
-                  ? "bg-[#6E63D5] text-white font-bold border-2 border-[#6E63D5] shadow-sm"
-                  : "bg-white/60 text-[#2B245A]/70 border-2 border-transparent",
+                  ? "bg-gradient-to-r from-sky-500 to-blue-600 text-white font-bold shadow-md shadow-sky-500/25"
+                  : "bg-white/70 text-slate-600 hover:bg-white/90",
                 checked ? "cursor-default" : "",
               ].join(" ")}
             >

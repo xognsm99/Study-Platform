@@ -168,7 +168,7 @@ function TeacherBuildPageContent() {
   return (
     <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
       <div className="mx-auto w-full max-w-md">
-        <h1 className="text-lg font-semibold text-[#6E63D5] max-[380px]:text-base mb-6">문제 구성</h1>
+        <h1 className="text-lg font-semibold text-[#2563eb] max-[380px]:text-base mb-6">문제 구성</h1>
 
         <div className="rounded-[28px] bg-white shadow-sm p-5 max-[380px]:p-4">
           <div className="mb-4 text-base text-gray-600">
@@ -246,7 +246,7 @@ function TeacherBuildPageContent() {
             </button>
           </div>
 
-          <div className="mt-2 rounded-2xl bg-violet-50 px-4 py-3 text-sm">
+          <div className="mt-2 rounded-2xl bg-sky-50 px-4 py-3 text-sm">
             <div className="text-gray-600 mb-2">선택 / 자동 분배(총 {total}문항)</div>
             <div className="grid grid-cols-2 gap-2 text-gray-900">
               <div>어휘: <b>{plan.vocabulary}</b></div>
@@ -275,18 +275,100 @@ function TeacherBuildPageContent() {
             <button
               onClick={() => onCompose("overall")}
               disabled={loading}
-              className="w-full h-14 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              style={
+                loading
+                  ? {
+                      background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                      boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                      color: "#6b7280",
+                    }
+                  : {
+                      background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                      boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                      color: "white",
+                    }
+              }
             >
-              {loading ? "종합평가 생성 중..." : "종합평가"}
+              {!loading && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                  />
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+                </>
+              )}
+              <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                {loading ? "종합평가 생성 중..." : "종합평가"}
+              </span>
             </button>
 
             {/* ✅ 문제 생성: 체크박스 기반 */}
             <button
               onClick={() => onCompose("custom")}
               disabled={loading}
-              className="w-full h-14 max-[380px]:h-10 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] px-4 text-lg max-[380px]:text-xs text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition-all disabled:cursor-not-allowed disabled:bg-gray-300 disabled:hover:bg-gray-300 disabled:opacity-50 disabled:from-gray-300 disabled:to-gray-300"
+              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              style={
+                loading
+                  ? {
+                      background: "linear-gradient(145deg, #e5e7eb 0%, #d1d5db 50%, #9ca3af 100%)",
+                      boxShadow: "0 6px 20px -4px rgba(156,163,175,0.2)",
+                      color: "#6b7280",
+                    }
+                  : {
+                      background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+                      boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+                      color: "white",
+                    }
+              }
             >
-              {loading ? "문제 생성 중..." : "문제 생성"}
+              {!loading && (
+                <>
+                  <div className="absolute inset-0 bg-gradient-to-br from-blue-400/0 to-blue-600/0 group-hover:from-blue-400/20 group-hover:to-blue-600/10 transition-all duration-500 pointer-events-none" />
+                  <div
+                    className="absolute top-0 left-0 right-0 h-[45%] opacity-40 group-hover:opacity-60 transition-opacity duration-500 pointer-events-none rounded-t-[20px]"
+                    style={{ background: "linear-gradient(to bottom, rgba(255,255,255,0.25), transparent)" }}
+                  />
+                  <div
+                    className="absolute -inset-[1px] rounded-[20px] opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none"
+                    style={{
+                      background: "linear-gradient(145deg, rgba(96,165,250,0.6), rgba(59,130,246,0.4))",
+                      filter: "blur(3px)",
+                    }}
+                  />
+                  <div
+                    className="absolute inset-0 opacity-[0.12] pointer-events-none"
+                    style={{
+                      background: `
+                        radial-gradient(circle at 15% 30%, rgba(255,255,255,0.6) 0, transparent 2px),
+                        radial-gradient(circle at 85% 25%, rgba(255,255,255,0.5) 0, transparent 1.5px),
+                        radial-gradient(circle at 70% 70%, rgba(255,255,255,0.55) 0, transparent 2px)
+                      `,
+                    }}
+                  />
+                </>
+              )}
+              <span className="relative z-10 drop-shadow-[0_2px_8px_rgba(0,0,0,0.3)]">
+                {loading ? "문제 생성 중..." : "문제 생성"}
+              </span>
             </button>
           </div>
         </div>

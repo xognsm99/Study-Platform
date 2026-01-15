@@ -58,7 +58,7 @@ export default function UnitMultiSelect({
       <button
         type="button"
         onClick={() => setOpen((prev) => !prev)}
-        className="w-full h-12 max-[380px]:h-10 rounded-full bg-white border border-gray-200 hover:bg-violet-50 hover:border-violet-200 px-4 text-sm max-[380px]:text-xs text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-violet-200 transition"
+        className="w-full h-12 max-[380px]:h-10 rounded-full bg-white border border-gray-200 hover:bg-sky-50 hover:border-sky-200 px-4 text-sm max-[380px]:text-xs text-left flex items-center justify-between focus:outline-none focus:ring-2 focus:ring-sky-200 transition"
       >
         <span className={selectedUnits.length > 0 ? "text-[#2F2A57] font-semibold" : "text-gray-400"}>
           {displayText}
@@ -83,7 +83,7 @@ export default function UnitMultiSelect({
 
       {/* 드롭다운 */}
       {open && (
-        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-[#CFCBFF] bg-white shadow-lg overflow-hidden">
+        <div className="absolute z-50 mt-2 w-full rounded-2xl border border-sky-200/60 bg-sky-50/80 backdrop-blur-sm shadow-lg overflow-hidden">
           <div className="max-h-60 overflow-auto">
             {options.map((option) => {
               const isSelected = selectedUnits.includes(option.value);
@@ -92,17 +92,17 @@ export default function UnitMultiSelect({
                   key={option.value}
                   type="button"
                   onClick={() => toggleUnit(option.value)}
-                  className={`w-full px-4 py-3 text-sm max-[380px]:text-xs text-[#1F1B3A] text-left transition flex items-center gap-3 ${
+                  className={`w-full px-4 py-3 text-sm max-[380px]:text-xs text-slate-700 text-left transition flex items-center gap-3 ${
                     isSelected
-                      ? "bg-[#E9E6FF] font-semibold"
-                      : "hover:bg-[#E9E6FF]"
+                      ? "bg-sky-100 font-semibold"
+                      : "hover:bg-sky-100/60"
                   }`}
                 >
                   {/* 체크박스 */}
                   <div
                     className={`w-5 h-5 rounded border-2 flex items-center justify-center transition ${
                       isSelected
-                        ? "border-[#6E63D5] bg-[#6E63D5]"
+                        ? "border-sky-500 bg-sky-500"
                         : "border-gray-300 bg-white"
                     }`}
                   >
@@ -140,13 +140,13 @@ export default function UnitMultiSelect({
             return (
               <span
                 key={unitValue}
-                className="inline-flex items-center gap-1.5 rounded-full bg-[#E9E6FF] px-3 py-1.5 text-xs max-[380px]:text-[10px] font-semibold text-[#6E63D5]"
+                className="inline-flex items-center gap-1.5 rounded-full bg-sky-100 px-3 py-1.5 text-xs max-[380px]:text-[10px] font-semibold text-sky-600"
               >
                 {option.label}
                 <button
                   type="button"
                   onClick={() => removeUnit(unitValue)}
-                  className="hover:bg-[#6E63D5] hover:text-white rounded-full w-4 h-4 flex items-center justify-center transition"
+                  className="hover:bg-sky-500 hover:text-white rounded-full w-4 h-4 flex items-center justify-center transition"
                 >
                   ×
                 </button>

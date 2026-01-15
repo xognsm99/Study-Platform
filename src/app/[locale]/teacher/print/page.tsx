@@ -414,7 +414,8 @@ function TeacherPrintPageContent() {
       `}</style>
 
       <div id="print-root" className="print-root min-h-screen print:min-h-0 print:h-auto bg-gray-100 print:bg-white">
-        <div className="no-print fixed top-4 right-4 z-50 flex gap-2">
+        {/* 버튼 - 헤더 아래 고정 (top-[72px]로 헤더 아래 배치) */}
+        <div className="no-print fixed top-[72px] left-0 right-0 z-50 flex justify-center gap-3 py-3 bg-gradient-to-b from-slate-100/95 to-slate-100/80 backdrop-blur-sm border-b border-slate-200/50">
           <button
             onClick={() => {
               const params = new URLSearchParams({
@@ -425,19 +426,29 @@ function TeacherPrintPageContent() {
               });
               window.location.href = `/${locale}/teacher/print?${params.toString()}`;
             }}
-            className="no-print h-11 px-5 rounded-2xl bg-[#E9E6FF] text-[#4B3CC4] font-semibold shadow-sm border border-[#D7D0FF] hover:bg-[#DED8FF] transition"
+            className="no-print h-11 px-5 rounded-2xl font-semibold transition-all active:scale-[0.98] backdrop-blur-xl border border-white/40"
+            style={{
+              background: "linear-gradient(145deg, rgba(219,234,254,0.9) 0%, rgba(191,219,254,0.85) 50%, rgba(147,197,253,0.8) 100%)",
+              boxShadow: "0 8px 24px -4px rgba(30,64,175,0.25), 0 0 0 1px rgba(255,255,255,0.3) inset",
+              color: "#1e3a8a",
+            }}
           >
             {showAnswer ? "문제 보기" : "정답 보기"}
           </button>
           <button
             onClick={handlePrint}
-            className="no-print h-11 px-5 rounded-2xl bg-gradient-to-r from-[#6E63D5] to-[#8A7CF0] text-white font-semibold shadow-[0_12px_26px_rgba(110,99,213,0.35)] hover:from-[#5B52C8] hover:to-[#7A6FE0] transition"
+            className="no-print h-11 px-5 rounded-2xl text-white font-semibold transition-all active:scale-[0.98]"
+            style={{
+              background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
+              boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
+            }}
           >
             인쇄하기
           </button>
         </div>
 
-        <div className="print-container print:p-0 print:shadow-none">
+        {/* 버튼 바 높이만큼 상단 여백 추가 (인쇄시에는 제거) */}
+        <div className="print-container print:p-0 print:shadow-none pt-[60px] print:pt-0">
           <div className="print-page print:!p-6">
             {/* ===== Print Header ===== */}
             <div className="print-header">

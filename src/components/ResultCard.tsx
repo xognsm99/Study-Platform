@@ -127,37 +127,37 @@ function SingleResultSection({
   return (
     <div className="grid grid-cols-2 gap-2">
       {/* 정답 */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">정답</div>
         <div className="mt-1 text-xl font-bold">{correct}</div>
       </div>
 
       {/* 오답 */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">오답</div>
         <div className="mt-1 text-xl font-bold">{wrong}</div>
       </div>
 
       {/* 총 문항 */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">총 문항</div>
         <div className="mt-1 text-xl font-bold">{total}</div>
       </div>
 
       {/* 점수 */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">점수</div>
         <div className="mt-1 text-xl font-bold">{scorePct}</div>
       </div>
 
       {/* 문제 풀이 시간 (현재는 고정값 또는 미사용) */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">문제 풀이 시간</div>
         <div className="mt-1 text-base font-bold">{formatTime(durationSeconds)}</div>
       </div>
 
       {/* 힌트 사용 횟수 */}
-      <div className="rounded-xl border border-violet-500 bg-white p-3">
+      <div className="rounded-xl border border-sky-300 bg-white p-3">
         <div className="text-xs text-gray-500">힌트 사용 횟수</div>
         <div className="mt-1 text-base font-bold">{hintUsedCount}회</div>
       </div>
@@ -195,7 +195,7 @@ function TripleResultSection({
         {roundResults.map((roundResult) => {
           const roundScore = Math.round((roundResult.correct / Math.max(roundResult.total, 1)) * 100);
           return (
-            <div key={roundResult.round} className="rounded-xl border border-violet-500 bg-white p-3">
+            <div key={roundResult.round} className="rounded-xl border border-sky-300 bg-white p-3">
               <div className="mb-2 flex items-center justify-between">
                 <div className="text-sm font-semibold text-gray-900">
                   {roundResult.round}회차
@@ -224,7 +224,7 @@ function TripleResultSection({
       </div>
 
       {/* 총합 요약 */}
-      <div className="mb-4 rounded-xl border-2 border-violet-500 bg-blue-50 p-3">
+      <div className="mb-4 rounded-xl border-2 border-sky-400 bg-sky-50 p-3">
         <div className="text-xs font-semibold text-blue-900 mb-2">총합</div>
         <div className="grid grid-cols-2 gap-2">
           <div>
@@ -244,7 +244,7 @@ function TripleResultSection({
             <div className="mt-1 text-lg font-bold text-blue-900">{scorePct}%</div>
           </div>
         </div>
-        <div className="mt-3 pt-3 border-t border-violet-500 grid grid-cols-2 gap-2">
+        <div className="mt-3 pt-3 border-t border-sky-300 grid grid-cols-2 gap-2">
           <div>
             <div className="text-xs text-blue-700">총 풀이 시간</div>
             <div className="mt-1 text-sm font-semibold text-blue-900">{formatTime(durationSeconds)}</div>
@@ -481,14 +481,14 @@ export default function ResultCard({
           <button
             type="button"
             onClick={onRetry}
-            className="rounded-lg bg-violet-100 px-4 py-3 text-sm font-semibold text-violet-900 transition-colors hover:bg-violet-200"
+            className="rounded-lg bg-sky-100 px-4 py-3 text-sm font-semibold text-sky-700 transition-colors hover:bg-sky-200"
           >
             다시 풀기
           </button>
           <button
             type="button"
             onClick={onNew}
-            className="rounded-lg bg-[#6E63D5] px-4 py-3 text-sm font-semibold text-white transition-colors hover:bg-[#5B52C8]"
+            className="rounded-lg bg-gradient-to-r from-sky-500 to-blue-600 px-4 py-3 text-sm font-semibold text-white transition-colors hover:from-sky-600 hover:to-blue-700"
           >
             다른 문제 생성
           </button>

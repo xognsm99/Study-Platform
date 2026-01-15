@@ -59,8 +59,8 @@ export default function PurpleSelect({
           "h-12 w-full min-w-0 rounded-full px-4 text-sm max-[380px]:h-10 max-[380px]:text-xs text-left shadow-sm transition",
           "border outline-none",
           selected
-            ? "bg-violet-50 border-violet-300 ring-1 ring-violet-200 cursor-pointer"
-            : "bg-white border-gray-200 hover:bg-violet-50 hover:border-violet-200 focus:ring-2 focus:ring-violet-200 cursor-pointer",
+            ? "bg-sky-50 border-sky-300 ring-1 ring-sky-200 cursor-pointer"
+            : "bg-white border-gray-200 hover:bg-sky-50 hover:border-sky-200 focus:ring-2 focus:ring-sky-200 cursor-pointer",
           disabled ? "opacity-60 cursor-not-allowed" : "",
         ].join(" ")}
       >
@@ -77,7 +77,7 @@ export default function PurpleSelect({
       </button>
 
       {open && (
-        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-[#B9B4E4]/60 bg-[#F6F5FF] shadow-lg">
+        <div className="absolute z-50 mt-2 w-full overflow-hidden rounded-2xl border border-sky-200/60 bg-sky-50/80 backdrop-blur-sm shadow-lg">
           <div className="max-h-60 overflow-auto p-1">
             {safeOptions.map((opt) => {
               const active = opt.value === value;
@@ -92,8 +92,8 @@ export default function PurpleSelect({
                   className={[
                     "w-full rounded-xl px-3 py-2 text-left text-sm transition",
                     active
-                      ? "bg-[#B9B4E4]/55 text-slate-900"
-                      : "hover:bg-[#B9B4E4]/35 text-slate-800",
+                      ? "bg-sky-200/60 text-slate-900"
+                      : "hover:bg-sky-100/60 text-slate-800",
                   ].join(" ")}
                 >
                   {opt.label}
