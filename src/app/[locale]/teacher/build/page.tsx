@@ -166,11 +166,12 @@ function TeacherBuildPageContent() {
   };
 
   return (
-    <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3">
-      <div className="mx-auto w-full max-w-md">
-        <h1 className="text-lg font-semibold text-[#2563eb] max-[380px]:text-base mb-6">문제 구성</h1>
+    <div className="px-4 pt-4 pb-24 max-[380px]:px-3 max-[380px]:pt-3 md:px-6 md:pt-6 lg:px-8">
+      {/* 모바일: max-w-md, 태블릿: max-w-xl, PC: max-w-2xl */}
+      <div className="mx-auto w-full max-w-md md:max-w-xl lg:max-w-2xl">
+        <h1 className="text-lg font-semibold text-[#2563eb] max-[380px]:text-base md:text-xl lg:text-2xl mb-6">문제 구성</h1>
 
-        <div className="rounded-[28px] bg-white shadow-sm p-5 max-[380px]:p-4">
+        <div className="rounded-[28px] bg-white shadow-sm p-5 max-[380px]:p-4 md:p-8 lg:p-10">
           <div className="mb-4 text-base text-gray-600">
             <div>학년: <span className="font-semibold text-gray-900">{grade}</span></div>
             <div>과목: <span className="font-semibold text-gray-900">{subject}</span></div>
@@ -184,18 +185,18 @@ function TeacherBuildPageContent() {
 
           </div>
 
-          <div className="grid grid-cols-2 gap-2 max-[380px]:gap-2">
+          <div className="grid grid-cols-2 gap-2 max-[380px]:gap-2 md:gap-4 lg:grid-cols-4">
             <button
               type="button"
               onClick={() => setSelVocab(!selVocab)}
               aria-pressed={selVocab}
-              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
+              className={`h-14 max-[380px]:h-10 md:h-16 lg:h-20 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selVocab
                   ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
                   : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
+              <span className="text-lg max-[380px]:text-xs md:text-xl font-semibold text-[#1e40af]">
                 어 휘
               </span>
             </button>
@@ -204,13 +205,13 @@ function TeacherBuildPageContent() {
               type="button"
               onClick={() => setSelGrammar(!selGrammar)}
               aria-pressed={selGrammar}
-              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
+              className={`h-14 max-[380px]:h-10 md:h-16 lg:h-20 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selGrammar
                   ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
                   : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
+              <span className="text-lg max-[380px]:text-xs md:text-xl font-semibold text-[#1e40af]">
                 문 법
               </span>
             </button>
@@ -219,13 +220,13 @@ function TeacherBuildPageContent() {
               type="button"
               onClick={() => setSelReading(!selReading)}
               aria-pressed={selReading}
-              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
+              className={`h-14 max-[380px]:h-10 md:h-16 lg:h-20 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selReading
                   ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
                   : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
+              <span className="text-lg max-[380px]:text-xs md:text-xl font-semibold text-[#1e40af]">
                 본 문
               </span>
             </button>
@@ -234,21 +235,21 @@ function TeacherBuildPageContent() {
               type="button"
               onClick={() => setSelDialogue(!selDialogue)}
               aria-pressed={selDialogue}
-              className={`h-14 max-[380px]:h-10 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
+              className={`h-14 max-[380px]:h-10 md:h-16 lg:h-20 rounded-2xl border px-5 py-3 transition-all active:scale-[0.99] ${
                 selDialogue
                   ? "border-[#2563eb] bg-[#EFF6FF] shadow-[0_8px_20px_rgba(37,99,235,0.18)] hover:bg-[#DBEAFE]"
                   : "border-[#DBEAFE] bg-white hover:border-[#93C5FD] hover:bg-sky-50"
               }`}
             >
-              <span className="text-lg max-[380px]:text-xs font-semibold text-[#1e40af]">
+              <span className="text-lg max-[380px]:text-xs md:text-xl font-semibold text-[#1e40af]">
                 대화문
               </span>
             </button>
           </div>
 
-          <div className="mt-2 rounded-2xl bg-sky-50 px-4 py-3 text-sm">
+          <div className="mt-2 rounded-2xl bg-sky-50 px-4 py-3 text-sm md:text-base md:mt-4 md:px-6 md:py-4">
             <div className="text-gray-600 mb-2">선택 / 자동 분배(총 {total}문항)</div>
-            <div className="grid grid-cols-2 gap-2 text-gray-900">
+            <div className="grid grid-cols-2 gap-2 text-gray-900 md:grid-cols-4">
               <div>어휘: <b>{plan.vocabulary}</b></div>
               <div>문법: <b>{plan.grammar}</b></div>
               <div>본문: <b>{plan.reading}</b></div>
@@ -270,12 +271,12 @@ function TeacherBuildPageContent() {
             </div>
           )}
 
-          <div className="mt-6 grid gap-3 max-[380px]:gap-2">
+          <div className="mt-6 grid gap-3 max-[380px]:gap-2 md:grid-cols-2 md:gap-4 md:mt-8">
             {/* ✅ 종합평가: 시험지 비율 고정 */}
             <button
               onClick={() => onCompose("overall")}
               disabled={loading}
-              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
               style={
                 loading
                   ? {
@@ -325,7 +326,7 @@ function TeacherBuildPageContent() {
             <button
               onClick={() => onCompose("custom")}
               disabled={loading}
-              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
+              className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97] disabled:cursor-not-allowed disabled:opacity-50 disabled:active:scale-100"
               style={
                 loading
                   ? {

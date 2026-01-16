@@ -762,12 +762,13 @@ export default function StudentPage() {
               </div>
 
               {/* 주요 액션 버튼들 - 애플 글래스모피즘 스타일 */}
-              <div className="mt-8 space-y-3.5 max-[380px]:mt-3 max-[380px]:space-y-3">
+              {/* 모바일: 1열, 태블릿/PC: 2열 그리드 */}
+              <div className="mt-8 space-y-3.5 max-[380px]:mt-3 max-[380px]:space-y-3 md:grid md:grid-cols-2 md:gap-4 md:space-y-0">
                 {/* 1. 단어/숙어 훈련 - 라이트 블루 */}
                 <button
                   type="button"
                   onClick={() => router.push("/play")}
-                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(145deg, #dbeafe 0%, #bfdbfe 50%, #93c5fd 100%)",
                     boxShadow: "0 6px 20px -4px rgba(59,130,246,0.25), 0 0 0 1px rgba(255,255,255,0.6) inset",
@@ -799,7 +800,7 @@ export default function StudentPage() {
                 <button
                   type="button"
                   onClick={handleStartReadingAB}
-                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(145deg, #93c5fd 0%, #60a5fa 50%, #3b82f6 100%)",
                     boxShadow: "0 8px 24px -4px rgba(59,130,246,0.35), 0 0 0 1px rgba(255,255,255,0.3) inset",
@@ -841,7 +842,7 @@ export default function StudentPage() {
                     });
                     router.push(`/${locale}/student/vocab-game?${params.toString()}`);
                   }}
-                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(145deg, #3b82f6 0%, #2563eb 50%, #1d4ed8 100%)",
                     boxShadow: "0 8px 28px -4px rgba(37,99,235,0.4), 0 0 0 1px rgba(255,255,255,0.2) inset",
@@ -883,7 +884,7 @@ export default function StudentPage() {
                 {/* 4. 문장 배열 훈련 - 다크 블루 (가장 진함) */}
                 <button
                   onClick={() => router.push(`/${locale}/student/reading-ab2`)}
-                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 rounded-[20px] text-lg max-[380px]:text-base font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
+                  className="group relative overflow-hidden w-full h-14 max-[380px]:h-12 md:h-16 lg:h-20 rounded-[20px] text-lg max-[380px]:text-base md:text-xl lg:text-2xl font-semibold transition-all duration-500 ease-out select-none active:scale-[0.97]"
                   style={{
                     background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
                     boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",

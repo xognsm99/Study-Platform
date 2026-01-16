@@ -147,20 +147,21 @@ export default function ReadingABPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 px-4 py-6">
+    <div className="min-h-screen bg-gradient-to-br from-sky-100 via-blue-50 to-indigo-100 px-4 py-6 md:px-6 lg:px-8">
 
-      <div className="mx-auto w-full max-w-[420px]">
+      {/* 모바일: max-w-[420px], 태블릿: max-w-xl, PC: max-w-2xl */}
+      <div className="mx-auto w-full max-w-[420px] md:max-w-xl lg:max-w-2xl">
         {/* 헤더 */}
-        <div className="mb-4 flex items-center justify-between text-sky-700">
-          <button onClick={() => router.back()} className="text-slate-600 hover:text-sky-600 transition">
+        <div className="mb-4 flex items-center justify-between text-sky-700 md:mb-6">
+          <button onClick={() => router.back()} className="text-slate-600 hover:text-sky-600 transition md:text-lg">
             ← 뒤로가기
           </button>
-          <div className="text-xl font-semibold text-slate-800">본문 선택형 훈련</div>
+          <div className="text-xl font-semibold text-slate-800 md:text-2xl lg:text-3xl">본문 선택형 훈련</div>
           <div className="w-[80px]" />
         </div>
 
         {/* 글래스모피즘 카드 */}
-        <div className="rounded-[28px] bg-white/60 backdrop-blur-xl border border-white/40 p-5 shadow-[0_8px_32px_rgba(0,100,200,0.12)]">
+        <div className="rounded-[28px] bg-white/60 backdrop-blur-xl border border-white/40 p-5 shadow-[0_8px_32px_rgba(0,100,200,0.12)] md:p-8 lg:p-10">
           <div className="mb-3 flex items-center justify-between">
             <div className="text-[#2B245Z] font-xs text-[14px]">{page.title}</div>
             <div className="text-xs text-slate-500">
@@ -168,9 +169,9 @@ export default function ReadingABPage() {
             </div>
           </div>
 
-          <div className="space-y-3">
+          <div className="space-y-3 md:space-y-4">
             {page.lines.map((line, li) => (
-              <p key={li} className="text-[14px] leading-6 text-slate-900">
+              <p key={li} className="text-[14px] md:text-[16px] lg:text-[18px] leading-6 md:leading-7 lg:leading-8 text-slate-900">
                 {line.map((seg, si) => {
                   if (seg.kind === "text") return <span key={si}>{seg.value}</span>;
                   return (
@@ -203,7 +204,7 @@ export default function ReadingABPage() {
             }}
             disabled={!allAnswered}
             className={[
-              "mt-6 w-full rounded-full py-4 font-semibold transition-all duration-200",
+              "mt-6 w-full rounded-full py-4 md:py-5 lg:py-6 font-semibold transition-all duration-200 text-base md:text-lg lg:text-xl",
               !allAnswered
                 ? "bg-sky-200/60 text-sky-400 cursor-not-allowed"
                 : checked

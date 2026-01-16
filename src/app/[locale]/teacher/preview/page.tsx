@@ -315,11 +315,12 @@ function TeacherPreviewPageContent() {
   }
 
   return (
-    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white px-4 py-6 pb-24 max-[380px]:px-3">
-      <div className="mx-auto w-full max-w-[420px]">
-        <h1 className="text-[18px] font-semibold text-[#1e40af]">미리보기</h1>
+    <div className="min-h-[calc(100vh-64px)] bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white px-4 py-6 pb-24 max-[380px]:px-3 md:px-6 lg:px-8">
+      {/* 모바일: max-w-[420px], 태블릿: max-w-2xl, PC: max-w-4xl */}
+      <div className="mx-auto w-full max-w-[420px] md:max-w-2xl lg:max-w-4xl">
+        <h1 className="text-[18px] font-semibold text-[#1e40af] md:text-xl lg:text-2xl">미리보기</h1>
 
-        <div className="mt-4 rounded-[28px] bg-white/80 backdrop-blur-xl shadow-sm border border-[#c7d8e8] p-5">
+        <div className="mt-4 rounded-[28px] bg-white/80 backdrop-blur-xl shadow-sm border border-[#c7d8e8] p-5 md:p-8">
           <div className="mb-4 space-y-2">
             <div className="flex flex-wrap gap-2 text-xs">
               <span className="rounded-full bg-[#dbeafe] px-3 py-1 text-[#1e40af] font-semibold">
@@ -341,12 +342,12 @@ function TeacherPreviewPageContent() {
 
           <div className="flex items-center justify-between">
             <div>
-              <h2 className="text-[15px] font-semibold text-[#1e3a8a]">문제 목록</h2>
+              <h2 className="text-[15px] font-semibold text-[#1e3a8a] md:text-lg">문제 목록</h2>
             </div>
-            <div className="grid grid-cols-2 gap-2 ml-4">
+            <div className="grid grid-cols-2 gap-2 ml-4 md:gap-3">
               <button
                 onClick={() => handlePrint("question")}
-                className="h-9 px-3 rounded-xl text-white text-xs font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
+                className="h-9 px-3 md:h-11 md:px-5 rounded-xl text-white text-xs md:text-sm font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
                 style={{
                   background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
                   boxShadow: "0 8px 18px -4px rgba(30,64,175,0.4)",
@@ -356,7 +357,7 @@ function TeacherPreviewPageContent() {
               </button>
               <button
                 onClick={() => handlePrint("answer")}
-                className="h-9 px-3 rounded-xl text-white text-xs font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
+                className="h-9 px-3 md:h-11 md:px-5 rounded-xl text-white text-xs md:text-sm font-semibold active:scale-[0.98] transition-all whitespace-nowrap"
                 style={{
                   background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
                   boxShadow: "0 8px 18px -4px rgba(30,64,175,0.4)",
@@ -382,7 +383,7 @@ function TeacherPreviewPageContent() {
         </div>
 
         {/* 문제 목록 - 그리드 레이아웃 */}
-        <div className="mt-6 pb-4 grid grid-cols-1 md:grid-cols-2 gap-4">
+        <div className="mt-6 pb-4 grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4 md:gap-5">
           {items.map((item: any, idx: number) => {
             const qtype = item?.qtype ?? item?.content?.raw?.qtype ?? item?.content?.qtype ?? "";
             const passage = getTeacherPassage(item);

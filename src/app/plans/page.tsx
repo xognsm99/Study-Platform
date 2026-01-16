@@ -137,18 +137,18 @@ export default function PlansPage() {
   };
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white px-4 py-12">
-      <div className="mx-auto max-w-4xl">
+    <div className="min-h-screen bg-gradient-to-b from-[#e0e7f0] via-[#f0f4f8] to-white px-4 py-12 md:px-6 lg:px-8">
+      <div className="mx-auto max-w-4xl lg:max-w-5xl">
         {/* 헤더 */}
-        <div className="mb-8 text-center">
-          <h1 className="mb-2 text-3xl font-bold text-[#1e3a8a]">플랜 선택</h1>
-          <p className="text-slate-600">원하시는 플랜을 선택해주세요</p>
+        <div className="mb-8 text-center md:mb-12">
+          <h1 className="mb-2 text-3xl font-bold text-[#1e3a8a] lg:text-4xl">플랜 선택</h1>
+          <p className="text-slate-600 md:text-lg">원하시는 플랜을 선택해주세요</p>
         </div>
 
         {/* 플랜 카드 */}
-        <div className="grid gap-6 md:grid-cols-2">
+        <div className="grid gap-6 md:grid-cols-2 md:gap-8">
           {/* 무료 플랜 */}
-          <div className="rounded-2xl border-2 border-[#c7d8e8] bg-white/80 backdrop-blur-xl p-8 shadow-sm transition-all hover:border-[#93c5fd] hover:shadow-md">
+          <div className="rounded-2xl border-2 border-[#c7d8e8] bg-white/80 backdrop-blur-xl p-8 shadow-sm transition-all hover:border-[#93c5fd] hover:shadow-md lg:p-10">
             <div className="mb-6">
               <div className="text-3xl font-bold text-slate-900">무료</div>
             </div>
@@ -174,7 +174,7 @@ export default function PlansPage() {
 
             <button
               onClick={handleFreePlan}
-              className="group relative overflow-hidden w-full rounded-[16px] h-12 px-6 py-3 text-base font-semibold transition-all duration-500 ease-out active:scale-[0.97] backdrop-blur-xl border border-white/40"
+              className="group relative overflow-hidden w-full rounded-[16px] h-12 md:h-14 lg:h-16 px-6 py-3 text-base md:text-lg lg:text-xl font-semibold transition-all duration-500 ease-out active:scale-[0.97] backdrop-blur-xl border border-white/40"
               style={{
                 background: "linear-gradient(145deg, rgba(219,234,254,0.9) 0%, rgba(191,219,254,0.85) 50%, rgba(147,197,253,0.8) 100%)",
                 boxShadow: "0 8px 24px -4px rgba(30,64,175,0.2), 0 0 0 1px rgba(255,255,255,0.3) inset",
@@ -201,7 +201,7 @@ export default function PlansPage() {
           </div>
 
           {/* 프리미엄 플랜 */}
-          <div className="rounded-2xl border-2 border-[#60a5fa] bg-gradient-to-br from-[#eff6ff] via-[#dbeafe] to-[#bfdbfe] p-8 shadow-lg backdrop-blur-xl transition-all hover:border-[#3b82f6] hover:shadow-xl">
+          <div className="rounded-2xl border-2 border-[#60a5fa] bg-gradient-to-br from-[#eff6ff] via-[#dbeafe] to-[#bfdbfe] p-8 shadow-lg backdrop-blur-xl transition-all hover:border-[#3b82f6] hover:shadow-xl lg:p-10">
             <div className="mb-6">
               <div className="mb-3 flex items-center gap-2">
                 <div className="text-2xl font-bold text-[#1e3a8a]">프리미엄 구독하기</div>
@@ -286,7 +286,7 @@ export default function PlansPage() {
             <button
               onClick={handlePremiumPlan}
               disabled={isPaying}
-              className="group relative overflow-hidden w-full rounded-[16px] h-12 px-6 py-3 text-base font-semibold text-white transition-all duration-500 ease-out active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
+              className="group relative overflow-hidden w-full rounded-[16px] h-12 md:h-14 lg:h-16 px-6 py-3 text-base md:text-lg lg:text-xl font-semibold text-white transition-all duration-500 ease-out active:scale-[0.97] disabled:opacity-60 disabled:cursor-not-allowed"
               style={{
                 background: "linear-gradient(145deg, #1e40af 0%, #1e3a8a 50%, #172554 100%)",
                 boxShadow: "0 10px 32px -4px rgba(30,64,175,0.5), 0 0 0 1px rgba(255,255,255,0.1) inset",
